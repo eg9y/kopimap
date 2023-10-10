@@ -20,6 +20,15 @@ import { Rating } from "react-simple-star-rating";
 import Link from "next/link";
 import { fillColorArray } from "@/lib/fill-color-array";
 import { ExternalLinkIcon } from "@radix-ui/react-icons";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 function useCafesQuery(supabase: SupabaseClient<Database>) {
   const countPerPage = 30;
@@ -102,7 +111,7 @@ function getOpeningStatus(openingHours: OpeningHours | null): string {
   }
 }
 
-function Directory() {
+export default function Home() {
   const supabase = createClientComponentClient<Database>({
     supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
     supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
@@ -119,101 +128,125 @@ function Directory() {
   } = useCafesQuery(supabase);
 
   return (
-    <div className="">
+    <main className="flex flex-col items-center justify-between pt-4">
       {/* Render your data here */}
       {status === "loading" ? (
         <div>Loading...</div>
       ) : status === "error" ? (
         <div>Error loading cafes</div>
       ) : (
-        <div className="grid md:grid-cols-4 lg:grid-cols-5 gap-4 image-container">
-          {/* Render your list of cafes */}
-          {data.pages.map((page, index) => (
-            <>
-              {page.map((cafe) => (
-                <Link
-                  className=""
-                  href={`/${cafe.place_id}`}
-                  target="_blank"
-                  key={cafe.id}
-                >
-                  <Card className="h-full flex flex-col">
-                    {cafe.photo_urls && cafe.photo_urls.length > 0 && (
-                      <div className="w-full relative pt-[100%] overflow-hidden rounded-t-xl border border-slate-400 ">
-                        <Image
-                          src={cafe.photo_urls[0]}
-                          alt={`Photo of ${cafe.name}`}
-                          objectFit="cover"
-                          layout="fill"
-                          className="w-full h-full transition ease-in-out duration-1000 top-0 left-0 object-cover filter brightness-80"
-                        />
-                      </div>
-                    )}
-                    <CardHeader className="pb-1">
-                      <CardTitle>{cafe.name}</CardTitle>
-                      {cafe.rating && (
-                        <CardDescription className="flex items-baseline gap-1">
-                          <span className="font-semibold text-base text-slate-800">
-                            {cafe.rating}
-                          </span>{" "}
-                          <Rating
-                            SVGclassName="inline-block mb-1"
-                            allowFraction={true}
-                            size={20}
-                            readonly
-                            initialValue={cafe.rating}
-                            fillColorArray={fillColorArray}
-                          />
-                          <span className="text-slate-400">
-                            ({cafe.user_ratings_total})
-                          </span>
-                        </CardDescription>
-                      )}
-                    </CardHeader>
-                    <CardContent className="flex flex-col gap-2 grow">
-                      <p className="text-sm font-medium">
-                        {getOpeningStatus(
-                          cafe.opening_hours as unknown as OpeningHours
-                        )}
-                      </p>
-                      <p className="text-sm max-w-md">{cafe.vicinity}</p>
-                    </CardContent>
-                    <CardFooter className="flex">
-                      {cafe.website && (
-                        <Button variant={"link"} className="p-0 flex gap-1">
-                          {cafe.website.split("/")[2].slice(0, 30)}
-                          <ExternalLinkIcon className="w-4 h-4 " />
-                        </Button>
-                      )}
-                    </CardFooter>
-                  </Card>
-                </Link>
-              ))}
-            </>
-          ))}
-          {/* Render a button to load more items */}
-          <button
-            onClick={() => fetchNextPage()}
-            disabled={!hasNextPage || isFetchingNextPage}
-          >
-            {isFetchingNextPage
-              ? "Loading more..."
-              : hasNextPage
-              ? "Load More"
-              : "Nothing more to load"}
-          </button>
+        <div className="flex flex-col gap-4 ">
+          <div className="flex gap-2 justify-end">
+            <Select>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Rating" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="light">
+                  <span className="font-semibold text-base text-slate-800">
+                    2.0
+                  </span>{" "}
+                  <Rating
+                    SVGclassName="inline-block mb-1"
+                    allowFraction={true}
+                    size={20}
+                    readonly
+                    initialValue={2}
+                    fillColorArray={fillColorArray}
+                  />
+                </SelectItem>
+                <SelectItem value="dark">Dark</SelectItem>
+                <SelectItem value="system">System</SelectItem>
+              </SelectContent>
+            </Select>
+            <Input placeholder="Cari Kafe" className="max-w-md" />
+          </div>
+          <div className="grow relative">
+            <ScrollArea className="h-[85svh] w-[90vw] rounded-md">
+              {/* Render your list of cafes */}
+              <div className="grid md:grid-cols-4 lg:grid-cols-5 gap-4 ">
+                {data.pages.map((page, index) => (
+                  <>
+                    {page.map((cafe) => (
+                      <Link
+                        className="group"
+                        href={`/${cafe.place_id}`}
+                        target="_blank"
+                        key={cafe.id}
+                      >
+                        <Card className="h-full flex flex-col">
+                          {cafe.photo_urls && cafe.photo_urls.length > 0 && (
+                            <div className="w-full relative pt-[100%] overflow-hidden rounded-t-xl border border-slate-400 ">
+                              <Image
+                                src={cafe.photo_urls[0]}
+                                alt={`Photo of ${cafe.name}`}
+                                objectFit="cover"
+                                layout="fill"
+                                className="w-full h-full transition top-0 left-0 object-cover filter brightness-80 group-hover:opacity-90"
+                              />
+                            </div>
+                          )}
+                          <CardHeader className="pb-1">
+                            <CardTitle>{cafe.name}</CardTitle>
+                            {cafe.rating && (
+                              <CardDescription className="flex items-baseline gap-1">
+                                <span className="font-semibold text-base text-slate-800">
+                                  {cafe.rating}
+                                </span>{" "}
+                                <Rating
+                                  SVGclassName="inline-block mb-1"
+                                  allowFraction={true}
+                                  size={20}
+                                  readonly
+                                  initialValue={cafe.rating}
+                                  fillColorArray={fillColorArray}
+                                />
+                                <span className="text-slate-400">
+                                  ({cafe.user_ratings_total})
+                                </span>
+                              </CardDescription>
+                            )}
+                          </CardHeader>
+                          <CardContent className="flex flex-col gap-2 grow">
+                            <p className="text-sm font-medium">
+                              {getOpeningStatus(
+                                cafe.opening_hours as unknown as OpeningHours
+                              )}
+                            </p>
+                            <p className="text-sm max-w-md">{cafe.vicinity}</p>
+                          </CardContent>
+                          <CardFooter className="flex">
+                            {cafe.website && (
+                              <Button
+                                variant={"link"}
+                                className="p-0 flex gap-1"
+                              >
+                                {cafe.website.split("/")[2].slice(0, 30)}
+                                <ExternalLinkIcon className="w-4 h-4 " />
+                              </Button>
+                            )}
+                          </CardFooter>
+                        </Card>
+                      </Link>
+                    ))}
+                  </>
+                ))}
+              </div>
+              {/* Render a button to load more items */}
+              <button
+                onClick={() => fetchNextPage()}
+                disabled={!hasNextPage || isFetchingNextPage}
+              >
+                {isFetchingNextPage
+                  ? "Loading more..."
+                  : hasNextPage
+                  ? "Load More"
+                  : "Nothing more to load"}
+              </button>
+            </ScrollArea>
+          </div>
         </div>
       )}
-    </div>
-  );
-}
-
-export default function Home() {
-  const queryClient = new QueryClient();
-
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-10">
-      <Directory />
     </main>
   );
 }

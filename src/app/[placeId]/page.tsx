@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Database } from "@/lib/database.types";
 import { fillColorArray } from "@/lib/fill-color-array";
 import { getDollarSigns } from "@/lib/getDollarSigns";
+import { isChain } from "@/lib/is-chain";
 import { cn } from "@/lib/utils";
 import {
   ArrowLeftCircleIcon,
@@ -20,8 +21,15 @@ import Link from "next/link";
 import Carousel from "nuka-carousel";
 import { Rating } from "react-simple-star-rating";
 
-function useReviewsQuery(supabase: SupabaseClient<Database>, placeId: string) {
+function useReviewsQuery(
+  supabase: SupabaseClient<Database>,
+  placeId: string | null
+) {
   async function fetchReviews() {
+    if (!placeId) {
+      return null;
+    }
+
     const response = await supabase
       .from("reviews")
       .select(`*`)
@@ -37,14 +45,19 @@ function useReviewsQuery(supabase: SupabaseClient<Database>, placeId: string) {
   return useQuery(["reviews", placeId], fetchReviews, {
     // 4 days
     staleTime: 1000 * 60 * 60 * 24,
+    enabled: !!placeId,
   });
 }
 
 function useCafeDetailsQuery(
   supabase: SupabaseClient<Database>,
-  placeId: string
+  placeId: string | null
 ) {
   async function fetchPlaceDetails() {
+    if (!placeId) {
+      return null;
+    }
+
     const response = await supabase
       .from("cafes")
       .select(`*`)
@@ -60,10 +73,11 @@ function useCafeDetailsQuery(
 
   return useQuery(["cafes", placeId], fetchPlaceDetails, {
     staleTime: 1000 * 60 * 60 * 24,
+    enabled: !!placeId,
   });
 }
 
-export const renderCenterLeftControls = ({
+export const RenderCenterLeftControls = ({
   previousDisabled,
   previousSlide,
 }: {
@@ -85,20 +99,7 @@ export const renderCenterLeftControls = ({
   </button>
 );
 
-function isChain(name: string) {
-  const chains = [
-    "starbucks",
-    "maxx",
-    "djournal",
-    "kopikenangan",
-    "janji jiwa",
-    "anomali",
-  ];
-
-  return chains.some((chain) => name.toLowerCase().includes(chain));
-}
-
-export const renderCenterRightControls = ({
+export const RenderCenterRightControls = ({
   nextDisabled,
   nextSlide,
 }: {
@@ -123,7 +124,9 @@ export const renderCenterRightControls = ({
 export default function DetailsComponent({
   params,
 }: {
-  params: { placeId: string };
+  params: {
+    placeId: string;
+  };
 }) {
   const supabase = createClientComponentClient<Database>();
 
@@ -132,7 +135,7 @@ export default function DetailsComponent({
 
   return (
     <div className="py-10 px-5">
-      {cafeDetails.status === "success" && (
+      {cafeDetails.status === "success" && cafeDetails.data && (
         <div className="grid grid-cols-2 gap-4">
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-1">
@@ -198,8 +201,8 @@ export default function DetailsComponent({
                 slidesToShow={2}
                 autoplayInterval={10000}
                 className="rounded-md"
-                renderCenterLeftControls={renderCenterLeftControls}
-                renderCenterRightControls={renderCenterRightControls}
+                renderCenterLeftControls={RenderCenterLeftControls}
+                renderCenterRightControls={RenderCenterRightControls}
                 defaultControlsConfig={{
                   nextButtonText: ">",
                   prevButtonText: "<",
@@ -215,7 +218,7 @@ export default function DetailsComponent({
                       <div className="w-full relative pt-[100%]">
                         <Image
                           src={photo}
-                          alt={`Photo #${photoIndex} of ${cafeDetails.data.name}`}
+                          alt={`Photo #${photoIndex} of ${cafeDetails.data?.name}`}
                           objectFit="cover"
                           layout="fill"
                           className="w-full h-full top-0 left-0 rounded-xl drop-shadow-lg border-2 border-slate-800"
@@ -241,6 +244,7 @@ export default function DetailsComponent({
             <p>🚌 Near Public Transport</p>
             <p>🅿️ Parking Spots</p>
             <p>🏞️ Outdoor Seating</p>
+            <p>🐶 Pet Friendly</p>
             {cafeDetails.data.name && (
               <p>
                 🏡 Cafe Type:{" "}
@@ -250,7 +254,6 @@ export default function DetailsComponent({
               </p>
             )}
           </div>
-
           <div>
             <div className="flex items-center gap-2">
               <h2 className="font-semibold text-2xl">Reviews</h2>
@@ -280,7 +283,7 @@ export default function DetailsComponent({
             <div className="pt-4">
               {reviews.status === "loading" && <div>Loading...</div>}
               {reviews.status === "error" && <div>Error</div>}
-              {reviews.status === "success" && (
+              {reviews.status === "success" && reviews.data && (
                 <div className="flex flex-col gap-4">
                   {reviews.data.map((review) => (
                     <div
