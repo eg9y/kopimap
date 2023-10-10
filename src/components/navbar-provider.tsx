@@ -36,7 +36,7 @@ export function NavBarProvider({ children }: { children: React.ReactNode }) {
           <Link href="/">
             <Button variant={"ghost"} className="hover:bg-transparent">
               <h1 className="font-bold text-4xl hover:text-slate-700">
-                Kopi Map
+                ☕️ Kopi Map
               </h1>
             </Button>
           </Link>
