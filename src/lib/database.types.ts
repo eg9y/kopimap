@@ -11,6 +11,7 @@ export interface Database {
     Tables: {
       cafes: {
         Row: {
+          about: Json | null
           address_components: Json | null
           adr_address: string | null
           business_status: string | null
@@ -21,18 +22,24 @@ export interface Database {
           formatted_address: string
           geometry: Json | null
           id: number
+          is_franchise: boolean
           location: unknown | null
           menu_link: string | null
           name: string | null
-          opening_hours: Json | null
+          opening_hours: string | null
+          parking_availability: string | null
+          parking_options: string | null
           phone_number: string | null
           photo_urls: string[] | null
           photos: string[] | null
           place_id: string | null
+          plugs: string | null
           price_level: number | null
           rating: number | null
           reservable: boolean | null
           reviews: Json | null
+          reviews_link: string | null
+          reviews_per_rating: Json | null
           serves_beer: boolean | null
           serves_breakfast: boolean | null
           serves_brunch: boolean | null
@@ -45,11 +52,15 @@ export interface Database {
           types: string[] | null
           url: string | null
           user_ratings_total: number | null
+          user_reviews: Json | null
           vicinity: string | null
           website: string | null
           wheelchair_accessible_entrance: boolean | null
+          wifi_available: boolean | null
+          wifi_speed: string | null
         }
         Insert: {
+          about?: Json | null
           address_components?: Json | null
           adr_address?: string | null
           business_status?: string | null
@@ -60,18 +71,24 @@ export interface Database {
           formatted_address: string
           geometry?: Json | null
           id?: number
+          is_franchise?: boolean
           location?: unknown | null
           menu_link?: string | null
           name?: string | null
-          opening_hours?: Json | null
+          opening_hours?: string | null
+          parking_availability?: string | null
+          parking_options?: string | null
           phone_number?: string | null
           photo_urls?: string[] | null
           photos?: string[] | null
           place_id?: string | null
+          plugs?: string | null
           price_level?: number | null
           rating?: number | null
           reservable?: boolean | null
           reviews?: Json | null
+          reviews_link?: string | null
+          reviews_per_rating?: Json | null
           serves_beer?: boolean | null
           serves_breakfast?: boolean | null
           serves_brunch?: boolean | null
@@ -84,11 +101,15 @@ export interface Database {
           types?: string[] | null
           url?: string | null
           user_ratings_total?: number | null
+          user_reviews?: Json | null
           vicinity?: string | null
           website?: string | null
           wheelchair_accessible_entrance?: boolean | null
+          wifi_available?: boolean | null
+          wifi_speed?: string | null
         }
         Update: {
+          about?: Json | null
           address_components?: Json | null
           adr_address?: string | null
           business_status?: string | null
@@ -99,18 +120,24 @@ export interface Database {
           formatted_address?: string
           geometry?: Json | null
           id?: number
+          is_franchise?: boolean
           location?: unknown | null
           menu_link?: string | null
           name?: string | null
-          opening_hours?: Json | null
+          opening_hours?: string | null
+          parking_availability?: string | null
+          parking_options?: string | null
           phone_number?: string | null
           photo_urls?: string[] | null
           photos?: string[] | null
           place_id?: string | null
+          plugs?: string | null
           price_level?: number | null
           rating?: number | null
           reservable?: boolean | null
           reviews?: Json | null
+          reviews_link?: string | null
+          reviews_per_rating?: Json | null
           serves_beer?: boolean | null
           serves_breakfast?: boolean | null
           serves_brunch?: boolean | null
@@ -123,9 +150,12 @@ export interface Database {
           types?: string[] | null
           url?: string | null
           user_ratings_total?: number | null
+          user_reviews?: Json | null
           vicinity?: string | null
           website?: string | null
           wheelchair_accessible_entrance?: boolean | null
+          wifi_available?: boolean | null
+          wifi_speed?: string | null
         }
         Relationships: []
       }
@@ -216,12 +246,13 @@ export interface Database {
           user_ratings_total: number
           vicinity: string
           formatted_address: string
-          opening_hours: Json
+          opening_hours: string
           website: string
           place_id: string
           photo_urls: string[]
           dist_meters: number
           id: number
+          is_franchise: boolean
         }[]
       }
     }

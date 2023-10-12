@@ -39,7 +39,7 @@ function MainComponent() {
   const router = useRouter();
 
   return (
-    <div className="p-10">
+    <div className="pt-10 w-[90vw] mx-auto">
       <div className="px-40">
         {/* <NavigationMenu>
             <NavigationMenuList>
@@ -52,7 +52,7 @@ function MainComponent() {
             </NavigationMenuList>
           </NavigationMenu> */}
       </div>
-      <div className="flex gap-4 justify-between px-2">
+      <div className="flex gap-4 justify-between">
         <Link href="/">
           <Button
             variant={"ghost"}
@@ -67,17 +67,24 @@ function MainComponent() {
           </Button>
         </Link>
         {/* {JSON.stringify(session)} */}
-        {user.session?.user.id && (
-          <Button
-            onClick={async () => {
-              const supabase = createClientComponentClient<Database>();
-              await supabase.auth.signOut();
-              router.refresh();
-            }}
-          >
-            Logout
-          </Button>
-        )}
+        <div className="flex gap-4">
+          {user.session?.user.email === "brickkace@gmail.com" && (
+            <Link href="/add-cafe">
+              <Button>Add Cafe</Button>
+            </Link>
+          )}
+          {user.session?.user.id && (
+            <Button
+              onClick={async () => {
+                const supabase = createClientComponentClient<Database>();
+                await supabase.auth.signOut();
+                router.refresh();
+              }}
+            >
+              Logout
+            </Button>
+          )}
+        </div>
         {!user.session?.user.id && (
           <Link href="/login">
             <Button>Login</Button>

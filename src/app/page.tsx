@@ -34,12 +34,15 @@ import { Fragment, useState } from "react";
 import { StarIcon } from "@heroicons/react/20/solid";
 import { useDebouncedCallback } from "use-debounce";
 import { useGeolocated } from "react-geolocated";
+import { Checkbox } from "@/components/ui/checkbox";
+import { chains } from "@/lib/is-chain";
 
 function useCafesQuery(
   supabase: SupabaseClient<Database>,
   rating: string,
   searchQuery: string,
   enableNearbySearch: boolean,
+  showFranchises: boolean,
   coords?: GeolocationCoordinates
 ) {
   const countPerPage = 30;
@@ -58,6 +61,10 @@ function useCafesQuery(
     if (searchQuery) {
       query.ilike("name", `%${searchQuery.trim()}%`);
       // query.textSearch("name", searchQuery);
+    }
+
+    if (!showFranchises) {
+      query.eq("is_franchise", false);
     }
 
     if (enableNearbySearch && coords) {
@@ -88,6 +95,7 @@ function useCafesQuery(
         searchQuery,
         coords,
         enableNearbySearch,
+        showFranchises,
       },
     ],
     ({ pageParam = 0 }) => fetchCafes({ pageParam }),
@@ -101,69 +109,72 @@ function useCafesQuery(
   );
 }
 
-function useMyLocationName(lat?: number, long?: number) {
-  // call https://nominatim.openstreetmap.org/reverse?lat=-6.202159&lon=106.802041&format=json
-  async function fetchLocationName() {
-    const response = await fetch(
-      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${long}&format=jsonv2`
-    );
-    const data = await response.json();
-    return data;
-  }
-
-  return useQuery(["location-name", { lat, long }], () => fetchLocationName(), {
-    enabled: !!(lat && long),
-  });
-}
-
-interface Time {
-  day: number;
-  time: string;
-}
-
-interface Period {
-  open: Time;
-  close: Time;
-}
-
 interface OpeningHours {
-  periods: Period[];
-  open_now: boolean;
-  weekday_text: string[];
+  day: string;
+  times: string[];
 }
 
-function convertTo12Hour(time: string): string {
-  const hours24 = parseInt(time.slice(0, 2), 10);
-  const minutes = time.slice(2);
-  const hours12 = ((hours24 + 11) % 12) + 1;
-  const amPm = hours24 >= 12 ? "PM" : "AM";
-  return `${hours12}:${minutes} ${amPm}`;
+function convertTo24Hour(time: string): string {
+  const hours12 = parseInt(time.slice(0, 2), 10);
+  const minutes = time.slice(2, 4);
+  const amPm = time.slice(5);
+  const hours24 = hours12 + (amPm === "PM" ? 12 : 0);
+  return `${hours24}:${minutes}`;
 }
 
-function getOpeningStatus(openingHours: OpeningHours | null): string {
+function getOpeningStatus(openingHours: string | null): string {
   if (!openingHours) return "Hours not available";
 
   const now = new Date();
-  const currentDay = now.getDay();
-  const currentTime = `${now.getHours().toString().padStart(2, "0")}${now
-    .getMinutes()
-    .toString()
-    .padStart(2, "0")}`;
+  // set to human readable day e.g. Sunday
+  const currentDay = now.toLocaleString("en-US", { weekday: "long" });
+  // define currentTime to be the current time with format 00.00 and 13.00
+  const currentTime = now.toLocaleString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
 
-  const periodsToday = openingHours.periods.find(
-    (period) => period.open.day === currentDay
-  );
+  // set convertOpeningHours to convert openingHours to an array of json. opening hours example:
+  // [{'day': 'Kamis', 'times': ['07.00–22.00']}, {'day': 'Jumat', 'times': ['07.00–22.00']}, {'day': 'Sabtu', 'times': ['07.00–22.00']}, {'day': 'Minggu', 'times': ['07.00–22.00']}, {'day': 'Senin', 'times': ['07.00–22.00']}, {'day': 'Selasa', 'times': ['07.00–22.00']}, {'day': 'Rabu', 'times': ['07.00–22.00']}]
+  // notice the single quote, we need to convert it to double quote
+  const convertedOpeningHours = JSON.parse(
+    openingHours.replace(/'/g, '"')
+  ) as OpeningHours[];
+  const periodsToday = convertedOpeningHours.find((period) => {
+    let translatedDay = "Sunday";
+    if (period.day === "Minggu") {
+      translatedDay = "Sunday";
+    } else if (period.day === "Senin") {
+      translatedDay = "Monday";
+    } else if (period.day === "Selasa") {
+      translatedDay = "Tuesday";
+    } else if (period.day === "Rabu") {
+      translatedDay = "Wednesday";
+    } else if (period.day === "Kamis") {
+      translatedDay = "Thursday";
+    } else if (period.day === "Jumat") {
+      translatedDay = "Friday";
+    } else if (period.day === "Sabtu") {
+      translatedDay = "Saturday";
+    }
+
+    return translatedDay === currentDay;
+  });
   if (!periodsToday) return "-";
 
-  if (
-    periodsToday.open.time <= currentTime &&
-    periodsToday.close.time > currentTime
-  ) {
-    const closingTime = convertTo12Hour(periodsToday.close.time);
-    return `Closes at ${closingTime}`;
+  const openTime = periodsToday.times[0].split("–")[0];
+  const closeTime = periodsToday.times[0].split("–")[1];
+
+  // openTime and closeTime is of type where 1pm is 13.00 and 12am is 00.00
+  // return either Closes at time or Opens at time
+  //  keep in mind openTime and closeTime is in 24 hour format and is a string, and that currentTime is also a string
+  if (openTime == "Buka 24 jam") {
+    return "Open 24 hours";
+  } else if (currentTime > openTime && currentTime < closeTime) {
+    return `Open until ${closeTime}`;
   } else {
-    const openingTime = convertTo12Hour(periodsToday.open.time);
-    return `Opens at ${openingTime}`;
+    return `Closed until ${periodsToday.times[0].split("-")[0]}`;
   }
 }
 
@@ -178,6 +189,7 @@ export default function Home() {
   const [selectedRating, setSelectedRating] = useState<string>("any rating");
   const [searchQuery, setSearchQuery] = useState("");
   const [enableNearbySearch, setEnableNearbySearch] = useState(false);
+  const [showFranchises, setShowFranchises] = useState(true);
 
   const {
     coords,
@@ -211,22 +223,42 @@ export default function Home() {
     selectedRating,
     searchQuery,
     enableNearbySearch,
+    showFranchises,
     coords
   );
 
   return (
     <>
       <div className="flex gap-2 justify-end w-[90vw]">
-        <div className="flex items-center space-x-2 px-3 py-2 rounded-md">
-          <Switch
+        <div className="flex items-center space-x-2 px-1 py-2 rounded-md">
+          <Checkbox
             defaultChecked={false}
             onCheckedChange={(isNearbySearch) => {
               getPosition();
-              setEnableNearbySearch(isNearbySearch);
+              setEnableNearbySearch(
+                isNearbySearch === "indeterminate" ? false : isNearbySearch
+              );
             }}
           />
           <div className="flex flex-col gap-1">
-            <p className="text-sm">Nearby Cafes</p>
+            <p className="text-xs">Nearby Cafes</p>
+          </div>
+        </div>
+        <div className="flex items-center space-x-1 px-1 py-2 rounded-md">
+          <Checkbox
+            defaultChecked={true}
+            onCheckedChange={(isShowFranchices) => {
+              getPosition();
+              setShowFranchises(
+                isShowFranchices === "indeterminate" ? false : isShowFranchices
+              );
+            }}
+          />
+          <div className="flex flex-col gap-1">
+            <p className="text-xs">
+              {/* text indicating whether to show franchises/branches/chains or not */}
+              Show Franchises
+            </p>
           </div>
         </div>
         <Select
@@ -234,7 +266,7 @@ export default function Home() {
             setSelectedRating(ratingSelected);
           }}
         >
-          <SelectTrigger className="w-40">
+          <SelectTrigger className="w-40 text-xs md:text-xs">
             <SelectValue
               placeholder="Review Count"
               className=""
@@ -242,7 +274,7 @@ export default function Home() {
             ></SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value={"any rating"}>
+            <SelectItem value={"any count"}>
               <p className="font-semibold text-base">Any</p>
             </SelectItem>
             <SelectItem value={"50"} className="">
@@ -257,7 +289,7 @@ export default function Home() {
             setSelectedRating(ratingSelected);
           }}
         >
-          <SelectTrigger className="w-40">
+          <SelectTrigger className="w-40 text-xs">
             <SelectValue placeholder="Rating" className="" asChild>
               <div className="flex gap-1 items-center">
                 {selectedRating === "any rating" ? (
@@ -302,7 +334,7 @@ export default function Home() {
         </Select>
         <Input
           placeholder="Cari Kafe"
-          className="max-w-md"
+          className="max-w-sm text-xs"
           onChange={(e) => {
             if (e.target.value === "") {
               setSearchQuery("");
@@ -319,9 +351,9 @@ export default function Home() {
         <div>Error loading cafes</div>
       ) : (
         <div className="grow relative">
-          <ScrollArea className="h-[85svh] w-[90vw] rounded-md">
+          <ScrollArea className="h-[80svh] w-[90vw] rounded-md">
             {/* Render your list of cafes */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 ">
+            <div className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 ">
               {data.pages.map((page, index) => (
                 <Fragment key={index}>
                   {page.map((cafe) => (
@@ -329,6 +361,7 @@ export default function Home() {
                       <Card className="h-full flex flex-col">
                         {cafe.photo_urls && cafe.photo_urls.length > 0 ? (
                           <div className="w-full relative pt-[100%] overflow-hidden rounded-t-xl border border-slate-400 ">
+                            {cafe.photo_urls[0]}
                             <Image
                               src={cafe.photo_urls[0]}
                               alt={`Photo of ${cafe.name}`}
@@ -369,12 +402,10 @@ export default function Home() {
                           )}
                         </CardHeader>
                         <CardContent className="flex flex-col gap-2 grow">
-                          <p className="text-sm font-medium">
-                            {getOpeningStatus(
-                              cafe.opening_hours as unknown as OpeningHours
-                            )}
+                          <p className="text-xs font-medium">
+                            {getOpeningStatus(cafe.opening_hours)}
                           </p>
-                          <p className="text-sm max-w-md">
+                          <p className="text-xs max-w-md">
                             {cafe.vicinity ||
                               (cafe.formatted_address &&
                                 cafe.formatted_address
@@ -390,6 +421,7 @@ export default function Home() {
                               <ExternalLinkIcon className="w-4 h-4 " />
                             </Button>
                           )}
+                          {(cafe as any).dist_meters}
                         </CardFooter>
                       </Card>
                     </Link>
@@ -399,6 +431,7 @@ export default function Home() {
             </div>
             {/* Render a button to load more items */}
             <button
+              className="pt-4"
               onClick={() => fetchNextPage()}
               disabled={!hasNextPage || isFetchingNextPage}
             >
