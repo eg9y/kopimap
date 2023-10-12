@@ -82,137 +82,13 @@ function generateGrid(boundingBox: any, gridDimensions: any) {
   return grid;
 }
 
-async function fetchCafesInSegment(segment: any, nextPageToken = "") {
-  const centerLat = (segment.topLeft.lat + segment.bottomRight.lat) / 2;
-  const centerLng = (segment.topLeft.lng + segment.bottomRight.lng) / 2;
-  const radius = Math.sqrt(
-    Math.pow(segment.topLeft.lat - segment.bottomRight.lat, 2) +
-      Math.pow(segment.topLeft.lng - segment.bottomRight.lng, 2),
-  ) / 2 * 111000; // Approximate conversion from degrees to meters
-
-  console.log(
-    `Fetching cafes in segment centered at ${centerLat}, ${centerLng} with radius ${radius} meters.`,
-  );
-
-  try {
-    try {
-      const response = await client.placesNearby({
-        params: {
-          location: { latitude: centerLat, longitude: centerLng },
-          radius,
-          type: "cafe",
-          keyword: "Coffee Shop", // Add a keyword to refine the search
-          key: apiKey,
-          pagetoken: nextPageToken, // Use the next_page_token for pagination
-        },
-        timeout: 1000, // milliseconds
-      });
-      const cafes = response.data.results;
-      console.log(`Fetched ${cafes.length} cafes in current segment.`);
-      nextPageToken = response.data.next_page_token || ""; // Store the next_page_token
-
-      // Get the place_ids from the cafes fetched in the current segment
-      const placeIds = cafes.map((cafe) => cafe.place_id);
-
-      // Check for existing entries in the database
-      const { data: existingEntries, error } = await supabase
-        .from("cafes")
-        .select("place_id")
-        .in("place_id", placeIds);
-
-      if (error) {
-        logError(error, `Error fetching existing cafes. place_id: ${placeIds}`);
-        return;
-      }
-
-      // Create a set of existing place_ids for faster lookup
-      const existingPlaceIds = new Set(
-        existingEntries.map((entry) => entry.place_id),
-      );
-
-      // Filter out cafes that already exist in the database
-      const newCafes = cafes.filter((cafe) =>
-        !existingPlaceIds.has(cafe.place_id)
-      );
-
-      // New: array to hold the detailed data of cafes
-      const detailedCafeData = [];
-
-      for (const cafe of newCafes) {
-        console.log(`${cafe.name}, ${cafe.vicinity}`);
-        if (!cafe.geometry || !cafe.geometry.location) {
-          console.warn(`No location data for cafe: ${cafe.name}`);
-          continue; // Skip this cafe
-        }
-
-        if (!cafe.place_id) {
-          console.warn(`No place_id for cafe: ${cafe.name}`);
-          continue; // Skip this cafe
-        }
-
-        // New: fetch detailed info for each cafe
-        const detailedData = await fetchCafeDetails(cafe.place_id);
-        detailedCafeData.push({
-          ...detailedData,
-          name: cafe.name,
-          place_id: cafe.place_id,
-          location:
-            `POINT(${cafe.geometry.location.lng} ${cafe.geometry.location.lat})`,
-        });
-      }
-
-      // This replaces the prior snippet
-      if (detailedCafeData.length > 0) {
-        try {
-          const { error } = await supabase
-            .from("cafes")
-            .insert(detailedCafeData);
-          if (error) {
-            console.error("Error inserting cafes:", error.message);
-            throw error;
-          }
-        } catch (error: any) {
-          console.error("Error inserting cafes:", error.message);
-          throw error;
-        }
-      } else {
-        console.warn("No cafes with location data to insert");
-      }
-    } catch (error: any) {
-      logError(error, `Error fetching cafes in segment. segment: ${segment}`);
-    }
-
-    // If nextPageToken exists, it means there are more pages to fetch
-    if (nextPageToken) {
-      console.log(`Waiting for ${delay} ms before fetching the next page...`);
-      await new Promise((resolve) => setTimeout(resolve, delay));
-
-      // Double the delay for the next iteration (exponential backoff)
-      delay *= 2;
-
-      // If delay exceeds maxDelay, reset it back to initial delay
-      if (delay > maxDelay) {
-        console.log("Delay exceeded max delay, resetting...");
-        delay = 2000; // Reset delay back to 1 second
-      }
-
-      // Recursively call fetchCafesInSegment with the new nextPageToken
-      return fetchCafesInSegment(segment, nextPageToken);
-    } else {
-      // Reset delay for the next segment/grid
-      delay = 2000;
-    }
-
-    return nextPageToken;
-  } catch (error: any) {
-    logError(error, `Error fetching cafes in segment. segment: ${segment}`);
-  }
-}
-
 let checkOnce = false;
 async function fetchCafeDetails(placeId: string) {
   try {
     const fields = [
+      "rating",
+      "user_ratings_total",
+      "photo",
       "curbside_pickup",
       "delivery",
       "dine_in",
@@ -255,6 +131,9 @@ async function fetchCafeDetails(placeId: string) {
 
     // Map the fields to the payload for your database
     const payload = {
+      rating: cafeDetails.rating,
+      user_ratings_total: cafeDetails.user_ratings_total,
+      photo: cafeDetails.photo,
       curbside_pickup: cafeDetails.curbside_pickup,
       delivery: cafeDetails.delivery,
       dine_in: cafeDetails.dine_in,
@@ -290,6 +169,198 @@ async function fetchCafeDetails(placeId: string) {
   }
 }
 
+async function fetchCafesInSegment(segment: any, nextPageToken = "") {
+  let cafesWithErrors = [];
+  const centerLat = (segment.topLeft.lat + segment.bottomRight.lat) / 2;
+  const centerLng = (segment.topLeft.lng + segment.bottomRight.lng) / 2;
+  const radius = Math.sqrt(
+    Math.pow(segment.topLeft.lat - segment.bottomRight.lat, 2) +
+      Math.pow(segment.topLeft.lng - segment.bottomRight.lng, 2),
+  ) / 2 * 111000; // Approximate conversion from degrees to meters
+
+  console.log(
+    `Fetching cafes in segment centered at ${centerLat}, ${centerLng} with radius ${radius} meters.`,
+  );
+
+  try {
+    try {
+      const response = await client.placesNearby({
+        params: {
+          location: { latitude: centerLat, longitude: centerLng },
+          radius,
+          type: "cafe",
+          keyword: "Coffee", // Add a keyword to refine the search
+          key: apiKey,
+          pagetoken: nextPageToken, // Use the next_page_token for pagination
+        },
+        timeout: 1000, // milliseconds
+      });
+      const cafes = response.data.results;
+      console.log(`Fetched ${cafes.length} cafes in current segment.`);
+      nextPageToken = response.data.next_page_token || ""; // Store the next_page_token
+
+      // Get the place_ids from the cafes fetched in the current segment
+      const placeIds = cafes.map((cafe) => cafe.place_id);
+
+      // Check for existing entries in the database
+      const { data: existingEntries, error } = await supabase
+        .from("cafes")
+        .select("place_id")
+        .in("place_id", placeIds);
+
+      if (error) {
+        logError(error, `Error fetching existing cafes. place_id: ${placeIds}`);
+        return;
+      }
+
+      // Create a set of existing place_ids for faster lookup
+      const existingPlaceIds = new Set(
+        existingEntries.map((entry) => entry.place_id),
+      );
+
+      // Filter out cafes that already exist in the database
+      const newCafes = cafes.filter((cafe) =>
+        !existingPlaceIds.has(cafe.place_id)
+      );
+
+      // New: array to hold the detailed data of cafes
+      const detailedCafeData = [];
+      const detailedReviewData = [];
+
+      for (const cafe of newCafes) {
+        console.log(`${cafe.name}, ${cafe.vicinity}`);
+        if (!cafe.geometry || !cafe.geometry.location) {
+          console.warn(`No location data for cafe: ${cafe.name}`);
+          continue; // Skip this cafe
+        }
+
+        if (!cafe.place_id) {
+          console.warn(`No place_id for cafe: ${cafe.name}`);
+          continue; // Skip this cafe
+        }
+
+        // New: fetch detailed info for each cafe
+        const cafeDetails = await fetchCafeDetails(cafe.place_id);
+
+        if (!cafeDetails) {
+          cafesWithErrors.push(cafe);
+          console.log(`Errors: ${JSON.stringify(cafesWithErrors, null, 2)}`);
+          throw new Error(
+            `Error fetching cafe details. place_id: ${cafe.place_id}`,
+          );
+        }
+
+        const { reviews, photo, ...cafeDetailsWithoutReviews } = cafeDetails;
+
+        const photoUrls = [];
+        for (const currentPhoto of photo) {
+          try {
+            const response = await fetch(currentPhoto, {
+              method: "GET",
+              redirect: "manual", // This prevents the actual redirect and allows us to inspect the location header
+            });
+
+            const imageUrl = response.headers.get("location");
+            photoUrls.push(imageUrl);
+          } catch (error: any) {
+            console.error("Error fetching photo:", error.message);
+            cafesWithErrors.push(cafe);
+          }
+        }
+
+        if (!reviews) {
+          continue;
+        }
+
+        const reviewData = reviews.map((review: any) => {
+          return {
+            place_id: cafe.place_id,
+            author_name: review.author_name,
+            author_url: review.author_url,
+            language: review.language,
+            profile_photo_url: review.profile_photo_url,
+            rating: review.rating,
+            relative_time_description: review.relative_time_description,
+            text: review.text,
+            time: review.time,
+          };
+        });
+
+        detailedReviewData.push(...reviewData);
+
+        detailedCafeData.push({
+          ...cafeDetailsWithoutReviews,
+          name: cafe.name,
+          place_id: cafe.place_id,
+          photo_urls: photoUrls,
+          location:
+            `POINT(${cafe.geometry.location.lng} ${cafe.geometry.location.lat})`,
+        });
+      }
+
+      // This replaces the prior snippet
+      if (detailedCafeData.length > 0) {
+        try {
+          const { error } = await supabase
+            .from("cafes")
+            .insert(detailedCafeData);
+          if (error) {
+            console.error("Error inserting cafes:", error.message);
+            throw error;
+          }
+        } catch (error: any) {
+          console.error("Error inserting cafes:", error.message);
+          throw error;
+        }
+      } else {
+        console.warn("No cafes with location data to insert");
+      }
+
+      if (detailedReviewData.length > 0) {
+        try {
+          const { error } = await supabase
+            .from("reviews")
+            .insert(detailedReviewData);
+          if (error) {
+            console.error("Error inserting reviews:", error.message);
+            throw error;
+          }
+        } catch (error: any) {
+          console.error("Error inserting reviews:", error.message);
+          throw error;
+        }
+      }
+    } catch (error: any) {
+      logError(error, `Error fetching cafes in segment. segment: ${segment}`);
+    }
+
+    // If nextPageToken exists, it means there are more pages to fetch
+    if (nextPageToken) {
+      console.log(`Waiting for ${delay} ms before fetching the next page...`);
+      await new Promise((resolve) => setTimeout(resolve, delay));
+
+      // Double the delay for the next iteration (exponential backoff)
+      delay *= 2;
+
+      // If delay exceeds maxDelay, reset it back to initial delay
+      if (delay > maxDelay) {
+        console.log("Delay exceeded max delay, resetting...");
+        delay = 2000; // Reset delay back to 1 second
+      }
+
+      // Recursively call fetchCafesInSegment with the new nextPageToken
+      return fetchCafesInSegment(segment, nextPageToken);
+    } else {
+      // Reset delay for the next segment/grid
+      delay = 2000;
+    }
+
+    return nextPageToken;
+  } catch (error: any) {
+    logError(error, `Error fetching cafes in segment. segment: ${segment}`);
+  }
+}
+
 async function fetchCafes() {
   const grid = generateGrid(boundingBox, gridDimensions);
   for (const segment of grid) {
@@ -305,6 +376,8 @@ async function fetchCafes() {
     // Further processing of errors, e.g., sending a report
   }
 }
+
+fetchCafes();
 
 async function populateMoreDetails() {
   // iterate through all photos field in cafes in iterations of 100
@@ -399,7 +472,7 @@ async function populateMoreDetails() {
   }
 }
 
-populateMoreDetails();
+// populateMoreDetails();
 
 // Call the function
 // fetchCafes();

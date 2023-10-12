@@ -5,7 +5,7 @@ import {
   SupabaseClient,
   createClientComponentClient,
 } from "@supabase/auth-helpers-nextjs";
-import { useInfiniteQuery, QueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import {
   Card,
   CardContent,
@@ -29,14 +29,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { Fragment, useState } from "react";
 import { StarIcon } from "@heroicons/react/20/solid";
-import { useDebounce, useDebouncedCallback } from "use-debounce";
+import { useDebouncedCallback } from "use-debounce";
+import { useGeolocated } from "react-geolocated";
 
 function useCafesQuery(
   supabase: SupabaseClient<Database>,
   rating: string,
-  searchQuery: string
+  searchQuery: string,
+  enableNearbySearch: boolean,
+  coords?: GeolocationCoordinates
 ) {
   const countPerPage = 30;
   async function fetchCafes({ pageParam = 0 }) {
@@ -56,13 +60,24 @@ function useCafesQuery(
       // query.textSearch("name", searchQuery);
     }
 
-    const response = await query;
+    if (enableNearbySearch && coords) {
+      const nearbyQuery = await supabase.rpc("nearby_cafes", {
+        lat: coords.latitude,
+        long: coords.longitude,
+        rating_filter: rating !== "any rating" ? Number(rating) : undefined,
 
-    if (response.error) {
-      throw new Error(response.error.message);
+        page_param: pageParam,
+        count_per_page: countPerPage,
+      });
+      return nearbyQuery.data || [];
     }
 
-    return response.data;
+    const { data, error } = await query;
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return data;
   }
 
   return useInfiniteQuery(
@@ -71,6 +86,8 @@ function useCafesQuery(
       {
         rating,
         searchQuery,
+        coords,
+        enableNearbySearch,
       },
     ],
     ({ pageParam = 0 }) => fetchCafes({ pageParam }),
@@ -79,9 +96,24 @@ function useCafesQuery(
         if (lastPage.length === 0) return; // Assume no next page if last page is empty
         return allPages.length; // Use the number of fetched pages as the next page param
       },
-      staleTime: 1000 * 60 * 60, // 1 hour
+      // staleTime: 1000 * 60 * 60, // 1 hour
     }
   );
+}
+
+function useMyLocationName(lat?: number, long?: number) {
+  // call https://nominatim.openstreetmap.org/reverse?lat=-6.202159&lon=106.802041&format=json
+  async function fetchLocationName() {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${long}&format=jsonv2`
+    );
+    const data = await response.json();
+    return data;
+  }
+
+  return useQuery(["location-name", { lat, long }], () => fetchLocationName(), {
+    enabled: !!(lat && long),
+  });
 }
 
 interface Time {
@@ -121,7 +153,7 @@ function getOpeningStatus(openingHours: OpeningHours | null): string {
   const periodsToday = openingHours.periods.find(
     (period) => period.open.day === currentDay
   );
-  if (!periodsToday) return "Closed today";
+  if (!periodsToday) return "-";
 
   if (
     periodsToday.open.time <= currentTime &&
@@ -145,6 +177,22 @@ export default function Home() {
 
   const [selectedRating, setSelectedRating] = useState<string>("any rating");
   const [searchQuery, setSearchQuery] = useState("");
+  const [enableNearbySearch, setEnableNearbySearch] = useState(false);
+
+  const {
+    coords,
+    getPosition,
+    isGeolocationAvailable,
+    isGeolocationEnabled,
+    positionError,
+  } = useGeolocated({
+    suppressLocationOnMount: true,
+    positionOptions: {
+      enableHighAccuracy: false,
+    },
+    userDecisionTimeout: 5000,
+    watchLocationPermissionChange: true,
+  });
 
   const debounced = useDebouncedCallback((value) => {
     setSearchQuery(value);
@@ -158,11 +206,52 @@ export default function Home() {
     isFetching,
     isFetchingNextPage,
     status,
-  } = useCafesQuery(supabase, selectedRating, searchQuery);
+  } = useCafesQuery(
+    supabase,
+    selectedRating,
+    searchQuery,
+    enableNearbySearch,
+    coords
+  );
 
   return (
-    <main className="flex flex-col items-center w-full pt-4 gap-4">
+    <>
       <div className="flex gap-2 justify-end w-[90vw]">
+        <div className="flex items-center space-x-2 px-3 py-2 rounded-md">
+          <Switch
+            defaultChecked={false}
+            onCheckedChange={(isNearbySearch) => {
+              getPosition();
+              setEnableNearbySearch(isNearbySearch);
+            }}
+          />
+          <div className="flex flex-col gap-1">
+            <p className="text-sm">Nearby Cafes</p>
+          </div>
+        </div>
+        <Select
+          onValueChange={(ratingSelected) => {
+            setSelectedRating(ratingSelected);
+          }}
+        >
+          <SelectTrigger className="w-40">
+            <SelectValue
+              placeholder="Review Count"
+              className=""
+              asChild
+            ></SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={"any rating"}>
+              <p className="font-semibold text-base">Any</p>
+            </SelectItem>
+            <SelectItem value={"50"} className="">
+              <span className="font-semibold text-base text-slate-800">
+                50+ Reviews
+              </span>
+            </SelectItem>
+          </SelectContent>
+        </Select>
         <Select
           onValueChange={(ratingSelected) => {
             setSelectedRating(ratingSelected);
@@ -187,7 +276,7 @@ export default function Home() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value={"any rating"}>
-              <p className="font-semibold text-base">Any rating</p>
+              <p className="font-semibold text-base">Any</p>
             </SelectItem>
             {ratings.map((rating) => (
               <SelectItem
@@ -236,12 +325,7 @@ export default function Home() {
               {data.pages.map((page, index) => (
                 <Fragment key={index}>
                   {page.map((cafe) => (
-                    <Link
-                      className="group"
-                      href={`/${cafe.place_id}`}
-                      target="_blank"
-                      key={cafe.id}
-                    >
+                    <Link className="group" href={`/${cafe.id}`} key={cafe.id}>
                       <Card className="h-full flex flex-col">
                         {cafe.photo_urls && cafe.photo_urls.length > 0 ? (
                           <div className="w-full relative pt-[100%] overflow-hidden rounded-t-xl border border-slate-400 ">
@@ -290,7 +374,14 @@ export default function Home() {
                               cafe.opening_hours as unknown as OpeningHours
                             )}
                           </p>
-                          <p className="text-sm max-w-md">{cafe.vicinity}</p>
+                          <p className="text-sm max-w-md">
+                            {cafe.vicinity ||
+                              (cafe.formatted_address &&
+                                cafe.formatted_address
+                                  .split(",")
+                                  .slice(0, 3)
+                                  .join(","))}
+                          </p>
                         </CardContent>
                         <CardFooter className="flex">
                           {cafe.website && (
@@ -320,6 +411,6 @@ export default function Home() {
           </ScrollArea>
         </div>
       )}
-    </main>
+    </>
   );
 }

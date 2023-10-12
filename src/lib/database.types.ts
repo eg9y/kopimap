@@ -18,13 +18,11 @@ export interface Database {
           delivery: boolean | null
           dine_in: boolean | null
           editorial_summary: string | null
-          formatted_address: string | null
+          formatted_address: string
           geometry: Json | null
-          icon: string | null
-          icon_background_color: string | null
-          icon_mask_base_uri: string | null
           id: number
           location: unknown | null
+          menu_link: string | null
           name: string | null
           opening_hours: Json | null
           phone_number: string | null
@@ -59,13 +57,11 @@ export interface Database {
           delivery?: boolean | null
           dine_in?: boolean | null
           editorial_summary?: string | null
-          formatted_address?: string | null
+          formatted_address: string
           geometry?: Json | null
-          icon?: string | null
-          icon_background_color?: string | null
-          icon_mask_base_uri?: string | null
           id?: number
           location?: unknown | null
+          menu_link?: string | null
           name?: string | null
           opening_hours?: Json | null
           phone_number?: string | null
@@ -100,13 +96,11 @@ export interface Database {
           delivery?: boolean | null
           dine_in?: boolean | null
           editorial_summary?: string | null
-          formatted_address?: string | null
+          formatted_address?: string
           geometry?: Json | null
-          icon?: string | null
-          icon_background_color?: string | null
-          icon_mask_base_uri?: string | null
           id?: number
           location?: unknown | null
+          menu_link?: string | null
           name?: string | null
           opening_hours?: Json | null
           phone_number?: string | null
@@ -137,39 +131,39 @@ export interface Database {
       }
       reviews: {
         Row: {
-          aspects: Json[] | null
           author_name: string
           author_url: string | null
+          cafe_id: number | null
+          cafe_url: string | null
           id: number
           language: string | null
           place_id: string | null
-          profile_photo_url: string | null
           rating: number
           relative_time_description: string
           text: string | null
           time: number | null
         }
         Insert: {
-          aspects?: Json[] | null
           author_name: string
           author_url?: string | null
+          cafe_id?: number | null
+          cafe_url?: string | null
           id?: number
           language?: string | null
           place_id?: string | null
-          profile_photo_url?: string | null
           rating: number
           relative_time_description: string
           text?: string | null
           time?: number | null
         }
         Update: {
-          aspects?: Json[] | null
           author_name?: string
           author_url?: string | null
+          cafe_id?: number | null
+          cafe_url?: string | null
           id?: number
           language?: string | null
           place_id?: string | null
-          profile_photo_url?: string | null
           rating?: number
           relative_time_description?: string
           text?: string | null
@@ -177,10 +171,16 @@ export interface Database {
         }
         Relationships: [
           {
-            foreignKeyName: "reviews_place_id_fkey"
-            columns: ["place_id"]
+            foreignKeyName: "reviews_cafe_id_fkey"
+            columns: ["cafe_id"]
             referencedRelation: "cafes"
-            referencedColumns: ["place_id"]
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_cafe_url_fkey"
+            columns: ["cafe_url"]
+            referencedRelation: "cafes"
+            referencedColumns: ["url"]
           }
         ]
       }
@@ -200,6 +200,28 @@ export interface Database {
           cafe_name: string
           cafe_address: string
           distance_meters: number
+        }[]
+      }
+      nearby_cafes: {
+        Args: {
+          lat: number
+          long: number
+          rating_filter?: number
+          page_param?: number
+          count_per_page?: number
+        }
+        Returns: {
+          name: string
+          rating: number
+          user_ratings_total: number
+          vicinity: string
+          formatted_address: string
+          opening_hours: Json
+          website: string
+          place_id: string
+          photo_urls: string[]
+          dist_meters: number
+          id: number
         }[]
       }
     }

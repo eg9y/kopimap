@@ -23,17 +23,17 @@ import { Rating } from "react-simple-star-rating";
 
 function useReviewsQuery(
   supabase: SupabaseClient<Database>,
-  placeId: string | null
+  cafeId: string | null
 ) {
   async function fetchReviews() {
-    if (!placeId) {
+    if (!cafeId) {
       return null;
     }
 
     const response = await supabase
       .from("reviews")
       .select(`*`)
-      .eq("place_id", placeId);
+      .eq("cafe_id", cafeId);
 
     if (response.error) {
       throw new Error(response.error.message);
@@ -42,26 +42,26 @@ function useReviewsQuery(
     return response.data;
   }
 
-  return useQuery(["reviews", placeId], fetchReviews, {
+  return useQuery(["reviews", cafeId], fetchReviews, {
     // 4 days
     staleTime: 1000 * 60 * 60 * 24,
-    enabled: !!placeId,
+    enabled: !!cafeId,
   });
 }
 
 function useCafeDetailsQuery(
   supabase: SupabaseClient<Database>,
-  placeId: string | null
+  cafeId: string | null
 ) {
   async function fetchPlaceDetails() {
-    if (!placeId) {
+    if (!cafeId) {
       return null;
     }
 
     const response = await supabase
       .from("cafes")
       .select(`*`)
-      .eq("place_id", placeId)
+      .eq("id", cafeId)
       .single();
 
     if (response.error) {
@@ -71,9 +71,9 @@ function useCafeDetailsQuery(
     return response.data;
   }
 
-  return useQuery(["cafes", placeId], fetchPlaceDetails, {
+  return useQuery(["cafes", cafeId], fetchPlaceDetails, {
     staleTime: 1000 * 60 * 60 * 24,
-    enabled: !!placeId,
+    enabled: !!cafeId,
   });
 }
 
@@ -125,13 +125,13 @@ export default function DetailsComponent({
   params,
 }: {
   params: {
-    placeId: string;
+    cafeId: string;
   };
 }) {
   const supabase = createClientComponentClient<Database>();
 
-  const reviews = useReviewsQuery(supabase, params.placeId);
-  const cafeDetails = useCafeDetailsQuery(supabase, params.placeId);
+  const reviews = useReviewsQuery(supabase, params.cafeId);
+  const cafeDetails = useCafeDetailsQuery(supabase, params.cafeId);
 
   return (
     <div className="py-10 px-5">
@@ -194,39 +194,53 @@ export default function DetailsComponent({
                 </Link>
               )}
             </div>
-            <div className="relative ">
-              <Carousel
-                wrapAround={true}
-                autoplay={true}
-                slidesToShow={2}
-                autoplayInterval={10000}
-                className="rounded-md"
-                renderCenterLeftControls={RenderCenterLeftControls}
-                renderCenterRightControls={RenderCenterRightControls}
-                defaultControlsConfig={{
-                  nextButtonText: ">",
-                  prevButtonText: "<",
-                  pagingDotsClassName: "hidden",
-                }}
-                style={{
-                  height: "100%",
-                }}
-              >
-                {cafeDetails.data.photo_urls &&
-                  cafeDetails.data.photo_urls.map((photo, photoIndex) => (
-                    <div className=" h-auto pr-4 pl-2">
-                      <div className="w-full relative pt-[100%]">
-                        <Image
-                          src={photo}
-                          alt={`Photo #${photoIndex} of ${cafeDetails.data?.name}`}
-                          objectFit="cover"
-                          layout="fill"
-                          className="w-full h-full top-0 left-0 rounded-xl drop-shadow-lg border-2 border-slate-800"
-                        />
-                      </div>
-                    </div>
-                  ))}
-              </Carousel>
+            <div className="relative">
+              {cafeDetails.data.photo_urls &&
+                cafeDetails.data.photo_urls.length > 1 && (
+                  <Carousel
+                    wrapAround={true}
+                    autoplay={true}
+                    slidesToShow={2}
+                    autoplayInterval={10000}
+                    className="rounded-md"
+                    renderCenterLeftControls={RenderCenterLeftControls}
+                    renderCenterRightControls={RenderCenterRightControls}
+                    defaultControlsConfig={{
+                      nextButtonText: ">",
+                      prevButtonText: "<",
+                      pagingDotsClassName: "hidden",
+                    }}
+                    style={{
+                      height: "100%",
+                    }}
+                  >
+                    {cafeDetails.data.photo_urls &&
+                      cafeDetails.data.photo_urls.map((photo, photoIndex) => (
+                        <div className=" h-auto pr-4 pl-2">
+                          <div className="w-full relative pt-[100%]">
+                            <Image
+                              src={photo}
+                              alt={`Photo #${photoIndex} of ${cafeDetails.data?.name}`}
+                              layout="fill"
+                              className="w-full h-full object-cover top-0 left-0 rounded-xl drop-shadow-lg border-2 border-slate-800"
+                            />
+                          </div>
+                        </div>
+                      ))}
+                  </Carousel>
+                )}
+              {cafeDetails.data.photo_urls &&
+                cafeDetails.data.photo_urls.length === 1 && (
+                  <div className="relative">
+                    <Image
+                      src={cafeDetails.data.photo_urls[0]}
+                      width={500}
+                      height={500}
+                      alt={`Photo of ${cafeDetails.data?.name}`}
+                      className=" object-cover rounded-xl drop-shadow-lg border-2 border-slate-800"
+                    />
+                  </div>
+                )}
             </div>
             {cafeDetails.data.adr_address && (
               <div

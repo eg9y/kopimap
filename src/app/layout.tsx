@@ -3,6 +3,9 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { NavBarProvider } from "@/components/navbar-provider";
 import { cn } from "@/lib/utils";
+import { cookies } from "next/headers";
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { Database } from "@/lib/database.types";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,7 +22,11 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={cn(inter.className, "")}>
-        <NavBarProvider>{children}</NavBarProvider>
+        <NavBarProvider>
+          <main className="flex flex-col items-center w-full pt-4 gap-4">
+            {children}
+          </main>
+        </NavBarProvider>
       </body>
     </html>
   );
