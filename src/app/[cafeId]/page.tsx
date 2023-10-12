@@ -77,7 +77,7 @@ function useCafeDetailsQuery(
   });
 }
 
-export const RenderCenterLeftControls = ({
+const RenderCenterLeftControls = ({
   previousDisabled,
   previousSlide,
 }: {
@@ -99,7 +99,7 @@ export const RenderCenterLeftControls = ({
   </button>
 );
 
-export const RenderCenterRightControls = ({
+const RenderCenterRightControls = ({
   nextDisabled,
   nextSlide,
 }: {
