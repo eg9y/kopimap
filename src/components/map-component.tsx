@@ -16,6 +16,11 @@ interface MapComponentProps {
   children: ReactNode;
 }
 
+const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL!,
+  import.meta.env.VITE_SUPABASE_ANON_KEY!
+);
+
 export const MapComponent: React.FC<MapComponentProps> = ({
   pmTilesReady,
   children,
@@ -25,11 +30,6 @@ export const MapComponent: React.FC<MapComponentProps> = ({
   const [popupInfo, setPopupInfo] = useState<any>(null);
   const popupTimeoutRef = useRef<number | null>(null);
   const isHoveringPopupRef = useRef<boolean>(false);
-
-  const supabase = createClient(
-    import.meta.env.VITE_SUPABASE_URL!,
-    import.meta.env.VITE_SUPABASE_ANON_KEY!
-  );
 
   const geoControlRef = useRef<maplibregl.GeolocateControl>();
 
