@@ -1,0 +1,51 @@
+
+Meta 
+- name
+- description
+- address
+- phone
+- website
+- socials
+- meta last updated date
+- photos
+    - menu
+    - vibes
+    - coffee
+    - parking
+- rating
+- reviews[]
+    - verified?
+        - has photo
+    - photos
+    - title (optional)
+    - review
+    - author
+
+- price
+- interesting notes
+    - e.g. cats, live band
+- gmaps link
+
+Filters
+- distance
+- size
+    - small, medium, big
+- rating
+    - 1-5
+- plugs
+    - no, few, many
+- tables
+    - no, few, many
+- smoking area
+    - 
+- has food
+    - no, only appetizer, main 
+- parking
+    - size
+        - small, medium, big
+    - valet
+        - no, yes
+- wifi
+    - has wifi
+        - no, yes
+        - wifi speed
