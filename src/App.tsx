@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Toaster } from "sonner";
 import { AnimatePresence } from "framer-motion";
 import * as pmtiles from "pmtiles";
 import maplibregl from "maplibre-gl";
@@ -19,17 +20,20 @@ function App() {
   }, []);
 
   return (
-    <div className="flex w-[100vw] h-[100vh]">
-      <MainSidebar>
-        <div className="rounded-lg overflow-hidden grow relative h-full">
-          <MapComponent pmTilesReady={pmTilesReady}>
-            <AnimatePresence>
-              <CafeDetails />
-            </AnimatePresence>
-          </MapComponent>
-        </div>
-      </MainSidebar>
-    </div>
+    <>
+      <div className="flex w-[100vw] h-[100vh]">
+        <MainSidebar>
+          <div className="rounded-lg overflow-hidden grow relative h-full">
+            <MapComponent pmTilesReady={pmTilesReady}>
+              <AnimatePresence>
+                <CafeDetails />
+              </AnimatePresence>
+            </MapComponent>
+          </div>
+        </MainSidebar>
+      </div>
+      <Toaster />
+    </>
   );
 }
 

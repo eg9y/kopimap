@@ -1,8 +1,7 @@
-// components/CafeDetails.tsx
+import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import Confetti from "react-confetti";
 import useWindowSize from "react-use/lib/useWindowSize";
-
 import { useStore } from "../store";
 import { Heading } from "./catalyst/heading";
 import { Badge, BadgeButton } from "./catalyst/badge";
@@ -11,183 +10,20 @@ import {
   ArrowLeftFromLineIcon,
   ArrowRightFromLineIcon,
   MapPinIcon,
-  PinIcon,
+  PlusIcon,
 } from "lucide-react";
 import { cn } from "./lib/utils";
 import { Rate } from "./rate";
 import { CafeImages } from "./cafe-images";
 import { Button } from "./catalyst/button";
-import { useRef, useState } from "react";
-
-type Attribute = {
-  name: string;
-  options: string[];
-  icon: string;
-};
-
-type CategoryAttributes = {
-  color:
-    | "orange"
-    | "blue"
-    | "emerald"
-    | "purple"
-    | "fuchsia"
-    | "zinc"
-    | "cyan"
-    | "green"
-    | "indigo"
-    | "lime"
-    | "pink"
-    | "red"
-    | "teal"
-    | "violet"
-    | "yellow"
-    | "amber"
-    | "sky"
-    | "rose"
-    | undefined;
-  category: string;
-  attributes: Attribute[];
-};
-
-const cafeAttributes: CategoryAttributes[] = [
-  {
-    color: "orange",
-    category: "Atmosphere",
-    attributes: [
-      {
-        name: "Overall Vibe",
-        options: ["Relaxed", "Energetic", "Cozy", "Modern", "Artistic"],
-        icon: "HomeIcon",
-      },
-      {
-        name: "Seating Comfort",
-        options: ["Basic", "Comfortable", "Luxurious"],
-        icon: "ArmchairIcon",
-      },
-    ],
-  },
-  {
-    color: "blue",
-    category: "Work-Friendly",
-    attributes: [
-      {
-        name: "WiFi Reliability",
-        options: ["No WiFi", "Unreliable", "Mostly Reliable", "Very Reliable"],
-        icon: "WifiIcon",
-      },
-      {
-        name: "Power Outlets",
-        options: ["None Visible", "Limited", "Plenty"],
-        icon: "PlugIcon",
-      },
-      {
-        name: "Work Space",
-        options: ["Not Suitable", "Okay", "Good", "Excellent"],
-        icon: "BriefcaseIcon",
-      },
-    ],
-  },
-  {
-    color: "emerald",
-    category: "Food & Drinks",
-    attributes: [
-      {
-        name: "Coffee Quality",
-        options: ["Poor", "Average", "Good", "Excellent"],
-        icon: "CoffeeIcon",
-      },
-      {
-        name: "Non-Coffee Options",
-        options: ["Very Limited", "Some Options", "Great Variety"],
-        icon: "CupSodaIcon",
-      },
-      {
-        name: "Food Options",
-        options: ["No Food", "Snacks Only", "Light Meals", "Full Menu"],
-        icon: "UtensilsIcon",
-      },
-    ],
-  },
-  // {
-  //   color: "purple",
-  //   category: "Service",
-  //   attributes: [
-  //     {
-  //       name: "Staff Attitude",
-  //       options: ["Unfriendly", "Neutral", "Friendly", "Very Welcoming"],
-  //       icon: "SmileIcon",
-  //     },
-  //     {
-  //       name: "Order Accuracy",
-  //       options: ["Poor", "Okay", "Good", "Excellent"],
-  //       icon: "CheckCircleIcon",
-  //     },
-  //   ],
-  // },
-  {
-    color: "purple",
-    category: "Value",
-    attributes: [
-      {
-        name: "Value for Money",
-        options: ["Poor", "Fair", "Good", "Excellent"],
-        icon: "ScaleIcon",
-      },
-    ],
-  },
-  {
-    color: "fuchsia",
-    category: "Facilities",
-    attributes: [
-      {
-        name: "Cleanliness",
-        options: ["Poor", "Acceptable", "Clean", "Very Clean"],
-        icon: "SparklesIcon",
-      },
-      {
-        name: "Bathroom Availability",
-        options: ["No Bathroom", "For Customers", "Public Access"],
-        icon: "ShowerHeadIcon",
-      },
-      {
-        name: "Accessibility",
-        options: ["Not Accessible", "Partially Accessible", "Fully Accessible"],
-        icon: "AccessibilityIcon",
-      },
-    ],
-  },
-  {
-    color: "zinc",
-    category: "Special Features",
-    attributes: [
-      {
-        name: "Outdoor Seating",
-        options: ["None", "Limited", "Ample"],
-        icon: "SunIcon",
-      },
-      {
-        name: "Instagram-worthy",
-        options: ["Not Really", "Somewhat", "Very"],
-        icon: "CameraIcon",
-      },
-      {
-        name: "Pet-friendly",
-        options: ["no", "meow"],
-        icon: "StarIcon",
-      },
-      {
-        name: "Unique Offering",
-        options: ["Standard", "Interesting", "Very Unique"],
-        icon: "StarIcon",
-      },
-    ],
-  },
-];
+import { SubmitReviewDialog } from "./submit-review-dialog";
+import { reviewAttributes } from "./lib/review-attributes";
+import { Divider } from "./catalyst/divider";
 
 export const CafeDetails = () => {
   const { selectedCafe, expandDetails, setExpandDetails } = useStore();
   const [letsParty, setLetsParty] = useState(false);
+  const [openSubmitReviewDialog, setOpenSubmitReviewDialog] = useState(false);
   const { width, height } = useWindowSize();
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [confettiPosition, setConfettiPosition] = useState({ x: 0, y: 0 });
@@ -205,39 +41,67 @@ export const CafeDetails = () => {
     setLetsParty(true);
   };
 
-  const renderAttribute = (attr: CategoryAttributes) => {
-    return (
+  const renderAggregatedReviews = () => {
+    return reviewAttributes.map((category) => (
       <div
-        key={attr.category}
+        key={category.category}
         className={cn(
-          `flex flex-col p-2 gap-2 rounded-md`,
-          attr.color === "orange" && "bg-orange-100",
-          attr.color === "blue" && "bg-blue-100",
-          attr.color === "emerald" && "bg-emerald-100",
-          attr.color === "purple" && "bg-purple-100",
-          attr.color === "yellow" && "bg-yellow-100",
-          attr.color === "fuchsia" && "bg-fuchsia-100",
-          attr.color === "zinc" && "bg-zinc-100",
-          "w-full"
+          "flex flex-col gap-4 rounded-md p-2",
+          `bg-${category.color}-100`
         )}
       >
-        <p className={`text-sm font-semibold text-${attr.color}-800`}>
-          {attr.category}
+        <p
+          className={cn(
+            "text-base font-bold",
+            category.color === "orange" && "text-orange-800",
+            category.color === "blue" && "text-blue-800",
+            category.color === "emerald" && "text-emerald-800",
+            category.color === "purple" && "text-purple-800",
+            category.color === "yellow" && "text-yellow-800",
+            category.color === "fuchsia" && "text-fuchsia-800",
+            category.color === "zinc" && "text-zinc-800"
+          )}
+        >
+          {category.category}
         </p>
-        {attr.attributes.map((attribute) => (
-          <div key={attribute.name} className="flex flex-col gap-1">
-            <p className="text-xs font-medium">{attribute.name}</p>
-            <div className="flex items-center gap-1">
-              {attribute.options.map((option) => (
-                <Badge key={option} color={attr.color}>
-                  {option}
-                </Badge>
-              ))}
-            </div>
-          </div>
-        ))}
+        <div className="flex flex-col">
+          {category.attributes.map((attr) => {
+            const modeKey = `${attr.name
+              .replace(/\s+/g, "_")
+              .toLowerCase()}_mode`;
+            const value = selectedCafe[modeKey];
+            return (
+              <div key={attr.name} className="">
+                <div className={cn(`flex justify-between p-2 gap-2`, "w-full")}>
+                  <p
+                    className={cn(
+                      `text-base font-semibold`,
+                      category.color === "orange" && "text-orange-500",
+                      category.color === "blue" && "text-blue-500",
+                      category.color === "emerald" && "text-emerald-500",
+                      category.color === "purple" && "text-purple-500",
+                      category.color === "yellow" && "text-yellow-500",
+                      category.color === "fuchsia" && "text-fuchsia-500",
+                      category.color === "zinc" && "text-zinc-500"
+                    )}
+                  >
+                    {attr.icon} {attr.name}
+                  </p>
+                  {value ? (
+                    <div className="flex items-center gap-1 flex-wrap">
+                      <Badge color={category.color}>{value}</Badge>
+                    </div>
+                  ) : (
+                    <div className="text-gray-500">-</div>
+                  )}
+                </div>
+                <Divider />
+              </div>
+            );
+          })}
+        </div>
       </div>
-    );
+    ));
   };
 
   return (
@@ -314,7 +178,8 @@ export const CafeDetails = () => {
               <div className="flex gap-1">
                 <BadgeButton
                   color="red"
-                  href={selectedCafe.gmaps_link}
+                  href={selectedCafe.gmaps_link || ""}
+                  disabled={!selectedCafe.gmaps_link}
                   target="_blank"
                 >
                   GMaps
@@ -338,27 +203,37 @@ export const CafeDetails = () => {
                 <CafeImages cafe={selectedCafe} expandDetails={expandDetails} />
               )}
             </div>
-            <div className="flex flex-col gap-2">
-              <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-4">
+              <div className="bg-white p-4 rounded-lg shadow-md">
+                <Heading className="mb-4">User Reviews</Heading>
+                <Rate rating={selectedCafe.avg_rating ?? 0} />
+                <p className="text-center mt-2">
+                  Based on {selectedCafe.review_count ?? 0} reviews
+                </p>
                 <Button
                   color="emerald"
-                  className="cursor-pointer"
-                  onClick={handleBeenHereClick}
+                  className="w-full mt-4 cursor-pointer"
+                  onClick={() => setOpenSubmitReviewDialog(true)}
                   ref={buttonRef}
                 >
-                  Been here!
-                  <PinIcon size={16} />
+                  <PlusIcon size={16} />
+                  Write a Review
                 </Button>
-                <Rate />
               </div>
-
-              <div className="flex flex-wrap gap-2">
-                {cafeAttributes.map(renderAttribute)}
+              <div className="bg-white p-4 rounded-lg shadow-md">
+                <Heading className="mb-4">Ratings Breakdown</Heading>
+                <div className="flex flex-col gap-2">
+                  {renderAggregatedReviews()}
+                </div>
               </div>
             </div>
           </div>
         </div>
       </motion.div>
+      <SubmitReviewDialog
+        isOpen={openSubmitReviewDialog}
+        setIsOpen={setOpenSubmitReviewDialog}
+      />
       <Confetti
         style={{
           pointerEvents: "none",

@@ -143,6 +143,7 @@ export const MapComponent: React.FC<MapComponentProps> = ({
           lat: lat,
           lon: lng - 0.01,
         },
+        zoom: 14,
       });
     }
   };
@@ -152,9 +153,9 @@ export const MapComponent: React.FC<MapComponentProps> = ({
       id="test"
       onClick={() => selectCafe(null)}
       initialViewState={{
-        latitude: 6.1944,
-        longitude: 106.8229,
-        zoom: 10,
+        latitude: -6.274163,
+        longitude: 106.789514505,
+        zoom: 14,
       }}
       maxBounds={[
         106.626998 - 0.1,
@@ -163,7 +164,7 @@ export const MapComponent: React.FC<MapComponentProps> = ({
         -6.121617 + 0.1,
       ]}
       maxZoom={24}
-      minZoom={10}
+      minZoom={14}
       mapLib={maplibregl as any}
       style={{ width: "100%", height: "100%" }}
       mapStyle={pmTilesReady ? mapStyle : undefined}

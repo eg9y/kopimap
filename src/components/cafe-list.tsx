@@ -19,6 +19,7 @@ export function CafeList() {
                 lat: cafe.latitude,
                 lon: cafe.longitude,
               },
+              zoom: 14,
             });
           }}
           className="flex gap-2 flex-wrap"

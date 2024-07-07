@@ -48,9 +48,18 @@ import {
 } from "./catalyst/dialog";
 import { Field, Label } from "./catalyst/fieldset";
 import { useState } from "react";
+import { createClient } from "@supabase/supabase-js";
+import { useUser } from "./lib/use-user";
+
+const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL!,
+  import.meta.env.VITE_SUPABASE_ANON_KEY!
+);
 
 export function MainSidebar({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
+
+  const { loggedInUser } = useUser();
 
   return (
     <>
@@ -96,9 +105,13 @@ export function MainSidebar({ children }: { children: React.ReactNode }) {
         }
         sidebar={
           <Sidebar>
-            <SidebarHeader className="">
-              <Heading>KopiMap</Heading>
-              <Text>Peta cafe DKI Jakarta</Text>
+            <SidebarHeader>
+              <div className="flex justify-between">
+                <div className="">
+                  <Heading>KopiMap</Heading>
+                  <Text>Peta cafe DKI Jakarta</Text>
+                </div>
+              </div>
               <div className="flex gap-2">
                 <div className="grow">
                   <InputGroup className="">
@@ -130,48 +143,83 @@ export function MainSidebar({ children }: { children: React.ReactNode }) {
               <Dropdown>
                 <DropdownButton as={SidebarItem}>
                   <div className="flex items-baseline justify-between w-full">
-                    <Text className="flex min-w-0 items-center gap-3">
-                      Login to make a review!
-                    </Text>
-                    <Text className="!text-xs">
-                      Made with ☕️ by{" "}
-                      <Link href="https://github.com/eg9y" target="_blank">
-                        Egan
-                      </Link>
-                    </Text>
+                    {loggedInUser && (
+                      <span className="flex min-w-0 items-center gap-3">
+                        <Avatar
+                          src={loggedInUser.user_metadata.avatar_url}
+                          className="size-10"
+                          square
+                          alt=""
+                        />
+                        <span className="min-w-0">
+                          <span className="block truncate text-sm/5 font-medium text-zinc-950 dark:text-white">
+                            {loggedInUser.user_metadata.name}
+                          </span>
+                          <span className="block truncate text-xs/5 font-normal text-zinc-500 dark:text-zinc-400">
+                            {loggedInUser.email}
+                          </span>
+                        </span>
+                      </span>
+                    )}
+                    {!loggedInUser && (
+                      <Text className="flex min-w-0 items-center gap-3">
+                        Login to make a review!
+                      </Text>
+                    )}
                   </div>
-                  {/* <span className="flex min-w-0 items-center gap-3">
-                    <Avatar
-                      src="/profile-photo.jpg"
-                      className="size-10"
-                      square
-                      alt=""
-                    />
-                    <span className="min-w-0">
-                      <span className="block truncate text-sm/5 font-medium text-zinc-950 dark:text-white">
-                        Erica
-                      </span>
-                      <span className="block truncate text-xs/5 font-normal text-zinc-500 dark:text-zinc-400">
-                        erica@example.com
-                      </span>
-                    </span>
-                  </span> */}
+
                   <ChevronUpIcon />
                 </DropdownButton>
+                <div className="px-2 pb-2">
+                  <Link
+                    href="https://github.com/eg9y"
+                    target="_blank"
+                    className="text-xs"
+                  >
+                    Made by turning ☕️ to {"</>"}
+                  </Link>
+                </div>
                 <DropdownMenu className="min-w-64" anchor="top start">
-                  <DropdownItem href="/my-profile">
-                    <UserIcon />
-                    <DropdownLabel>My profile</DropdownLabel>
-                  </DropdownItem>
-                  <DropdownItem href="/share-feedback">
-                    <LightBulbIcon />
-                    <DropdownLabel>Share feedback</DropdownLabel>
-                  </DropdownItem>
-                  <DropdownDivider />
-                  <DropdownItem href="/logout">
-                    <ArrowRightStartOnRectangleIcon />
-                    <DropdownLabel>Sign out</DropdownLabel>
-                  </DropdownItem>
+                  {loggedInUser && (
+                    <>
+                      {/* <DropdownItem href="/my-profile">
+                        <UserIcon />
+                        <DropdownLabel>My profile</DropdownLabel>
+                      </DropdownItem>
+                      <DropdownItem href="/share-feedback">
+                        <LightBulbIcon />
+                        <DropdownLabel>Share feedback</DropdownLabel>
+                      </DropdownItem>
+                      <DropdownDivider /> */}
+                      <DropdownItem
+                        onClick={async () => {
+                          await supabase.auth.signOut();
+                          window.location.reload();
+                        }}
+                      >
+                        <ArrowRightStartOnRectangleIcon />
+                        <DropdownLabel>Sign out</DropdownLabel>
+                      </DropdownItem>
+                    </>
+                  )}
+                  {!loggedInUser && (
+                    <>
+                      {/* <DropdownDivider /> */}
+                      <DropdownItem
+                        onClick={async () => {
+                          await supabase.auth.signInWithOAuth({
+                            provider: "google",
+                            options: {
+                              redirectTo: import.meta.env.VITE_URL,
+                            },
+                          });
+                        }}
+                      >
+                        <ArrowRightStartOnRectangleIcon />
+                        <DropdownLabel>Sign in</DropdownLabel>
+                      </DropdownItem>
+                    </>
+                  )}
                 </DropdownMenu>
               </Dropdown>
             </SidebarFooter>
