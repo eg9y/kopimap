@@ -1,4 +1,23 @@
 import { CategoryAttributes } from "../../types";
+import {
+  HomeIcon,
+  ArmchairIcon,
+  WifiIcon,
+  PlugIcon,
+  BriefcaseIcon,
+  CoffeeIcon,
+  CupSodaIcon,
+  UtensilsIcon,
+  ScaleIcon,
+  CarIcon,
+  SparklesIcon,
+  ShowerHeadIcon,
+  AccessibilityIcon,
+  SunIcon,
+  CameraIcon,
+  CatIcon,
+  StarIcon,
+} from "lucide-react";
 
 export const reviewAttributes: CategoryAttributes[] = [
   {
@@ -8,12 +27,12 @@ export const reviewAttributes: CategoryAttributes[] = [
       {
         name: "Overall Vibe",
         options: ["Relaxed", "Energetic", "Cozy", "Modern", "Artistic"],
-        icon: "HomeIcon",
+        icon: HomeIcon,
       },
       {
         name: "Seating Comfort",
         options: ["Basic", "Comfortable", "Luxurious"],
-        icon: "ArmchairIcon",
+        icon: ArmchairIcon,
       },
     ],
   },
@@ -24,17 +43,17 @@ export const reviewAttributes: CategoryAttributes[] = [
       {
         name: "WiFi Reliability",
         options: ["No WiFi", "Unreliable", "Mostly Reliable", "Very Reliable"],
-        icon: "WifiIcon",
+        icon: WifiIcon,
       },
       {
         name: "Power Outlets",
         options: ["None Visible", "Limited", "Plenty"],
-        icon: "PlugIcon",
+        icon: PlugIcon,
       },
       {
         name: "Work Space",
         options: ["Not Suitable", "Okay", "Good", "Excellent"],
-        icon: "BriefcaseIcon",
+        icon: BriefcaseIcon,
       },
     ],
   },
@@ -45,17 +64,17 @@ export const reviewAttributes: CategoryAttributes[] = [
       {
         name: "Coffee Quality",
         options: ["Poor", "Average", "Good", "Excellent"],
-        icon: "CoffeeIcon",
+        icon: CoffeeIcon,
       },
       {
         name: "Non-Coffee Options",
         options: ["Very Limited", "Some Options", "Great Variety"],
-        icon: "CupSodaIcon",
+        icon: CupSodaIcon,
       },
       {
         name: "Food Options",
         options: ["No Food", "Snacks Only", "Light Meals", "Full Menu"],
-        icon: "UtensilsIcon",
+        icon: UtensilsIcon,
       },
     ],
   },
@@ -66,7 +85,7 @@ export const reviewAttributes: CategoryAttributes[] = [
       {
         name: "Value for Money",
         options: ["Poor", "Fair", "Good", "Excellent"],
-        icon: "ScaleIcon",
+        icon: ScaleIcon,
       },
     ],
   },
@@ -77,22 +96,22 @@ export const reviewAttributes: CategoryAttributes[] = [
       {
         name: "Parking",
         options: ["No Parking", "Limited", "Ample"],
-        icon: "CarIcon",
+        icon: CarIcon,
       },
       {
         name: "Cleanliness",
         options: ["Poor", "Acceptable", "Clean", "Very Clean"],
-        icon: "SparklesIcon",
+        icon: SparklesIcon,
       },
       {
         name: "Bathroom Availability",
         options: ["No Bathroom", "For Customers", "Public Access"],
-        icon: "ShowerHeadIcon",
+        icon: ShowerHeadIcon,
       },
       {
         name: "Accessibility",
         options: ["Not Accessible", "Partially Accessible", "Fully Accessible"],
-        icon: "AccessibilityIcon",
+        icon: AccessibilityIcon,
       },
     ],
   },
@@ -103,22 +122,22 @@ export const reviewAttributes: CategoryAttributes[] = [
       {
         name: "Outdoor Seating",
         options: ["None", "Limited", "Ample"],
-        icon: "SunIcon",
+        icon: SunIcon,
       },
       {
         name: "Instagram-worthy",
         options: ["Not Really", "Somewhat", "Very"],
-        icon: "CameraIcon",
+        icon: CameraIcon,
       },
       {
         name: "Pet-friendly",
         options: ["no", "meow"],
-        icon: "StarIcon",
+        icon: CatIcon,
       },
       {
         name: "Unique Offering",
         options: ["Standard", "Interesting", "Very Unique"],
-        icon: "StarIcon",
+        icon: StarIcon,
       },
     ],
   },

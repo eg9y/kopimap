@@ -3,12 +3,15 @@ import { Toaster } from "sonner";
 import { AnimatePresence } from "framer-motion";
 import * as pmtiles from "pmtiles";
 import maplibregl from "maplibre-gl";
+import { QueryClient, QueryClientProvider } from "react-query";
 
 import "@smastrom/react-rating/style.css";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { CafeDetails } from "./components/cafe-details";
 import { MainSidebar } from "./components/main-sidebar";
-import { MapComponent } from "./components/map-component";
+import { MemoizedMapComponent } from "./components/map-component";
+
+const queryClient = new QueryClient();
 
 function App() {
   const [pmTilesReady, setPmTilesReady] = useState(false);
@@ -20,20 +23,20 @@ function App() {
   }, []);
 
   return (
-    <>
+    <QueryClientProvider client={queryClient}>
       <div className="flex w-[100vw] h-[100vh]">
         <MainSidebar>
           <div className="rounded-lg overflow-hidden grow relative h-full">
-            <MapComponent pmTilesReady={pmTilesReady}>
+            <MemoizedMapComponent pmTilesReady={pmTilesReady}>
               <AnimatePresence>
                 <CafeDetails />
               </AnimatePresence>
-            </MapComponent>
+            </MemoizedMapComponent>
           </div>
         </MainSidebar>
       </div>
       <Toaster />
-    </>
+    </QueryClientProvider>
   );
 }
 

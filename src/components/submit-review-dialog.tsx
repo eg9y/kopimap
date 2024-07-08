@@ -1,6 +1,5 @@
-import React from "react";
-import { useForm, Controller } from "react-hook-form";
-import { createClient } from "@supabase/supabase-js";
+import React, { useEffect, useState } from "react";
+import { useForm, Controller, FieldValues } from "react-hook-form";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -16,11 +15,9 @@ import { useStore } from "../store";
 import { Rating, RoundedStar } from "@smastrom/react-rating";
 import { useUser } from "./lib/use-user";
 import { reviewAttributes } from "./lib/review-attributes";
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
+import { useSubmitReview } from "../hooks/use-submit-review";
+import { createClient } from "@supabase/supabase-js";
+import { Database } from "./lib/database.types";
 
 const CUSTOM_GROUP_LABEL_ID = "group_label";
 const CUSTOM_ITEM_LABELS = ["Bad", "Poor", "Average", "Great", "Excellent"];
@@ -31,6 +28,11 @@ const CUSTOM_ITEM_LABELS_IDS = [
   "label_4",
   "label_5",
 ];
+
+const supabase = createClient<Database>(
+  import.meta.env.VITE_SUPABASE_URL!,
+  import.meta.env.VITE_SUPABASE_ANON_KEY!
+);
 
 export function SubmitReviewDialog({
   isOpen,
@@ -43,57 +45,96 @@ export function SubmitReviewDialog({
     control,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
-  } = useForm();
+  } = useForm<FieldValues>();
   const { selectedCafe } = useStore();
   const { loggedInUser } = useUser();
+  const [isUpdating, setIsUpdating] = useState(false);
 
-  const onSubmit = async (data) => {
-    try {
-      if (!loggedInUser) {
-        toast.warning("Login to Review", {
-          description: "Please login to submit your review.",
-          position: "top-right",
-        });
-        return;
+  const onSuccess = () => {
+    toast.success(isUpdating ? "Review Updated" : "Review Submitted", {
+      description: isUpdating
+        ? "Your review has been successfully updated."
+        : "Your review has been successfully submitted.",
+      position: "top-right",
+    });
+    setIsOpen(false);
+    reset();
+  };
+
+  const { mutate } = useSubmitReview(onSuccess);
+
+  useEffect(() => {
+    const fetchExistingReview = async () => {
+      if (loggedInUser && selectedCafe) {
+        const { data, error } = await supabase
+          .from("reviews")
+          .select("*")
+          .eq("user_id", loggedInUser.id)
+          .eq("cafe_id", selectedCafe.id)
+          .single();
+
+        if (error) {
+          if (error.code !== "PGRST116") {
+            console.error("Error fetching existing review:", error);
+          }
+          setIsUpdating(false);
+          return;
+        }
+
+        if (data) {
+          // Populate form with existing review data
+          Object.entries(data).forEach(([key, value]) => {
+            setValue(key as any, value);
+          });
+          setIsUpdating(true);
+        } else {
+          setIsUpdating(false);
+          reset(); // Clear form if no existing review
+        }
       }
-      const { data: review, error } = await supabase.from("reviews").upsert({
-        cafe_id: selectedCafe.id,
-        cafe_place_id: selectedCafe.place_id,
-        user_id: loggedInUser.id,
-        ...data,
-      });
+    };
 
-      if (error) throw error;
+    fetchExistingReview();
+  }, [loggedInUser, selectedCafe, setValue, reset]);
 
-      toast.success("Review Submitted", {
-        description: "Your review has been successfully submitted.",
+  const onSubmit = (data: any) => {
+    if (!loggedInUser) {
+      toast.warning("Login to Review", {
+        description: "Please login to submit your review.",
         position: "top-right",
       });
-      setIsOpen(false);
-      reset();
-    } catch (error) {
-      toast.error("Error", {
-        description:
-          "There was an error submitting your review. Please try again.",
-        position: "top-right",
-      });
+      return;
     }
+
+    const reviewData = {
+      cafe_id: selectedCafe!.id,
+      cafe_place_id: selectedCafe!.place_id,
+      user_id: loggedInUser.id,
+      ...data,
+    };
+
+    mutate(reviewData);
   };
 
   return (
     <Dialog
-      open={isOpen}
+      open={isOpen && !!selectedCafe}
       onClose={() => setIsOpen(false)}
       className="!max-w-[70vw] h-[90vh] flex flex-col overflow-y-auto"
     >
-      <DialogTitle>Review Cafe: {selectedCafe.name}</DialogTitle>
+      <DialogTitle>
+        {isUpdating ? "Update Review" : "Create Review"}: {selectedCafe!.name}
+      </DialogTitle>
       <DialogDescription>
-        Fill in the options you'd like to review. Only the overall rating is
-        required.
+        {isUpdating
+          ? "You're modifying your existing review. Update the fields you'd like to change."
+          : "Fill in the options you'd like to review. Only the overall rating is required."}
       </DialogDescription>
       <form onSubmit={handleSubmit(onSubmit)} className="grow">
         <DialogBody className="flex flex-col gap-2">
+          {/* Error display */}
           {Object.keys(errors).length > 0 && (
             <div
               className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
@@ -111,6 +152,7 @@ export function SubmitReviewDialog({
             </div>
           )}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {/* Overall Rating */}
             <div className="p-2 rounded-md bg-slate-100 w-full flex flex-col">
               <Field className="">
                 <Label className="text-base !font-semibold text-slate-800">
@@ -158,7 +200,7 @@ export function SubmitReviewDialog({
                       </div>
                       {errors.rating && (
                         <span className="text-red-500 text-sm">
-                          {errors.rating.message}
+                          {errors.rating.message as string}
                         </span>
                       )}
                     </div>
@@ -166,9 +208,11 @@ export function SubmitReviewDialog({
                 />
               </Field>
             </div>
+            {/* Images section (placeholder) */}
             <div className="p-2 rounded-md bg-slate-100 w-full flex flex-col">
               <div className="">Images</div>
             </div>
+            {/* Review attributes */}
             {reviewAttributes.map((attr) => (
               <div
                 key={attr.category}
@@ -211,7 +255,7 @@ export function SubmitReviewDialog({
             Cancel
           </Button>
           <Button type="submit" color="emerald" className="cursor-pointer">
-            Submit Review
+            {isUpdating ? "Update Review" : "Submit Review"}
           </Button>
         </DialogActions>
       </form>

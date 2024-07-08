@@ -3,7 +3,7 @@ import { Database } from "./components/lib/database.types";
 type Attribute = {
   name: string;
   options: string[];
-  icon: string;
+  icon: any;
 };
 
 export type CategoryAttributes = {

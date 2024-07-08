@@ -1,61 +1,54 @@
-import React, { useRef, useEffect, useState, ReactNode } from "react";
-import {
-  Map as Mapgl,
-  GeolocateControl,
-  Marker,
-  Popup,
-} from "react-map-gl/maplibre";
+import React, {
+  useRef,
+  useEffect,
+  useState,
+  ReactNode,
+  useCallback,
+  memo,
+} from "react";
+import { Map as Mapgl, GeolocateControl, Popup } from "react-map-gl/maplibre";
 import maplibregl from "maplibre-gl";
 import { useStore } from "../store";
 import { mapStyle } from "../config";
-import Pin from "./pin";
-import { createClient } from "@supabase/supabase-js";
+import { useCafes } from "../hooks/use-cafes";
+import { GeolocateResultEvent } from "react-map-gl/dist/esm/types";
+import Markers from "./markers";
 
 interface MapComponentProps {
   pmTilesReady: boolean;
   children: ReactNode;
 }
 
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL!,
-  import.meta.env.VITE_SUPABASE_ANON_KEY!
-);
-
-export const MapComponent: React.FC<MapComponentProps> = ({
+const MapComponent: React.FC<MapComponentProps> = ({
   pmTilesReady,
   children,
 }) => {
-  const { cafes, setCafes, selectCafe, selectedCafe, setMapRef, mapRef } =
-    useStore();
+  const { selectCafe, setMapRef, mapRef } = useStore();
   const [popupInfo, setPopupInfo] = useState<any>(null);
   const popupTimeoutRef = useRef<number | null>(null);
   const isHoveringPopupRef = useRef<boolean>(false);
-
   const geoControlRef = useRef<maplibregl.GeolocateControl>();
 
+  const [mapCenter, setMapCenter] = useState<{ lat: number; long: number }>({
+    lat: -6.274163,
+    long: 106.789514505,
+  });
+
+  const [viewport, setViewport] = useState({
+    latitude: -6.274163,
+    longitude: 106.789514505,
+    zoom: 14,
+  });
+
+  const { refetch: refetchCafes } = useCafes(mapCenter.lat, mapCenter.long);
+
   useEffect(() => {
-    geoControlRef.current?.trigger();
-  }, [geoControlRef]);
+    const debounceTimer = setTimeout(() => {
+      refetchCafes();
+    }, 300); // Debounce refetch to avoid excessive API calls
 
-  const handleMarkerMouseEnter = (cafe: any) => {
-    if (popupInfo && cafe.id === popupInfo.id) {
-      return;
-    }
-    if (popupTimeoutRef.current !== null) {
-      clearTimeout(popupTimeoutRef.current);
-      popupTimeoutRef.current = null;
-    }
-    setPopupInfo(cafe);
-  };
-
-  const handleMarkerMouseLeave = () => {
-    popupTimeoutRef.current = window.setTimeout(() => {
-      if (!isHoveringPopupRef.current) {
-        setPopupInfo(null);
-      }
-      popupTimeoutRef.current = null;
-    }, 300);
-  };
+    return () => clearTimeout(debounceTimer);
+  }, [mapCenter, refetchCafes]);
 
   const handlePopupMouseEnter = () => {
     isHoveringPopupRef.current = true;
@@ -73,90 +66,57 @@ export const MapComponent: React.FC<MapComponentProps> = ({
     }, 300);
   };
 
-  const toRadians = (degrees: number) => degrees * (Math.PI / 180);
+  const handleGeolocate = useCallback(
+    (e: GeolocateResultEvent<maplibregl.GeolocateControl>) => {
+      if (mapRef && mapRef.current) {
+        mapRef.current.flyTo({
+          center: [e.coords.longitude, e.coords.latitude],
+          zoom: 14,
+          essential: true,
+        });
+      }
+    },
+    [mapRef]
+  );
 
-  const calculateDistance = (
-    lat1: number,
-    lon1: number,
-    lat2: number,
-    lon2: number
-  ) => {
-    const R = 6371; // Radius of the Earth in km
-    const dLat = toRadians(lat2 - lat1);
-    const dLon = toRadians(lon2 - lon1);
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(toRadians(lat1)) *
-        Math.cos(toRadians(lat2)) *
-        Math.sin(dLon / 2) *
-        Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    const distance = R * c;
-    return distance;
-  };
+  const handleFlyTo = useCallback(
+    (lat: number, lng: number) => {
+      if (mapRef && mapRef.current && !isNaN(lat) && !isNaN(lng)) {
+        mapRef.current.flyTo({
+          center: {
+            lat: lat,
+            lon: lng - 0.01,
+          },
+          zoom: 14,
+          essential: true, // this animation is considered essential with respect to prefers-reduced-motion
+        });
+      }
+    },
+    [mapRef]
+  );
 
-  const fetchNearbyCafes = async () => {
+  const handleMapMove = useCallback(() => {
     if (mapRef && mapRef.current) {
       const center = mapRef.current.getCenter();
-      if (center && center.lat && center.lng) {
-        const excludedIds = cafes.map((cafe) => cafe.id);
-        const { data, error } = await supabase.rpc("nearby_cafes", {
-          lat: center.lat,
-          long: center.lng,
-          excluded_ids: excludedIds,
-        });
-
-        if (error) {
-          console.error("Error fetching nearby cafes:", error);
-        } else {
-          const newCafes = data || [];
-          const uniqueCafes = newCafes.filter(
-            (newCafe: any) => !cafes.some((cafe) => cafe.id === newCafe.id)
-          );
-
-          const sortedCafes = [...cafes, ...uniqueCafes].sort((a, b) => {
-            const distanceA = calculateDistance(
-              popupInfo ? popupInfo.latitude : center.lat,
-              popupInfo ? popupInfo.longitude : center.lng,
-              a.latitude,
-              a.longitude
-            );
-            const distanceB = calculateDistance(
-              popupInfo ? popupInfo.latitude : center.lat,
-              popupInfo ? popupInfo.longitude : center.lng,
-              b.latitude,
-              b.longitude
-            );
-            return distanceA - distanceB;
-          });
-
-          setCafes(sortedCafes);
-        }
+      if (center) {
+        setMapCenter({ lat: center.lat, long: center.lng });
+        setViewport((prev) => ({
+          ...prev,
+          latitude: center.lat,
+          longitude: center.lng,
+          zoom: mapRef.current!.getZoom(),
+        }));
       }
     }
-  };
-
-  const handleFlyTo = (lat: number, lng: number) => {
-    if (mapRef && mapRef.current && !isNaN(lat) && !isNaN(lng)) {
-      mapRef.current.flyTo({
-        center: {
-          lat: lat,
-          lon: lng - 0.01,
-        },
-        zoom: 14,
-      });
-    }
-  };
+  }, [mapRef]);
 
   return (
     <Mapgl
       id="test"
       onClick={() => selectCafe(null)}
-      initialViewState={{
-        latitude: -6.274163,
-        longitude: 106.789514505,
-        zoom: 14,
-      }}
+      {...viewport}
+      onMove={(evt) => setViewport(evt.viewState)}
+      onMoveEnd={handleMapMove}
       maxBounds={[
         106.626998 - 0.1,
         -6.426709 - 0.1,
@@ -164,56 +124,23 @@ export const MapComponent: React.FC<MapComponentProps> = ({
         -6.121617 + 0.1,
       ]}
       maxZoom={24}
-      minZoom={14}
+      minZoom={10}
       mapLib={maplibregl as any}
       style={{ width: "100%", height: "100%" }}
       mapStyle={pmTilesReady ? mapStyle : undefined}
-      onLoad={() => {
-        geoControlRef.current?.trigger();
-      }}
-      onMoveEnd={() => {
-        fetchNearbyCafes();
-      }}
-      onResize={() => {
-        fetchNearbyCafes();
-      }}
+      onResize={handleMapMove}
       ref={setMapRef as any}
     >
       {children}
-      {cafes.map((cafe) => (
-        <Marker
-          longitude={cafe.longitude}
-          latitude={cafe.latitude}
-          key={cafe.name + cafe.id}
-          className="pointer-events-auto z-50"
-          anchor="bottom"
-          onClick={(e) => {
-            e.originalEvent.stopPropagation();
-            selectCafe(cafe);
-            handleFlyTo(cafe.latitude, cafe.longitude);
-          }}
-        >
-          <div
-            onMouseEnter={() => handleMarkerMouseEnter(cafe)}
-            onMouseLeave={handleMarkerMouseLeave}
-          >
-            <Pin
-              {...(selectedCafe && selectedCafe.id === cafe.id
-                ? { fill: "black" }
-                : {
-                    fill:
-                      cafe.gmaps_rating <= 3
-                        ? "red"
-                        : cafe.gmaps_rating < 4.5
-                        ? "#61bb00"
-                        : cafe.gmaps_rating <= 5
-                        ? "#009664"
-                        : "red",
-                  })}
-            />
-          </div>
-        </Marker>
-      ))}
+      <Markers
+        mapCenter={mapCenter}
+        viewport={viewport}
+        handleFlyTo={handleFlyTo}
+        popupInfo={popupInfo}
+        setPopupInfo={setPopupInfo}
+        isHoveringPopupRef={isHoveringPopupRef}
+        popupTimeoutRef={popupTimeoutRef}
+      />
       {popupInfo && (
         <Popup
           anchor="top"
@@ -236,16 +163,19 @@ export const MapComponent: React.FC<MapComponentProps> = ({
           >
             <div className="p-2 flex w-full items-center">
               <div className="font-bold">{popupInfo.name}</div>
-              {/* <img
-                width="100%"
-                src={popupInfo.gmaps_featured_image}
-                alt={popupInfo.name}
-              /> */}
             </div>
           </div>
         </Popup>
       )}
-      <GeolocateControl ref={geoControlRef as any} />
+      <GeolocateControl
+        ref={geoControlRef as any}
+        positionOptions={{
+          enableHighAccuracy: true,
+        }}
+        onGeolocate={handleGeolocate}
+      />
     </Mapgl>
   );
 };
+
+export const MemoizedMapComponent = memo(MapComponent);

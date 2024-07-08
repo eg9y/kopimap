@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import Confetti from "react-confetti";
 import useWindowSize from "react-use/lib/useWindowSize";
@@ -11,6 +11,8 @@ import {
   ArrowRightFromLineIcon,
   MapPinIcon,
   PlusIcon,
+  EditIcon,
+  MinusIcon,
 } from "lucide-react";
 import { cn } from "./lib/utils";
 import { Rate } from "./rate";
@@ -18,7 +20,15 @@ import { CafeImages } from "./cafe-images";
 import { Button } from "./catalyst/button";
 import { SubmitReviewDialog } from "./submit-review-dialog";
 import { reviewAttributes } from "./lib/review-attributes";
-import { Divider } from "./catalyst/divider";
+import { useUser } from "./lib/use-user";
+import { useCafeAggregatedReview } from "../hooks/use-cafes";
+import { createClient } from "@supabase/supabase-js";
+import { Database } from "./lib/database.types";
+
+const supabase = createClient<Database>(
+  import.meta.env.VITE_SUPABASE_URL!,
+  import.meta.env.VITE_SUPABASE_ANON_KEY!
+);
 
 export const CafeDetails = () => {
   const { selectedCafe, expandDetails, setExpandDetails } = useStore();
@@ -27,10 +37,40 @@ export const CafeDetails = () => {
   const { width, height } = useWindowSize();
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [confettiPosition, setConfettiPosition] = useState({ x: 0, y: 0 });
+  const { loggedInUser } = useUser();
+  const [userReview, setUserReview] = useState<
+    Database["public"]["Tables"]["reviews"]["Row"] | null
+  >(null);
+  const { data: aggregatedReview } = useCafeAggregatedReview(
+    selectedCafe?.place_id
+  );
+
+  useEffect(() => {
+    const fetchUserReview = async () => {
+      if (loggedInUser && selectedCafe) {
+        const { data, error } = await supabase
+          .from("reviews")
+          .select("*")
+          .eq("user_id", loggedInUser.id)
+          .eq("cafe_id", selectedCafe.id)
+          .single();
+
+        if (error) {
+          if (error.code !== "PGRST116") {
+            console.error("Error fetching user review:", error);
+          }
+        } else {
+          setUserReview(data);
+        }
+      }
+    };
+
+    fetchUserReview();
+  }, [loggedInUser, selectedCafe]);
 
   if (!selectedCafe) return null;
 
-  const handleBeenHereClick = () => {
+  const handleReviewButtonClick = () => {
     if (buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
       setConfettiPosition({
@@ -38,70 +78,93 @@ export const CafeDetails = () => {
         y: rect.top + rect.height / 2,
       });
     }
-    setLetsParty(true);
+    setOpenSubmitReviewDialog(true);
   };
 
   const renderAggregatedReviews = () => {
-    return reviewAttributes.map((category) => (
-      <div
-        key={category.category}
-        className={cn(
-          "flex flex-col gap-4 rounded-md p-2",
-          `bg-${category.color}-100`
-        )}
-      >
-        <p
-          className={cn(
-            "text-base font-bold",
-            category.color === "orange" && "text-orange-800",
-            category.color === "blue" && "text-blue-800",
-            category.color === "emerald" && "text-emerald-800",
-            category.color === "purple" && "text-purple-800",
-            category.color === "yellow" && "text-yellow-800",
-            category.color === "fuchsia" && "text-fuchsia-800",
-            category.color === "zinc" && "text-zinc-800"
-          )}
-        >
-          {category.category}
-        </p>
-        <div className="flex flex-col">
-          {category.attributes.map((attr) => {
-            const modeKey = `${attr.name
-              .replace(/\s+/g, "_")
-              .toLowerCase()}_mode`;
-            const value = selectedCafe[modeKey];
-            return (
-              <div key={attr.name} className="">
-                <div className={cn(`flex justify-between p-2 gap-2`, "w-full")}>
-                  <p
-                    className={cn(
-                      `text-base font-semibold`,
-                      category.color === "orange" && "text-orange-500",
-                      category.color === "blue" && "text-blue-500",
-                      category.color === "emerald" && "text-emerald-500",
-                      category.color === "purple" && "text-purple-500",
-                      category.color === "yellow" && "text-yellow-500",
-                      category.color === "fuchsia" && "text-fuchsia-500",
-                      category.color === "zinc" && "text-zinc-500"
-                    )}
-                  >
-                    {attr.icon} {attr.name}
-                  </p>
-                  {value ? (
-                    <div className="flex items-center gap-1 flex-wrap">
-                      <Badge color={category.color}>{value}</Badge>
+    if (!aggregatedReview) return null;
+
+    return (
+      <div className="grid grid-cols-2 gap-2">
+        {reviewAttributes.map((category) => (
+          <div
+            key={category.category}
+            className={cn(
+              "flex flex-col gap-4 rounded-md p-2",
+              `bg-${category.color}-100`
+            )}
+          >
+            <p
+              className={cn(
+                "text-base font-bold",
+                category.color === "orange" && "text-orange-800",
+                category.color === "blue" && "text-blue-800",
+                category.color === "emerald" && "text-emerald-800",
+                category.color === "purple" && "text-purple-800",
+                category.color === "yellow" && "text-yellow-800",
+                category.color === "fuchsia" && "text-fuchsia-800",
+                category.color === "zinc" && "text-zinc-800"
+              )}
+            >
+              {category.category}
+            </p>
+            <div className="flex flex-col">
+              {category.attributes.map((attr) => {
+                const modeKey = `${attr.name
+                  .replace(/\s+/g, "_")
+                  .toLowerCase()}_mode`;
+                const value =
+                  aggregatedReview[
+                    modeKey as keyof Database["public"]["Tables"]["cafe_aggregated_reviews"]["Row"]
+                  ];
+                return (
+                  <div key={attr.name} className="">
+                    <div className={cn(`flex flex-col p-2 gap-2`, "w-full")}>
+                      <div className="flex items-center gap-2">
+                        {attr.icon && <attr.icon className="w-5 h-5" />}
+                        <p
+                          className={cn(
+                            `text-base font-semibold`,
+                            category.color === "orange" && "text-orange-500",
+                            category.color === "blue" && "text-blue-500",
+                            category.color === "emerald" && "text-emerald-500",
+                            category.color === "purple" && "text-purple-500",
+                            category.color === "yellow" && "text-yellow-500",
+                            category.color === "fuchsia" && "text-fuchsia-500",
+                            category.color === "zinc" && "text-zinc-500"
+                          )}
+                        >
+                          {attr.name}
+                        </p>
+                      </div>
+                      {value ? (
+                        <div className="pl-6 flex items-center gap-1 flex-wrap">
+                          <Badge color={category.color}>{value}</Badge>
+                        </div>
+                      ) : (
+                        <MinusIcon
+                          size={8}
+                          className={cn(
+                            "ml-7",
+                            category.color === "orange" && "text-orange-800",
+                            category.color === "blue" && "text-blue-800",
+                            category.color === "emerald" && "text-emerald-800",
+                            category.color === "purple" && "text-purple-800",
+                            category.color === "yellow" && "text-yellow-800",
+                            category.color === "fuchsia" && "text-fuchsia-800",
+                            category.color === "zinc" && "text-zinc-800"
+                          )}
+                        />
+                      )}
                     </div>
-                  ) : (
-                    <div className="text-gray-500">-</div>
-                  )}
-                </div>
-                <Divider />
-              </div>
-            );
-          })}
-        </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </div>
-    ));
+    );
   };
 
   return (
@@ -122,7 +185,7 @@ export const CafeDetails = () => {
         }}
       >
         <div className={cn("flex gap-4 p-4 flex-col grow")}>
-          {!expandDetails && (
+          {!expandDetails && selectedCafe.gmaps_featured_image && (
             <div className="w-full h-[200px]">
               <img
                 src={selectedCafe.gmaps_featured_image}
@@ -131,7 +194,6 @@ export const CafeDetails = () => {
               />
             </div>
           )}
-
           <div
             className={cn(
               "w-full grow gap-4",
@@ -211,14 +273,28 @@ export const CafeDetails = () => {
                   Based on {selectedCafe.review_count ?? 0} reviews
                 </p>
                 <Button
-                  color="emerald"
+                  color={userReview ? "blue" : "emerald"}
                   className="w-full mt-4 cursor-pointer"
-                  onClick={() => setOpenSubmitReviewDialog(true)}
+                  onClick={handleReviewButtonClick}
                   ref={buttonRef}
                 >
-                  <PlusIcon size={16} />
-                  Write a Review
+                  {userReview ? (
+                    <>
+                      <EditIcon size={16} />
+                      Edit Your Review
+                    </>
+                  ) : (
+                    <>
+                      <PlusIcon size={16} />
+                      Write a Review
+                    </>
+                  )}
                 </Button>
+                {userReview && (
+                  <p className="text-center mt-2 text-sm text-emerald-600">
+                    You've reviewed this café!
+                  </p>
+                )}
               </div>
               <div className="bg-white p-4 rounded-lg shadow-md">
                 <Heading className="mb-4">Ratings Breakdown</Heading>

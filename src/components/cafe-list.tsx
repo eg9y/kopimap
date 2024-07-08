@@ -17,7 +17,7 @@ export function CafeList() {
             mapRef?.current.flyTo({
               center: {
                 lat: cafe.latitude,
-                lon: cafe.longitude,
+                lon: cafe.longitude - 0.01,
               },
               zoom: 14,
             });
