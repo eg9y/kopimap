@@ -23,17 +23,12 @@ const MapComponent: React.FC<MapComponentProps> = ({
   pmTilesReady,
   children,
 }) => {
-  const { selectCafe, setMapRef, mapRef } = useStore();
+  const { selectCafe, setMapRef, mapRef, mapCenter, setMapCenter } = useStore();
   const [popupInfo, setPopupInfo] = useState<any>(null);
   const popupTimeoutRef = useRef<number | null>(null);
   const isHoveringPopupRef = useRef<boolean>(false);
   const geoControlRef = useRef<maplibregl.GeolocateControl>();
   const clustersRef = useRef<ClustersRef>(null);
-
-  const [mapCenter, setMapCenter] = useState<{ lat: number; long: number }>({
-    lat: -6.274163,
-    long: 106.789514505,
-  });
 
   const [viewport, setViewport] = useState({
     latitude: -6.274163,

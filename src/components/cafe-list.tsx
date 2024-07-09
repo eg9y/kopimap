@@ -1,10 +1,12 @@
 import { SidebarItem, SidebarLabel, SidebarSection } from "./catalyst/sidebar";
 
 import { useStore } from "../store";
+import { useCafes } from "../hooks/use-cafes";
 
 export function CafeList() {
-  const selectCafe = useStore((state) => state.selectCafe);
-  const cafes = useStore((state) => state.cafes);
+  const { selectCafe, mapCenter } = useStore();
+
+  const { data: cafes } = useCafes(mapCenter.lat, mapCenter.long);
   const mapRef = useStore((state) => state.mapRef);
 
   return (

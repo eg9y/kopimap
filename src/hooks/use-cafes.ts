@@ -43,20 +43,13 @@ export const useCafes = (lat: number, long: number) => {
 
     if (error) throw new Error(error.message);
 
-    // Sort the cafes by distance
-    const sortedCafes = data.sort((a, b) => {
-      const distanceA = calculateDistance(lat, long, a.latitude, a.longitude);
-      const distanceB = calculateDistance(lat, long, b.latitude, b.longitude);
-      return distanceA - distanceB;
-    });
-
     // Update excluded IDs
     excludedIdsRef.current = [
       ...excludedIdsRef.current,
-      ...sortedCafes.map((cafe) => cafe.id),
+      ...data.map((cafe) => cafe.id),
     ];
 
-    return sortedCafes;
+    return data;
   }, [lat, long]);
 
   const { data: newCafes, ...rest } = useQuery(
@@ -75,11 +68,19 @@ export const useCafes = (lat: number, long: number) => {
       const updatedCafes = [...existingCafes, ...newCafes].filter(
         (cafe, index, self) => index === self.findIndex((t) => t.id === cafe.id)
       );
-      queryClient.setQueryData(["allCafes"], updatedCafes);
+
+      // Sort the cafes by distance
+      const sortedCafes = updatedCafes.sort((a, b) => {
+        const distanceA = calculateDistance(lat, long, a.latitude, a.longitude);
+        const distanceB = calculateDistance(lat, long, b.latitude, b.longitude);
+        return distanceA - distanceB;
+      });
+
+      queryClient.setQueryData(["allCafes"], sortedCafes);
       return updatedCafes;
     }
     return existingCafes;
-  }, [newCafes, queryClient]);
+  }, [newCafes, queryClient, lat, long]);
 
   const refetch = useCallback(() => {
     queryClient.invalidateQueries(["cafes", lat, long]);

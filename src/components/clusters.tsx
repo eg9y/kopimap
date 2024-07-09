@@ -174,8 +174,8 @@ const Clusters = forwardRef<ClustersRef, ClustersProps>(
               id: properties.id,
               name: properties.name,
               gmaps_rating: properties.rating,
-              latitude: (feature.geometry as GeoJSON.Point).coordinates[1],
-              longitude: (feature.geometry as GeoJSON.Point).coordinates[0],
+              latitude: properties.latitude,
+              longitude: properties.longitude,
               ...properties,
             };
 
@@ -199,8 +199,6 @@ const Clusters = forwardRef<ClustersRef, ClustersProps>(
           if (properties) {
             setPopupInfo({
               ...properties,
-              latitude: (feature.geometry as GeoJSON.Point).coordinates[1],
-              longitude: (feature.geometry as GeoJSON.Point).coordinates[0],
             });
           }
         }

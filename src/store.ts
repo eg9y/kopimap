@@ -8,6 +8,11 @@ import { SelectedCafe } from "./types";
 interface MapState {
   selectedCafe: SelectedCafe | null;
   selectCafe: (cafe: any | null) => void;
+  mapCenter: {
+    lat: number;
+    long: number;
+  };
+  setMapCenter: (center: { lat: number; long: number }) => void;
   mapRef: MutableRefObject<MapRef> | undefined;
   setMapRef: (element: MapRef | undefined) => void;
   expandDetails: boolean;
@@ -22,6 +27,11 @@ export const useStore = create<MapState>()(
         selectCafe(cafe) {
           set(() => ({ selectedCafe: cafe }));
         },
+        mapCenter: {
+          lat: -6.274163,
+          long: 106.789514505,
+        },
+        setMapCenter: (center) => set({ mapCenter: center }),
         mapRef: createRef<MapRef>() as MutableRefObject<MapRef> | undefined,
         setMapRef: (element: MapRef | undefined) => {
           if (!element) {
