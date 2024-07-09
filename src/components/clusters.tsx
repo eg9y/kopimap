@@ -4,11 +4,28 @@ import React, {
   useImperativeHandle,
   forwardRef,
 } from "react";
-import { Source, Layer, useMap } from "react-map-gl/maplibre";
+import { Source, Layer, useMap, Marker } from "react-map-gl/maplibre";
 import type { MapRef } from "react-map-gl/maplibre";
 import type { LayerSpecification } from "maplibre-gl";
 import { useCafes } from "../hooks/use-cafes";
 import { useStore } from "../store";
+import { StarIcon } from "lucide-react";
+import { motion, Variants } from "framer-motion";
+
+const AnimatedStar = motion(StarIcon);
+
+const starVariants: Variants = {
+  initial: { y: 0 },
+  animate: {
+    y: [-4, 0],
+    transition: {
+      duration: 0.6,
+      repeat: Infinity,
+      repeatType: "reverse",
+      ease: "easeInOut",
+    },
+  },
+};
 
 export interface ClustersRef {
   onClick: (e: maplibregl.MapMouseEvent) => void;
@@ -38,7 +55,7 @@ const clusterLayer: LayerSpecification = {
       50,
       "#f28cb1",
     ],
-    "circle-radius": ["step", ["get", "point_count"], 30, 20, 40, 50, 50], // Increased radius values
+    "circle-radius": ["step", ["get", "point_count"], 30, 20, 40, 50, 50],
   },
 };
 
@@ -63,18 +80,28 @@ const unclusteredPointLayer: LayerSpecification = {
     "circle-color": [
       "case",
       [">=", ["get", "gmaps_rating"], 4.6],
-      "#006400", // Dark Green
+      "#006400",
       [">=", ["get", "gmaps_rating"], 4.3],
-      "#32CD32", // Medium Green
+      "#32CD32",
       [">=", ["get", "gmaps_rating"], 4.0],
-      "#90EE90", // Light Green
+      "#90EE90",
       [">=", ["get", "gmaps_rating"], 3.0],
-      "#FFD700", // Yellow
-      "#FF4500", // Red
+      "#FFD700",
+      "#FF4500",
     ],
-    "circle-radius": 8, // Increased radius value
-    "circle-stroke-width": 1,
-    "circle-stroke-color": "#fff",
+    "circle-radius": 8,
+    "circle-stroke-width": [
+      "case",
+      ["==", ["get", "place_id"], ["get", "selectedCafeId"]],
+      3,
+      1,
+    ],
+    "circle-stroke-color": [
+      "case",
+      ["==", ["get", "place_id"], ["get", "selectedCafeId"]],
+      "#FFD700",
+      "#fff",
+    ],
   },
 };
 
@@ -95,6 +122,7 @@ const Clusters = forwardRef<ClustersRef, ClustersProps>(
             ...cafe,
             cluster: false,
             gmaps_rating: parseFloat(cafe.gmaps_rating),
+            selectedCafeId: selectedCafe?.place_id || "",
           },
           geometry: {
             type: "Point",
@@ -102,7 +130,7 @@ const Clusters = forwardRef<ClustersRef, ClustersProps>(
           },
         })),
       };
-    }, [cafes]);
+    }, [cafes, selectedCafe]);
 
     const onClick = useCallback(
       async (event: maplibregl.MapMouseEvent) => {
@@ -151,7 +179,6 @@ const Clusters = forwardRef<ClustersRef, ClustersProps>(
               ...properties,
             };
 
-            console.log("clicking cafe", cafe);
             selectCafe(cafe);
             handleFlyTo(cafe.latitude, cafe.longitude);
           }
@@ -193,19 +220,36 @@ const Clusters = forwardRef<ClustersRef, ClustersProps>(
     }));
 
     return (
-      <Source
-        id="cafes"
-        type="geojson"
-        data={geojson}
-        cluster={true}
-        clusterMaxZoom={14}
-        clusterRadius={50}
-        clusterMinPoints={10} // Set minimum number of points for a cluster
-      >
-        <Layer {...clusterLayer} />
-        <Layer {...clusterCountLayer} />
-        <Layer {...unclusteredPointLayer} />
-      </Source>
+      <>
+        <Source
+          id="cafes"
+          type="geojson"
+          data={geojson}
+          cluster={true}
+          clusterMaxZoom={14}
+          clusterRadius={50}
+          clusterMinPoints={10}
+        >
+          <Layer {...clusterLayer} />
+          <Layer {...clusterCountLayer} />
+          <Layer {...unclusteredPointLayer} />
+        </Source>
+        {selectedCafe && (
+          <Marker
+            latitude={selectedCafe.latitude!}
+            longitude={selectedCafe.longitude!}
+            offset={[0, -20]}
+          >
+            <AnimatedStar
+              size={24}
+              className="fill-yellow-400"
+              variants={starVariants}
+              initial="initial"
+              animate="animate"
+            />
+          </Marker>
+        )}
+      </>
     );
   }
 );

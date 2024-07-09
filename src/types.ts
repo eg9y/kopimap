@@ -31,5 +31,6 @@ export type CategoryAttributes = {
   attributes: Attribute[];
 };
 
-export type SelectedCafe = Database["public"]["Tables"]["cafes"]["Row"] &
-  Database["public"]["Tables"]["cafe_aggregated_reviews"]["Row"];
+export type SelectedCafe =
+  Database["public"]["Views"]["cafe_location_view"]["Row"] &
+    Database["public"]["Tables"]["cafe_aggregated_reviews"]["Row"];
