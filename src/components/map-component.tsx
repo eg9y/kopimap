@@ -12,7 +12,7 @@ import { useStore } from "../store";
 import { mapStyle } from "../config";
 import { useCafes } from "../hooks/use-cafes";
 import { GeolocateResultEvent } from "react-map-gl/dist/esm/types";
-import Markers from "./markers";
+import Clusters, { ClustersRef } from "./clusters"; // Adjust the path as necessary
 
 interface MapComponentProps {
   pmTilesReady: boolean;
@@ -28,6 +28,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
   const popupTimeoutRef = useRef<number | null>(null);
   const isHoveringPopupRef = useRef<boolean>(false);
   const geoControlRef = useRef<maplibregl.GeolocateControl>();
+  const clustersRef = useRef<ClustersRef>(null);
 
   const [mapCenter, setMapCenter] = useState<{ lat: number; long: number }>({
     lat: -6.274163,
@@ -113,7 +114,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
   return (
     <Mapgl
       id="test"
-      onClick={() => selectCafe(null)}
       {...viewport}
       onMove={(evt) => setViewport(evt.viewState)}
       onMoveEnd={handleMapMove}
@@ -130,16 +130,24 @@ const MapComponent: React.FC<MapComponentProps> = ({
       mapStyle={pmTilesReady ? mapStyle : undefined}
       onResize={handleMapMove}
       ref={setMapRef as any}
+      onClick={(e) => {
+        selectCafe(null);
+        const feature = e.features && e.features[0];
+        if (feature && feature.properties && feature.properties.cluster) {
+          clustersRef.current?.onClick(e);
+        } else {
+          clustersRef.current?.onClickSingle(e);
+        }
+      }}
+      onMouseMove={(e) => clustersRef.current?.onMouseEnter(e)}
+      onMouseLeave={() => clustersRef.current?.onMouseLeave()}
     >
       {children}
-      <Markers
+      <Clusters
+        ref={clustersRef}
         mapCenter={mapCenter}
-        viewport={viewport}
         handleFlyTo={handleFlyTo}
-        popupInfo={popupInfo}
         setPopupInfo={setPopupInfo}
-        isHoveringPopupRef={isHoveringPopupRef}
-        popupTimeoutRef={popupTimeoutRef}
       />
       {popupInfo && (
         <Popup
