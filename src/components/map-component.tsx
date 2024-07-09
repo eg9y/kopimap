@@ -81,9 +81,9 @@ const MapComponent: React.FC<MapComponentProps> = ({
         mapRef.current.flyTo({
           center: {
             lat: lat,
-            lon: lng - 0.01,
+            lon: lng - 0.0025,
           },
-          zoom: 14,
+          zoom: 16,
           essential: true, // this animation is considered essential with respect to prefers-reduced-motion
         });
       }
@@ -111,6 +111,9 @@ const MapComponent: React.FC<MapComponentProps> = ({
       id="test"
       {...viewport}
       onMove={(evt) => setViewport(evt.viewState)}
+      onLoad={() => {
+        geoControlRef.current?.trigger();
+      }}
       onMoveEnd={handleMapMove}
       maxBounds={[
         106.626998 - 0.1,

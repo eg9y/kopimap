@@ -91,7 +91,13 @@ export const CafeDetails = () => {
             key={category.category}
             className={cn(
               "flex flex-col gap-4 rounded-md p-2",
-              `bg-${category.color}-100`
+              category.color === "orange" && "bg-orange-100",
+              category.color === "blue" && "bg-blue-100",
+              category.color === "emerald" && "bg-emerald-100",
+              category.color === "purple" && "bg-purple-100",
+              category.color === "yellow" && "bg-yellow-100",
+              category.color === "fuchsia" && "bg-fuchsia-100",
+              category.color === "zinc" && "bg-zinc-100"
             )}
           >
             <p
