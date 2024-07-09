@@ -63,7 +63,7 @@ export const useCafes = (lat: number, long: number) => {
     ["cafes", lat, long],
     fetchCafes,
     {
-      keepPreviousData: true,
+      // keepPreviousData: true,
       staleTime: 1000 * 60 * 5, // 5 minutes
     }
   );
@@ -93,7 +93,7 @@ export const useCafes = (lat: number, long: number) => {
 };
 
 // The useCafeAggregatedReview hook remains unchanged
-export const useCafeAggregatedReview = (placeId?: string) => {
+export const useCafeAggregatedReview = (placeId: string | null) => {
   return useQuery(
     ["cafeAggregatedReview", placeId],
     () => fetchCafeAggregatedReview(placeId),
@@ -103,7 +103,7 @@ export const useCafeAggregatedReview = (placeId?: string) => {
   );
 };
 
-const fetchCafeAggregatedReview = async (placeId?: string) => {
+const fetchCafeAggregatedReview = async (placeId: string | null) => {
   if (!placeId) {
     return null;
   }

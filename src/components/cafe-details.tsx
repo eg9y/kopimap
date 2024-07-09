@@ -42,7 +42,7 @@ export const CafeDetails = () => {
     Database["public"]["Tables"]["reviews"]["Row"] | null
   >(null);
   const { data: aggregatedReview } = useCafeAggregatedReview(
-    selectedCafe?.place_id
+    selectedCafe ? selectedCafe.place_id : null
   );
 
   useEffect(() => {
@@ -268,9 +268,9 @@ export const CafeDetails = () => {
             <div className="flex flex-col gap-4">
               <div className="bg-white p-4 rounded-lg shadow-md">
                 <Heading className="mb-4">User Reviews</Heading>
-                <Rate rating={selectedCafe.avg_rating ?? 0} />
+                <Rate rating={aggregatedReview?.avg_rating ?? 0} />
                 <p className="text-center mt-2">
-                  Based on {selectedCafe.review_count ?? 0} reviews
+                  Based on {aggregatedReview?.review_count ?? 0} reviews
                 </p>
                 <Button
                   color={userReview ? "blue" : "emerald"}

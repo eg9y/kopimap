@@ -3,7 +3,7 @@ import React from "react";
 import { Database } from "./lib/database.types";
 
 interface CafeImagesProps {
-  cafe: Database["public"]["Tables"]["cafes"]["Row"]; // Replace 'any' with a proper type for your cafe object
+  cafe: Database["public"]["Views"]["cafe_location_view"]["Row"]; // Replace 'any' with a proper type for your cafe object
   expandDetails: boolean;
 }
 

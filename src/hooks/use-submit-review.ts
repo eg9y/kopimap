@@ -25,14 +25,17 @@ const submitReview = async (reviewData: ReviewData): Promise<any> => {
   return data;
 };
 
-export const useSubmitReview = (onSuccess: () => void) => {
+export const useSubmitReview = (
+  onSuccess: () => void,
+  placeId: string | null
+) => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: submitReview,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["reviews"],
+        queryKey: ["cafeAggregatedReview", placeId],
       });
       onSuccess();
     },

@@ -63,7 +63,10 @@ export function SubmitReviewDialog({
     reset();
   };
 
-  const { mutate } = useSubmitReview(onSuccess);
+  const { mutate } = useSubmitReview(
+    onSuccess,
+    selectedCafe ? selectedCafe.place_id : null
+  );
 
   useEffect(() => {
     const fetchExistingReview = async () => {
@@ -72,7 +75,7 @@ export function SubmitReviewDialog({
           .from("reviews")
           .select("*")
           .eq("user_id", loggedInUser.id)
-          .eq("cafe_id", selectedCafe.id)
+          .eq("cafe_id", selectedCafe.id!)
           .single();
 
         if (error) {
