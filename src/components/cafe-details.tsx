@@ -90,7 +90,7 @@ export const CafeDetails = () => {
           <div
             key={category.category}
             className={cn(
-              "flex flex-col gap-4 rounded-md p-2",
+              "flex flex-col rounded-md p-2 gap-2",
               category.color === "orange" && "bg-orange-100",
               category.color === "blue" && "bg-blue-100",
               category.color === "emerald" && "bg-emerald-100",
@@ -102,7 +102,7 @@ export const CafeDetails = () => {
           >
             <p
               className={cn(
-                "text-base font-bold",
+                "text-base font-bold letter leading-4 text-nowrap",
                 category.color === "orange" && "text-orange-800",
                 category.color === "blue" && "text-blue-800",
                 category.color === "emerald" && "text-emerald-800",
@@ -114,7 +114,7 @@ export const CafeDetails = () => {
             >
               {category.category}
             </p>
-            <div className="flex flex-col">
+            <div className="flex flex-col gap-2">
               {category.attributes.map((attr) => {
                 const modeKey = `${attr.name
                   .replace(/\s+/g, "_")
@@ -125,12 +125,27 @@ export const CafeDetails = () => {
                   ];
                 return (
                   <div key={attr.name} className="">
-                    <div className={cn(`flex flex-col p-2 gap-2`, "w-full")}>
-                      <div className="flex items-center gap-2">
-                        {attr.icon && <attr.icon className="w-5 h-5" />}
+                    <div className={cn(`flex flex-col gap-1`, "w-full")}>
+                      <div className="flex items-center gap-1">
+                        {attr.icon && (
+                          <attr.icon
+                            className={cn(
+                              "w-4 h-4",
+                              category.color === "orange" && "text-orange-500",
+                              category.color === "blue" && "text-blue-500",
+                              category.color === "emerald" &&
+                                "text-emerald-500",
+                              category.color === "purple" && "text-purple-500",
+                              category.color === "yellow" && "text-yellow-500",
+                              category.color === "fuchsia" &&
+                                "text-fuchsia-500",
+                              category.color === "zinc" && "text-zinc-500"
+                            )}
+                          />
+                        )}
                         <p
                           className={cn(
-                            `text-base font-semibold`,
+                            `text-xs font-semibold text-nowrap`,
                             category.color === "orange" && "text-orange-500",
                             category.color === "blue" && "text-blue-500",
                             category.color === "emerald" && "text-emerald-500",
@@ -143,25 +158,15 @@ export const CafeDetails = () => {
                           {attr.name}
                         </p>
                       </div>
-                      {value ? (
-                        <div className="pl-6 flex items-center gap-1 flex-wrap">
+                      <div className="pl-0 flex items-center gap-1 flex-wrap">
+                        {value ? (
                           <Badge color={category.color}>{value}</Badge>
-                        </div>
-                      ) : (
-                        <MinusIcon
-                          size={8}
-                          className={cn(
-                            "ml-7",
-                            category.color === "orange" && "text-orange-800",
-                            category.color === "blue" && "text-blue-800",
-                            category.color === "emerald" && "text-emerald-800",
-                            category.color === "purple" && "text-purple-800",
-                            category.color === "yellow" && "text-yellow-800",
-                            category.color === "fuchsia" && "text-fuchsia-800",
-                            category.color === "zinc" && "text-zinc-800"
-                          )}
-                        />
-                      )}
+                        ) : (
+                          <Badge color={category.color} className="opacity-50">
+                            <MinusIcon size={20} />
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                   </div>
                 );
@@ -243,7 +248,7 @@ export const CafeDetails = () => {
                   <BadgeButton href={selectedCafe.menu_link}>Menu</BadgeButton>
                 )}
               </div>
-              <div className="flex gap-1">
+              <div className="flex gap-1 flex-wrap">
                 <BadgeButton
                   color="red"
                   href={selectedCafe.gmaps_link || ""}
@@ -252,14 +257,18 @@ export const CafeDetails = () => {
                 >
                   GMaps
                 </BadgeButton>
-                <Badge>
-                  <p>Google Rating</p>
+                <Badge className="text-nowrap">
+                  <p>GMaps Rating</p>
                   <StarIcon className="size-4" />
                   <p>{selectedCafe.gmaps_rating}</p>
                   <p>({selectedCafe.gmaps_total_reviews})</p>
                 </Badge>
-                <Badge>{selectedCafe.price_range}</Badge>
-                <Badge>Open {selectedCafe.workday_timings}</Badge>
+                {selectedCafe.price_range && (
+                  <Badge>{selectedCafe.price_range}</Badge>
+                )}
+                <Badge className="text-nowrap">
+                  Open {selectedCafe.workday_timings}
+                </Badge>
               </div>
               <div className="p-2 rounded-md bg-blue-100">
                 <p className="text-pretty text-xs">
@@ -273,7 +282,8 @@ export const CafeDetails = () => {
             </div>
             <div className="flex flex-col gap-4">
               <div className="bg-white p-4 rounded-lg shadow-md">
-                <Heading className="mb-4">User Reviews</Heading>
+                <Heading className="">User Reviews</Heading>
+
                 <Rate rating={aggregatedReview?.avg_rating ?? 0} />
                 <p className="text-center mt-2">
                   Based on {aggregatedReview?.review_count ?? 0} reviews
@@ -303,7 +313,7 @@ export const CafeDetails = () => {
                 )}
               </div>
               <div className="bg-white p-4 rounded-lg shadow-md">
-                <Heading className="mb-4">Ratings Breakdown</Heading>
+                <Heading className="mb-2">Ratings Breakdown</Heading>
                 <div className="flex flex-col gap-2">
                   {renderAggregatedReviews()}
                 </div>
