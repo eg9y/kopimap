@@ -52,7 +52,7 @@ export const CafeDetails = () => {
           .from("reviews")
           .select("*")
           .eq("user_id", loggedInUser.id)
-          .eq("cafe_id", selectedCafe.id)
+          .eq("cafe_id", selectedCafe.id!)
           .single();
 
         if (error) {
@@ -190,7 +190,7 @@ export const CafeDetails = () => {
               <img
                 src={selectedCafe.gmaps_featured_image}
                 className="w-full object-cover h-full"
-                alt={selectedCafe.name}
+                alt={selectedCafe.name!}
               />
             </div>
           )}
