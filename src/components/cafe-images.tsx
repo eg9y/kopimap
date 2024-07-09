@@ -3,7 +3,7 @@ import React from "react";
 import { Database } from "./lib/database.types";
 
 interface CafeImagesProps {
-  cafe: Database["public"]["Views"]["cafe_location_view"]["Row"]; // Replace 'any' with a proper type for your cafe object
+  cafe: Database["public"]["Views"]["cafe_location_view"]["Row"] | null; // Replace 'any' with a proper type for your cafe object
   expandDetails: boolean;
 }
 
@@ -31,15 +31,15 @@ export const CafeImages: React.FC<CafeImagesProps> = ({
       .slice(0, 1);
   };
 
-  const images = parseImages(cafe.gmaps_images as string);
+  const images = parseImages(cafe?.gmaps_images as string);
 
-  if (!expandDetails) {
+  if (!expandDetails && cafe) {
     return (
       <div className="w-full h-[200px]">
         <img
           src={cafe.gmaps_featured_image as string}
           className="w-full object-cover h-full"
-          alt={cafe.name}
+          alt={cafe.name!}
         />
       </div>
     );
