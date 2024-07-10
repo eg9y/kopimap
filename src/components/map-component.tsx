@@ -23,7 +23,14 @@ const MapComponent: React.FC<MapComponentProps> = ({
   pmTilesReady,
   children,
 }) => {
-  const { selectCafe, setMapRef, mapRef, mapCenter, setMapCenter } = useStore();
+  const {
+    selectCafe,
+    setMapRef,
+    mapRef,
+    mapCenter,
+    setMapCenter,
+    fetchedCafes,
+  } = useStore();
   const [popupInfo, setPopupInfo] = useState<any>(null);
   const popupTimeoutRef = useRef<number | null>(null);
   const isHoveringPopupRef = useRef<boolean>(false);
@@ -36,7 +43,11 @@ const MapComponent: React.FC<MapComponentProps> = ({
     zoom: 14,
   });
 
-  const { refetch: refetchCafes } = useCafes(mapCenter.lat, mapCenter.long);
+  const { refetch: refetchCafes } = useCafes(
+    mapCenter.lat,
+    mapCenter.long,
+    fetchedCafes
+  );
 
   useEffect(() => {
     const debounceTimer = setTimeout(() => {
@@ -111,7 +122,12 @@ const MapComponent: React.FC<MapComponentProps> = ({
       id="test"
       {...viewport}
       onMove={(evt) => setViewport(evt.viewState)}
-      onLoad={() => {
+      onLoad={(evt) => {
+        const center = evt.target.getCenter();
+        setMapCenter({
+          lat: center.lat,
+          long: center.lng,
+        });
         geoControlRef.current?.trigger();
       }}
       onMoveEnd={handleMapMove}
@@ -122,7 +138,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
         -6.121617 + 0.1,
       ]}
       maxZoom={24}
-      minZoom={10}
+      minZoom={14}
       mapLib={maplibregl as any}
       style={{ width: "100%", height: "100%" }}
       mapStyle={pmTilesReady ? mapStyle : undefined}

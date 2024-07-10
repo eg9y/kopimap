@@ -17,6 +17,28 @@ interface MapState {
   setMapRef: (element: MapRef | undefined) => void;
   expandDetails: boolean;
   setExpandDetails: (expand: boolean) => void;
+  fetchedCafes:
+    | {
+        id: number;
+        name: string;
+        gmaps_featured_image: string;
+        gmaps_ratings: string;
+        latitude: number;
+        longitude: number;
+        distance: number;
+      }[];
+  setFetchedCafes: (
+    cafes:
+      | {
+          id: number;
+          name: string;
+          gmaps_featured_image: string;
+          gmaps_ratings: string;
+          latitude: number;
+          longitude: number;
+          distance: number;
+        }[]
+  ) => void;
 }
 
 export const useStore = create<MapState>()(
@@ -43,9 +65,36 @@ export const useStore = create<MapState>()(
         },
         expandDetails: false,
         setExpandDetails: (expand: boolean) => set({ expandDetails: expand }),
+        fetchedCafes: [],
+        setFetchedCafes: (
+          ids:
+            | {
+                id: number;
+                name: string;
+                gmaps_featured_image: string;
+                gmaps_ratings: string;
+                latitude: number;
+                longitude: number;
+                distance: number;
+              }[]
+        ) => {
+          set({ fetchedCafes: ids });
+        },
       }),
       {
         name: "map-storage",
+        // storage: {
+        //   getItem: (key) => {
+        //     const value = sessionStorage.getItem(key);
+        //     return value ? JSON.parse(value) : null;
+        //   },
+        //   setItem: (key, value) => {
+        //     sessionStorage.setItem(key, JSON.stringify(value));
+        //   },
+        //   removeItem: (key) => {
+        //     sessionStorage.removeItem(key);
+        //   },
+        // },
       }
     )
   )

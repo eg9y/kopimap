@@ -3,6 +3,9 @@ import React, {
   useCallback,
   useImperativeHandle,
   forwardRef,
+  useEffect,
+  useState,
+  useRef,
 } from "react";
 import { Source, Layer, useMap, Marker } from "react-map-gl/maplibre";
 import type { MapRef } from "react-map-gl/maplibre";
@@ -108,20 +111,56 @@ const unclusteredPointLayer: LayerSpecification = {
 const Clusters = forwardRef<ClustersRef, ClustersProps>(
   ({ mapCenter, handleFlyTo, setPopupInfo }, ref) => {
     const { current: map } = useMap() as { current: MapRef };
-    const { selectCafe, selectedCafe } = useStore();
-    const { data: cafes } = useCafes(mapCenter.lat, mapCenter.long);
+    const { selectCafe, selectedCafe, fetchedCafes } = useStore();
+    const { data: newlyFetchedCafes } = useCafes(
+      mapCenter.lat,
+      mapCenter.long,
+      fetchedCafes
+    );
+    const [visibleCafes, setVisibleCafes] = useState<any[]>([]);
+    const visibleCafesRef = useRef<any[]>([]);
+
+    const updateVisibleCafes = useCallback(() => {
+      if (map && fetchedCafes) {
+        const bounds = map.getBounds();
+        const visible = fetchedCafes.filter((cafe) =>
+          bounds.contains([cafe.longitude, cafe.latitude])
+        );
+
+        // Check if the visible cafes have actually changed
+        if (
+          JSON.stringify(visible) !== JSON.stringify(visibleCafesRef.current)
+        ) {
+          visibleCafesRef.current = visible;
+          setVisibleCafes(visible);
+        }
+      }
+    }, [map, fetchedCafes]);
+
+    useEffect(() => {
+      updateVisibleCafes();
+
+      if (map) {
+        map.on("moveend", updateVisibleCafes);
+        return () => {
+          map.off("moveend", updateVisibleCafes);
+        };
+      }
+    }, [map, updateVisibleCafes]);
+
+    useEffect(() => {
+      updateVisibleCafes();
+    }, [newlyFetchedCafes, updateVisibleCafes]);
 
     const geojson = useMemo(() => {
-      if (!cafes) return { type: "FeatureCollection", features: [] };
-
       return {
         type: "FeatureCollection",
-        features: cafes.map((cafe) => ({
+        features: visibleCafes.map((cafe) => ({
           type: "Feature",
           properties: {
             ...cafe,
             cluster: false,
-            gmaps_rating: parseFloat(cafe.gmaps_rating),
+            gmaps_rating: parseFloat(cafe.gmaps_ratings),
             selectedCafeId: selectedCafe?.place_id || "",
           },
           geometry: {
@@ -130,7 +169,7 @@ const Clusters = forwardRef<ClustersRef, ClustersProps>(
           },
         })),
       };
-    }, [cafes, selectedCafe]);
+    }, [visibleCafes, selectedCafe]);
 
     const onClick = useCallback(
       async (event: maplibregl.MapMouseEvent) => {
@@ -173,7 +212,6 @@ const Clusters = forwardRef<ClustersRef, ClustersProps>(
             const cafe = {
               id: properties.id,
               name: properties.name,
-              gmaps_rating: properties.rating,
               latitude: properties.latitude,
               longitude: properties.longitude,
               ...properties,

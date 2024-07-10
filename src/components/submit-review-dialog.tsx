@@ -13,7 +13,7 @@ import { Field, Label } from "./catalyst/fieldset";
 import { Badge } from "./catalyst/badge";
 import { useStore } from "../store";
 import { Rating, RoundedStar } from "@smastrom/react-rating";
-import { useUser } from "./lib/use-user";
+import { useUser } from "../hooks/use-user";
 import { reviewAttributes } from "./lib/review-attributes";
 import { useSubmitReview } from "../hooks/use-submit-review";
 import { createClient } from "@supabase/supabase-js";

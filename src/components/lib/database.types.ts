@@ -11,7 +11,13 @@ export type Database = {
     Tables: {
       cafe_aggregated_reviews: {
         Row: {
+          accessibility_mode:
+            | Database["public"]["Enums"]["accessibility"]
+            | null
           avg_rating: number | null
+          bathroom_availability_mode:
+            | Database["public"]["Enums"]["bathroom_availability"]
+            | null
           cafe_id: number
           cafe_place_id: string
           cleanliness_mode: Database["public"]["Enums"]["cleanliness"] | null
@@ -19,11 +25,31 @@ export type Database = {
             | Database["public"]["Enums"]["quality_rating"]
             | null
           food_options_mode: Database["public"]["Enums"]["food_options"] | null
+          instagram_worthy_mode:
+            | Database["public"]["Enums"]["instagram_worthy"]
+            | null
           last_updated: string | null
+          non_coffee_options_mode:
+            | Database["public"]["Enums"]["non_coffee_options"]
+            | null
+          outdoor_seating_mode:
+            | Database["public"]["Enums"]["outdoor_seating"]
+            | null
+          overall_vibe_mode: Database["public"]["Enums"]["overall_vibe"] | null
+          parking_mode:
+            | Database["public"]["Enums"]["parking_availability"]
+            | null
+          pet_friendly_mode: Database["public"]["Enums"]["pet_friendly"] | null
           power_outlets_mode:
             | Database["public"]["Enums"]["power_outlets"]
             | null
           review_count: number | null
+          seating_comfort_mode:
+            | Database["public"]["Enums"]["seating_comfort"]
+            | null
+          unique_offering_mode:
+            | Database["public"]["Enums"]["unique_offering"]
+            | null
           value_for_money_mode:
             | Database["public"]["Enums"]["value_rating"]
             | null
@@ -33,7 +59,13 @@ export type Database = {
           work_space_mode: Database["public"]["Enums"]["work_space"] | null
         }
         Insert: {
+          accessibility_mode?:
+            | Database["public"]["Enums"]["accessibility"]
+            | null
           avg_rating?: number | null
+          bathroom_availability_mode?:
+            | Database["public"]["Enums"]["bathroom_availability"]
+            | null
           cafe_id: number
           cafe_place_id: string
           cleanliness_mode?: Database["public"]["Enums"]["cleanliness"] | null
@@ -41,11 +73,31 @@ export type Database = {
             | Database["public"]["Enums"]["quality_rating"]
             | null
           food_options_mode?: Database["public"]["Enums"]["food_options"] | null
+          instagram_worthy_mode?:
+            | Database["public"]["Enums"]["instagram_worthy"]
+            | null
           last_updated?: string | null
+          non_coffee_options_mode?:
+            | Database["public"]["Enums"]["non_coffee_options"]
+            | null
+          outdoor_seating_mode?:
+            | Database["public"]["Enums"]["outdoor_seating"]
+            | null
+          overall_vibe_mode?: Database["public"]["Enums"]["overall_vibe"] | null
+          parking_mode?:
+            | Database["public"]["Enums"]["parking_availability"]
+            | null
+          pet_friendly_mode?: Database["public"]["Enums"]["pet_friendly"] | null
           power_outlets_mode?:
             | Database["public"]["Enums"]["power_outlets"]
             | null
           review_count?: number | null
+          seating_comfort_mode?:
+            | Database["public"]["Enums"]["seating_comfort"]
+            | null
+          unique_offering_mode?:
+            | Database["public"]["Enums"]["unique_offering"]
+            | null
           value_for_money_mode?:
             | Database["public"]["Enums"]["value_rating"]
             | null
@@ -55,7 +107,13 @@ export type Database = {
           work_space_mode?: Database["public"]["Enums"]["work_space"] | null
         }
         Update: {
+          accessibility_mode?:
+            | Database["public"]["Enums"]["accessibility"]
+            | null
           avg_rating?: number | null
+          bathroom_availability_mode?:
+            | Database["public"]["Enums"]["bathroom_availability"]
+            | null
           cafe_id?: number
           cafe_place_id?: string
           cleanliness_mode?: Database["public"]["Enums"]["cleanliness"] | null
@@ -63,11 +121,31 @@ export type Database = {
             | Database["public"]["Enums"]["quality_rating"]
             | null
           food_options_mode?: Database["public"]["Enums"]["food_options"] | null
+          instagram_worthy_mode?:
+            | Database["public"]["Enums"]["instagram_worthy"]
+            | null
           last_updated?: string | null
+          non_coffee_options_mode?:
+            | Database["public"]["Enums"]["non_coffee_options"]
+            | null
+          outdoor_seating_mode?:
+            | Database["public"]["Enums"]["outdoor_seating"]
+            | null
+          overall_vibe_mode?: Database["public"]["Enums"]["overall_vibe"] | null
+          parking_mode?:
+            | Database["public"]["Enums"]["parking_availability"]
+            | null
+          pet_friendly_mode?: Database["public"]["Enums"]["pet_friendly"] | null
           power_outlets_mode?:
             | Database["public"]["Enums"]["power_outlets"]
             | null
           review_count?: number | null
+          seating_comfort_mode?:
+            | Database["public"]["Enums"]["seating_comfort"]
+            | null
+          unique_offering_mode?:
+            | Database["public"]["Enums"]["unique_offering"]
+            | null
           value_for_money_mode?:
             | Database["public"]["Enums"]["value_rating"]
             | null
@@ -241,6 +319,7 @@ export type Database = {
             | null
           outdoor_seating: Database["public"]["Enums"]["outdoor_seating"] | null
           overall_vibe: Database["public"]["Enums"]["overall_vibe"] | null
+          parking: Database["public"]["Enums"]["parking_availability"] | null
           pet_friendly: Database["public"]["Enums"]["pet_friendly"] | null
           power_outlets: Database["public"]["Enums"]["power_outlets"] | null
           rating: number | null
@@ -279,6 +358,7 @@ export type Database = {
             | Database["public"]["Enums"]["outdoor_seating"]
             | null
           overall_vibe?: Database["public"]["Enums"]["overall_vibe"] | null
+          parking?: Database["public"]["Enums"]["parking_availability"] | null
           pet_friendly?: Database["public"]["Enums"]["pet_friendly"] | null
           power_outlets?: Database["public"]["Enums"]["power_outlets"] | null
           rating?: number | null
@@ -321,6 +401,7 @@ export type Database = {
             | Database["public"]["Enums"]["outdoor_seating"]
             | null
           overall_vibe?: Database["public"]["Enums"]["overall_vibe"] | null
+          parking?: Database["public"]["Enums"]["parking_availability"] | null
           pet_friendly?: Database["public"]["Enums"]["pet_friendly"] | null
           power_outlets?: Database["public"]["Enums"]["power_outlets"] | null
           rating?: number | null
@@ -460,39 +541,16 @@ export type Database = {
     Functions: {
       nearby_cafes: {
         Args: {
-          lat: number
           long: number
+          lat: number
+          excluded_ids: number[]
           max_distance?: number
-          limit_count?: number
-          excluded_ids?: number[]
         }
         Returns: {
           id: number
-          created_at: string
           name: string
-          description: string
-          gmaps_rating: string
-          gmaps_total_reviews: number
-          gmaps_reviews_link: string
-          price_range: string
-          phone: string
-          website: string
-          menu_link: string
-          gmaps_link: string
-          address: string
-          plus_code: string
-          detailed_address: Json
           gmaps_featured_image: string
-          gmaps_images: Json
-          gmaps_featured_reviews: Json
-          gmaps_reviews_per_rating: Json
-          main_category: string
-          closed_on: string
-          workday_timings: string
-          hours: Json
-          popular_times: Json
-          place_id: string
-          location: unknown
+          gmaps_ratings: string
           latitude: number
           longitude: number
           distance: number
@@ -511,6 +569,7 @@ export type Database = {
       non_coffee_options: "Very Limited" | "Some Options" | "Great Variety"
       outdoor_seating: "None" | "Limited" | "Ample"
       overall_vibe: "Relaxed" | "Energetic" | "Cozy" | "Modern" | "Artistic"
+      parking_availability: "No Parking" | "Limited" | "Ample"
       pet_friendly: "no" | "yes"
       power_outlets: "None Visible" | "Limited" | "Plenty"
       quality_rating: "Poor" | "Average" | "Good" | "Excellent"

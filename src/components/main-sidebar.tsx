@@ -49,7 +49,7 @@ import {
 import { Field, Label } from "./catalyst/fieldset";
 import { useState } from "react";
 import { createClient } from "@supabase/supabase-js";
-import { useUser } from "./lib/use-user";
+import { useUser } from "../hooks/use-user";
 
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL!,

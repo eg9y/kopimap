@@ -20,10 +20,10 @@ import { CafeImages } from "./cafe-images";
 import { Button } from "./catalyst/button";
 import { SubmitReviewDialog } from "./submit-review-dialog";
 import { reviewAttributes } from "./lib/review-attributes";
-import { useUser } from "./lib/use-user";
-import { useCafeAggregatedReview } from "../hooks/use-cafes";
+import { useUser } from "../hooks/use-user";
 import { createClient } from "@supabase/supabase-js";
 import { Database } from "./lib/database.types";
+import { useCafeAggregatedReview } from "../hooks/use-cafe-aggregated-review";
 
 const supabase = createClient<Database>(
   import.meta.env.VITE_SUPABASE_URL!,
