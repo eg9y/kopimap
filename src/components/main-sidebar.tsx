@@ -196,15 +196,15 @@ export function MainSidebar({ children }: { children: React.ReactNode }) {
 
                   <ChevronUpIcon />
                 </DropdownButton>
-                <div className="px-2 pb-2">
+                {/* <div className="px-2">
                   <Link
                     href="https://github.com/eg9y"
                     target="_blank"
                     className="text-xs"
                   >
-                    check out my other apps
+                    other apps{" "}
                   </Link>
-                </div>
+                </div> */}
                 <DropdownMenu className="min-w-64" anchor="top start">
                   {loggedInUser && (
                     <>

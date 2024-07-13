@@ -21,7 +21,7 @@ function App() {
 
   return (
     <>
-      <div className="flex w-[100vw] h-[100vh]">
+      <div className="flex w-[100vw] h-[100vh] overflow-hidden">
         <MainSidebar>
           <div className="rounded-lg overflow-hidden grow relative h-full">
             <MemoizedMapComponent pmTilesReady={pmTilesReady}>
