@@ -112,11 +112,7 @@ const Clusters = forwardRef<ClustersRef, ClustersProps>(
   ({ mapCenter, handleFlyTo, setPopupInfo }, ref) => {
     const { current: map } = useMap() as { current: MapRef };
     const { selectCafe, selectedCafe, fetchedCafes } = useStore();
-    const { data: newlyFetchedCafes } = useCafes(
-      mapCenter.lat,
-      mapCenter.long,
-      fetchedCafes
-    );
+    const { data: newlyFetchedCafes } = useCafes(mapCenter.lat, mapCenter.long);
     const [visibleCafes, setVisibleCafes] = useState<any[]>([]);
     const visibleCafesRef = useRef<any[]>([]);
 

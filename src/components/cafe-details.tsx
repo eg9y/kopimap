@@ -24,6 +24,7 @@ import { useUser } from "../hooks/use-user";
 import { createClient } from "@supabase/supabase-js";
 import { Database } from "./lib/database.types";
 import { useCafeAggregatedReview } from "../hooks/use-cafe-aggregated-review";
+import { CafeDetailedInfo } from "../types";
 
 const supabase = createClient<Database>(
   import.meta.env.VITE_SUPABASE_URL!,
@@ -41,26 +42,44 @@ export const CafeDetails = () => {
   const [userReview, setUserReview] = useState<
     Database["public"]["Tables"]["reviews"]["Row"] | null
   >(null);
+  const [cafeDetailedInfo, setCafeDetailedInfo] =
+    useState<null | CafeDetailedInfo>(null);
+
   const { data: aggregatedReview } = useCafeAggregatedReview(
-    selectedCafe ? selectedCafe.place_id : null
+    selectedCafe ? selectedCafe.id : null
   );
 
   useEffect(() => {
     const fetchUserReview = async () => {
       if (loggedInUser && selectedCafe) {
-        const { data, error } = await supabase
+        const { data: reviewData, error: errorReviewData } = await supabase
           .from("reviews")
           .select("*")
           .eq("user_id", loggedInUser.id)
-          .eq("cafe_id", selectedCafe.id!)
+          .eq("cafe_place_id", selectedCafe.id!)
           .single();
 
-        if (error) {
-          if (error.code !== "PGRST116") {
-            console.error("Error fetching user review:", error);
+        const { data: fetchedCafeInfo, error: errorFetchedCafeInfo } =
+          await supabase
+            .from("cafe_location_view")
+            .select("*")
+            .eq("place_id", selectedCafe.id!)
+            .single();
+
+        if (errorReviewData) {
+          if (errorReviewData.code !== "PGRST116") {
+            console.error("Error fetching user review:", errorReviewData);
           }
         } else {
-          setUserReview(data);
+          setUserReview(reviewData);
+        }
+
+        if (errorFetchedCafeInfo) {
+          if (errorFetchedCafeInfo.code !== "PGRST116") {
+            console.error("Error fetching cafe info:", errorFetchedCafeInfo);
+          }
+        } else {
+          setCafeDetailedInfo(fetchedCafeInfo);
         }
       }
     };
@@ -196,130 +215,145 @@ export const CafeDetails = () => {
         }}
       >
         <div className={cn("flex gap-4 p-4 flex-col grow")}>
-          {!expandDetails && selectedCafe.gmaps_featured_image && (
-            <div className="w-full h-[200px]">
-              <img
-                src={selectedCafe.gmaps_featured_image}
-                className="w-full object-cover h-full"
-                alt={selectedCafe.name!}
-              />
-            </div>
-          )}
-          <div
-            className={cn(
-              "w-full grow gap-4",
-              expandDetails ? "grid grid-cols-2" : "flex flex-col"
-            )}
-          >
-            <div className="flex flex-col gap-2">
-              <div className="">
-                <div className="flex items-center gap-4">
-                  <Heading>{selectedCafe.name}</Heading>
-                  <BadgeButton
-                    color="zinc"
-                    onClick={() => setExpandDetails(!expandDetails)}
-                  >
-                    {expandDetails ? (
-                      <ArrowLeftFromLineIcon className="size-4" />
-                    ) : (
-                      <ArrowRightFromLineIcon className="size-4" />
-                    )}
-                  </BadgeButton>
+          {cafeDetailedInfo && (
+            <>
+              {!expandDetails && cafeDetailedInfo.gmaps_featured_image && (
+                <div className="w-full h-[200px]">
+                  <img
+                    src={cafeDetailedInfo.gmaps_featured_image}
+                    className="w-full object-cover h-full"
+                    alt={cafeDetailedInfo.name!}
+                  />
                 </div>
-                {expandDetails && (
-                  <p className="text-balance">{selectedCafe.description}</p>
-                )}
-              </div>
-
-              <div className="flex items-center gap-1 flex-wrap">
-                <Badge>
-                  <img src="/instagram.svg" alt="Instagram" />
-                </Badge>
-                <Badge>
-                  <img src="/whatsapp.svg" className="size-6" alt="WhatsApp" />
-                </Badge>
-                <Badge className="!gap-0">
-                  <span className="p-1">
-                    <img src="/phone.svg" className="size-4" alt="Phone" />
-                  </span>
-                  <span>{selectedCafe.phone}</span>
-                </Badge>
-                {selectedCafe.menu_link && (
-                  <BadgeButton href={selectedCafe.menu_link}>Menu</BadgeButton>
-                )}
-              </div>
-              <div className="flex gap-1 flex-wrap">
-                <BadgeButton
-                  color="red"
-                  href={selectedCafe.gmaps_link || ""}
-                  disabled={!selectedCafe.gmaps_link}
-                  target="_blank"
-                >
-                  GMaps
-                </BadgeButton>
-                <Badge className="text-nowrap">
-                  <p>GMaps Rating</p>
-                  <StarIcon className="size-4" />
-                  <p>{selectedCafe.gmaps_rating}</p>
-                  <p>({selectedCafe.gmaps_total_reviews})</p>
-                </Badge>
-                {selectedCafe.price_range && (
-                  <Badge>{selectedCafe.price_range}</Badge>
-                )}
-                <Badge className="text-nowrap">
-                  Open {selectedCafe.workday_timings}
-                </Badge>
-              </div>
-              <div className="p-2 rounded-md bg-blue-100">
-                <p className="text-pretty text-xs">
-                  <MapPinIcon className="size-4 inline" />{" "}
-                  {selectedCafe.address}
-                </p>
-              </div>
-              {expandDetails && (
-                <CafeImages cafe={selectedCafe} expandDetails={expandDetails} />
               )}
-            </div>
-            <div className="flex flex-col gap-4">
-              <div className="bg-white p-4 rounded-lg shadow-md">
-                <Heading className="">User Reviews</Heading>
-
-                <Rate rating={aggregatedReview?.avg_rating ?? 0} />
-                <p className="text-center mt-2">
-                  Based on {aggregatedReview?.review_count ?? 0} reviews
-                </p>
-                <Button
-                  color={userReview ? "blue" : "emerald"}
-                  className="w-full mt-4 cursor-pointer"
-                  onClick={handleReviewButtonClick}
-                  ref={buttonRef}
-                >
-                  {userReview ? (
-                    <>
-                      <EditIcon size={16} />
-                      Edit Your Review
-                    </>
-                  ) : (
-                    <>
-                      <PlusIcon size={16} />
-                      Write a Review
-                    </>
-                  )}
-                </Button>
-                {userReview && (
-                  <p className="text-center mt-2 text-sm text-emerald-600">
-                    You've reviewed this café!
-                  </p>
+              <div
+                className={cn(
+                  "w-full grow gap-4",
+                  expandDetails ? "grid grid-cols-2" : "flex flex-col"
                 )}
-              </div>
-              <div className="bg-white p-4 rounded-lg shadow-md">
-                <Heading className="mb-2">Ratings Breakdown</Heading>
+              >
                 <div className="flex flex-col gap-2">
-                  {renderAggregatedReviews()}
+                  <div className="">
+                    <div className="flex items-center gap-4">
+                      <Heading>{cafeDetailedInfo.name}</Heading>
+                      <BadgeButton
+                        color="zinc"
+                        onClick={() => setExpandDetails(!expandDetails)}
+                      >
+                        {expandDetails ? (
+                          <ArrowLeftFromLineIcon className="size-4" />
+                        ) : (
+                          <ArrowRightFromLineIcon className="size-4" />
+                        )}
+                      </BadgeButton>
+                    </div>
+                    {expandDetails && (
+                      <p className="text-balance">
+                        {cafeDetailedInfo.description}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-1 flex-wrap">
+                    <Badge>
+                      <img src="/instagram.svg" alt="Instagram" />
+                    </Badge>
+                    <Badge>
+                      <img
+                        src="/whatsapp.svg"
+                        className="size-6"
+                        alt="WhatsApp"
+                      />
+                    </Badge>
+                    <Badge className="!gap-0">
+                      <span className="p-1">
+                        <img src="/phone.svg" className="size-4" alt="Phone" />
+                      </span>
+                      <span>{cafeDetailedInfo.phone}</span>
+                    </Badge>
+                    {cafeDetailedInfo.menu_link && (
+                      <BadgeButton href={cafeDetailedInfo.menu_link}>
+                        Menu
+                      </BadgeButton>
+                    )}
+                  </div>
+                  <div className="flex gap-1 flex-wrap">
+                    <BadgeButton
+                      color="red"
+                      href={cafeDetailedInfo.gmaps_link || ""}
+                      disabled={!cafeDetailedInfo.gmaps_link}
+                      target="_blank"
+                    >
+                      GMaps
+                    </BadgeButton>
+                    <Badge className="text-nowrap">
+                      <p>GMaps Rating</p>
+                      <StarIcon className="size-4" />
+                      <p>{cafeDetailedInfo.gmaps_rating}</p>
+                      <p>({cafeDetailedInfo.gmaps_total_reviews})</p>
+                    </Badge>
+                    {cafeDetailedInfo.price_range && (
+                      <Badge>{cafeDetailedInfo.price_range}</Badge>
+                    )}
+                    <Badge className="text-nowrap">
+                      Open {cafeDetailedInfo.workday_timings}
+                    </Badge>
+                  </div>
+                  <div className="p-2 rounded-md bg-blue-100">
+                    <p className="text-pretty text-xs">
+                      <MapPinIcon className="size-4 inline" />{" "}
+                      {cafeDetailedInfo.address}
+                    </p>
+                  </div>
+                  {expandDetails && (
+                    <CafeImages
+                      cafe={cafeDetailedInfo}
+                      expandDetails={expandDetails}
+                    />
+                  )}
+                </div>
+                <div className="flex flex-col gap-4">
+                  <div className="bg-white p-4 rounded-lg shadow-md">
+                    <Heading className="">User Reviews</Heading>
+
+                    <Rate rating={aggregatedReview?.avg_rating ?? 0} />
+                    <p className="text-center mt-2">
+                      Based on {aggregatedReview?.review_count ?? 0} reviews
+                    </p>
+                    <Button
+                      color={userReview ? "blue" : "emerald"}
+                      className="w-full mt-4 cursor-pointer"
+                      onClick={handleReviewButtonClick}
+                      ref={buttonRef}
+                    >
+                      {userReview ? (
+                        <>
+                          <EditIcon size={16} />
+                          Edit Your Review
+                        </>
+                      ) : (
+                        <>
+                          <PlusIcon size={16} />
+                          Write a Review
+                        </>
+                      )}
+                    </Button>
+                    {userReview && (
+                      <p className="text-center mt-2 text-sm text-emerald-600">
+                        You've reviewed this café!
+                      </p>
+                    )}
+                  </div>
+                  <div className="bg-white p-4 rounded-lg shadow-md">
+                    <Heading className="mb-2">Ratings Breakdown</Heading>
+                    <div className="flex flex-col gap-2">
+                      {renderAggregatedReviews()}
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
+            </>
+          )}
         </div>
       </motion.div>
       <SubmitReviewDialog

@@ -3,10 +3,10 @@ import { devtools, persist } from "zustand/middleware";
 import type {} from "@redux-devtools/extension"; // required for devtools typing
 import { MutableRefObject, createRef } from "react";
 import { MapRef } from "react-map-gl";
-import { SelectedCafe } from "./types";
+import { Cafe, MeiliSearchCafe } from "./types";
 
 interface MapState {
-  selectedCafe: SelectedCafe | null;
+  selectedCafe: Cafe | null;
   selectCafe: (cafe: any | null) => void;
   mapCenter: {
     lat: number;
@@ -17,28 +17,8 @@ interface MapState {
   setMapRef: (element: MapRef | undefined) => void;
   expandDetails: boolean;
   setExpandDetails: (expand: boolean) => void;
-  fetchedCafes:
-    | {
-        id: number;
-        name: string;
-        gmaps_featured_image: string;
-        gmaps_ratings: string;
-        latitude: number;
-        longitude: number;
-        distance: number;
-      }[];
-  setFetchedCafes: (
-    cafes:
-      | {
-          id: number;
-          name: string;
-          gmaps_featured_image: string;
-          gmaps_ratings: string;
-          latitude: number;
-          longitude: number;
-          distance: number;
-        }[]
-  ) => void;
+  fetchedCafes: MeiliSearchCafe[];
+  setFetchedCafes: (cafes: MeiliSearchCafe[]) => void;
 }
 
 export const useStore = create<MapState>()(
@@ -66,19 +46,8 @@ export const useStore = create<MapState>()(
         expandDetails: false,
         setExpandDetails: (expand: boolean) => set({ expandDetails: expand }),
         fetchedCafes: [],
-        setFetchedCafes: (
-          ids:
-            | {
-                id: number;
-                name: string;
-                gmaps_featured_image: string;
-                gmaps_ratings: string;
-                latitude: number;
-                longitude: number;
-                distance: number;
-              }[]
-        ) => {
-          set({ fetchedCafes: ids });
+        setFetchedCafes: (cafes: MeiliSearchCafe[]) => {
+          set({ fetchedCafes: cafes });
         },
       }),
       {

@@ -449,11 +449,24 @@ export type Database = {
     Views: {
       cafe_location_view: {
         Row: {
+          accessibility_mode:
+            | Database["public"]["Enums"]["accessibility"]
+            | null
           address: string | null
+          aggregated_reviews_last_updated: string | null
+          avg_rating: number | null
+          bathroom_availability_mode:
+            | Database["public"]["Enums"]["bathroom_availability"]
+            | null
+          cleanliness_mode: Database["public"]["Enums"]["cleanliness"] | null
           closed_on: string | null
+          coffee_quality_mode:
+            | Database["public"]["Enums"]["quality_rating"]
+            | null
           created_at: string | null
           description: string | null
           detailed_address: Json | null
+          food_options_mode: Database["public"]["Enums"]["food_options"] | null
           gmaps_featured_image: string | null
           gmaps_featured_reviews: Json | null
           gmaps_images: Json | null
@@ -464,76 +477,49 @@ export type Database = {
           gmaps_total_reviews: number | null
           hours: Json | null
           id: number | null
+          instagram_worthy_mode:
+            | Database["public"]["Enums"]["instagram_worthy"]
+            | null
           latitude: number | null
           longitude: number | null
           main_category: string | null
           menu_link: string | null
           name: string | null
+          non_coffee_options_mode:
+            | Database["public"]["Enums"]["non_coffee_options"]
+            | null
+          outdoor_seating_mode:
+            | Database["public"]["Enums"]["outdoor_seating"]
+            | null
+          overall_vibe_mode: Database["public"]["Enums"]["overall_vibe"] | null
+          parking_mode:
+            | Database["public"]["Enums"]["parking_availability"]
+            | null
+          pet_friendly_mode: Database["public"]["Enums"]["pet_friendly"] | null
           phone: string | null
           place_id: string | null
           plus_code: string | null
           popular_times: Json | null
+          power_outlets_mode:
+            | Database["public"]["Enums"]["power_outlets"]
+            | null
           price_range: string | null
+          review_count: number | null
+          seating_comfort_mode:
+            | Database["public"]["Enums"]["seating_comfort"]
+            | null
+          unique_offering_mode:
+            | Database["public"]["Enums"]["unique_offering"]
+            | null
+          value_for_money_mode:
+            | Database["public"]["Enums"]["value_rating"]
+            | null
           website: string | null
+          wifi_reliability_mode:
+            | Database["public"]["Enums"]["wifi_reliability"]
+            | null
+          work_space_mode: Database["public"]["Enums"]["work_space"] | null
           workday_timings: string | null
-        }
-        Insert: {
-          address?: string | null
-          closed_on?: string | null
-          created_at?: string | null
-          description?: string | null
-          detailed_address?: Json | null
-          gmaps_featured_image?: string | null
-          gmaps_featured_reviews?: Json | null
-          gmaps_images?: Json | null
-          gmaps_link?: string | null
-          gmaps_rating?: string | null
-          gmaps_reviews_link?: string | null
-          gmaps_reviews_per_rating?: Json | null
-          gmaps_total_reviews?: number | null
-          hours?: Json | null
-          id?: number | null
-          latitude?: never
-          longitude?: never
-          main_category?: string | null
-          menu_link?: string | null
-          name?: string | null
-          phone?: string | null
-          place_id?: string | null
-          plus_code?: string | null
-          popular_times?: Json | null
-          price_range?: string | null
-          website?: string | null
-          workday_timings?: string | null
-        }
-        Update: {
-          address?: string | null
-          closed_on?: string | null
-          created_at?: string | null
-          description?: string | null
-          detailed_address?: Json | null
-          gmaps_featured_image?: string | null
-          gmaps_featured_reviews?: Json | null
-          gmaps_images?: Json | null
-          gmaps_link?: string | null
-          gmaps_rating?: string | null
-          gmaps_reviews_link?: string | null
-          gmaps_reviews_per_rating?: Json | null
-          gmaps_total_reviews?: number | null
-          hours?: Json | null
-          id?: number | null
-          latitude?: never
-          longitude?: never
-          main_category?: string | null
-          menu_link?: string | null
-          name?: string | null
-          phone?: string | null
-          place_id?: string | null
-          plus_code?: string | null
-          popular_times?: Json | null
-          price_range?: string | null
-          website?: string | null
-          workday_timings?: string | null
         }
         Relationships: []
       }

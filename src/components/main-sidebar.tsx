@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import { Avatar } from "./catalyst/avatar";
 import {
   Dropdown,
@@ -20,7 +21,6 @@ import {
   SidebarBody,
   SidebarFooter,
   SidebarHeader,
-  SidebarHeading,
   SidebarItem,
   SidebarSection,
   SidebarSpacer,
@@ -47,9 +47,9 @@ import {
   DialogActions,
 } from "./catalyst/dialog";
 import { Field, Label } from "./catalyst/fieldset";
-import { useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { useUser } from "../hooks/use-user";
+import { useSearch } from "../hooks/use-search";
 
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL!,
@@ -58,8 +58,30 @@ const supabase = createClient(
 
 export function MainSidebar({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
-
+  const [userLocation, setUserLocation] = useState<{
+    lat: number | null;
+    lng: number | null;
+  }>({ lat: null, lng: null });
   const { loggedInUser } = useUser();
+
+  const { searchTerm, setSearchTerm, handleSearch, isLoading, error } =
+    useSearch();
+
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setUserLocation({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        });
+      },
+      (error) => console.error("Error getting location:", error)
+    );
+  }, []);
+
+  const performSearch = () => {
+    handleSearch(userLocation);
+  };
 
   return (
     <>
@@ -118,8 +140,11 @@ export function MainSidebar({ children }: { children: React.ReactNode }) {
                     <MagnifyingGlassIcon />
                     <Input
                       name="search"
-                      placeholder="Search&hellip;"
+                      placeholder="Search cafes..."
                       aria-label="Search"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      onKeyPress={(e) => e.key === "Enter" && performSearch()}
                     />
                   </InputGroup>
                 </div>
@@ -134,7 +159,8 @@ export function MainSidebar({ children }: { children: React.ReactNode }) {
             </SidebarHeader>
             <SidebarBody>
               <SidebarSection className="max-lg:hidden">
-                <SidebarHeading>Results</SidebarHeading>
+                {isLoading && <Text>Loading...</Text>}
+                {error && <Text color="red">{error}</Text>}
                 <CafeList />
               </SidebarSection>
               <SidebarSpacer />
