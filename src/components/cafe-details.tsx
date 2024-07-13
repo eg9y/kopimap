@@ -43,7 +43,7 @@ export const CafeDetails = () => {
     Database["public"]["Tables"]["reviews"]["Row"] | null
   >(null);
   const [cafeDetailedInfo, setCafeDetailedInfo] =
-    useState<null | CafeDetailedInfo>(null);
+    useState<CafeDetailedInfo | null>(null);
 
   const { data: aggregatedReview } = useCafeAggregatedReview(
     selectedCafe ? selectedCafe.id : null
@@ -359,6 +359,7 @@ export const CafeDetails = () => {
       <SubmitReviewDialog
         isOpen={openSubmitReviewDialog}
         setIsOpen={setOpenSubmitReviewDialog}
+        cafeDetailedInfo={cafeDetailedInfo}
       />
       <Confetti
         style={{

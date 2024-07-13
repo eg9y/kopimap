@@ -21,7 +21,7 @@ export function CafeList() {
         (cafe, index, self) => index === self.findIndex((t) => t.id === cafe.id)
       );
 
-      const sortedCafes = uniqueCafes.sort((a, b) => {
+      const sortedCafes = uniqueCafes.sort((a) => {
         const distanceA = calculateDistance(
           mapCenter.lat,
           mapCenter.long,

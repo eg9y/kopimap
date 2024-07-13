@@ -18,6 +18,7 @@ import { reviewAttributes } from "./lib/review-attributes";
 import { useSubmitReview } from "../hooks/use-submit-review";
 import { createClient } from "@supabase/supabase-js";
 import { Database } from "./lib/database.types";
+import { CafeDetailedInfo } from "../types";
 
 const CUSTOM_GROUP_LABEL_ID = "group_label";
 const CUSTOM_ITEM_LABELS = ["Bad", "Poor", "Average", "Great", "Excellent"];
@@ -37,9 +38,11 @@ const supabase = createClient<Database>(
 export function SubmitReviewDialog({
   isOpen,
   setIsOpen,
+  cafeDetailedInfo,
 }: {
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  cafeDetailedInfo: CafeDetailedInfo | null;
 }) {
   const {
     control,
@@ -48,7 +51,6 @@ export function SubmitReviewDialog({
     setValue,
     formState: { errors },
   } = useForm<FieldValues>();
-  const { selectedCafe } = useStore();
   const { loggedInUser } = useUser();
   const [isUpdating, setIsUpdating] = useState(false);
 
@@ -65,17 +67,17 @@ export function SubmitReviewDialog({
 
   const { mutate } = useSubmitReview(
     onSuccess,
-    selectedCafe ? selectedCafe.place_id : null
+    cafeDetailedInfo ? cafeDetailedInfo.place_id : null
   );
 
   useEffect(() => {
     const fetchExistingReview = async () => {
-      if (loggedInUser && selectedCafe) {
+      if (loggedInUser && cafeDetailedInfo) {
         const { data, error } = await supabase
           .from("reviews")
           .select("*")
           .eq("user_id", loggedInUser.id)
-          .eq("cafe_id", selectedCafe.id!)
+          .eq("cafe_id", cafeDetailedInfo.id!)
           .single();
 
         if (error) {
@@ -100,7 +102,7 @@ export function SubmitReviewDialog({
     };
 
     fetchExistingReview();
-  }, [loggedInUser, selectedCafe, setValue, reset]);
+  }, [loggedInUser, cafeDetailedInfo, setValue, reset]);
 
   const onSubmit = (data: any) => {
     if (!loggedInUser) {
@@ -112,8 +114,8 @@ export function SubmitReviewDialog({
     }
 
     const reviewData = {
-      cafe_id: selectedCafe!.id,
-      cafe_place_id: selectedCafe!.place_id,
+      cafe_id: cafeDetailedInfo!.id,
+      cafe_place_id: cafeDetailedInfo!.place_id,
       user_id: loggedInUser.id,
       ...data,
     };
@@ -123,12 +125,13 @@ export function SubmitReviewDialog({
 
   return (
     <Dialog
-      open={isOpen && !!selectedCafe}
+      open={isOpen && !!cafeDetailedInfo}
       onClose={() => setIsOpen(false)}
       className="!max-w-[70vw] h-[90vh] flex flex-col overflow-y-auto"
     >
       <DialogTitle>
-        {isUpdating ? "Update Review" : "Create Review"}: {selectedCafe!.name}
+        {isUpdating ? "Update Review" : "Create Review"}:{" "}
+        {cafeDetailedInfo!.name}
       </DialogTitle>
       <DialogDescription>
         {isUpdating

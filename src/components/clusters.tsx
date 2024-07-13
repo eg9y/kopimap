@@ -120,7 +120,7 @@ const Clusters = forwardRef<ClustersRef, ClustersProps>(
       if (map && fetchedCafes) {
         const bounds = map.getBounds();
         const visible = fetchedCafes.filter((cafe) =>
-          bounds.contains([cafe.longitude, cafe.latitude])
+          bounds.contains([cafe._geo.lng, cafe._geo.lat])
         );
 
         // Check if the visible cafes have actually changed
@@ -157,7 +157,7 @@ const Clusters = forwardRef<ClustersRef, ClustersProps>(
             ...cafe,
             cluster: false,
             gmaps_rating: parseFloat(cafe.gmaps_ratings),
-            selectedCafeId: selectedCafe?.place_id || "",
+            selectedCafeId: selectedCafe?.id || "",
           },
           geometry: {
             type: "Point",
