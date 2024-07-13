@@ -202,7 +202,7 @@ export function MainSidebar({ children }: { children: React.ReactNode }) {
                     target="_blank"
                     className="text-xs"
                   >
-                    Made by turning ☕️ to {"</>"}
+                    check out my other apps
                   </Link>
                 </div>
                 <DropdownMenu className="min-w-64" anchor="top start">

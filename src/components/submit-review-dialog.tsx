@@ -130,7 +130,7 @@ export function SubmitReviewDialog({
     >
       <DialogTitle>
         {isUpdating ? "Update Review" : "Create Review"}:{" "}
-        {cafeDetailedInfo!.name}
+        {cafeDetailedInfo ? cafeDetailedInfo.name : "Loading..."}
       </DialogTitle>
       <DialogDescription>
         {isUpdating
