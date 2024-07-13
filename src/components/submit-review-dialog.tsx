@@ -11,7 +11,6 @@ import {
 import { Button } from "./catalyst/button";
 import { Field, Label } from "./catalyst/fieldset";
 import { Badge } from "./catalyst/badge";
-import { useStore } from "../store";
 import { Rating, RoundedStar } from "@smastrom/react-rating";
 import { useUser } from "../hooks/use-user";
 import { reviewAttributes } from "./lib/review-attributes";
