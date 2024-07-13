@@ -59,13 +59,6 @@ export const CafeDetails = () => {
           .eq("cafe_place_id", selectedCafe.id!)
           .single();
 
-        const { data: fetchedCafeInfo, error: errorFetchedCafeInfo } =
-          await supabase
-            .from("cafe_location_view")
-            .select("*")
-            .eq("place_id", selectedCafe.id!)
-            .single();
-
         if (errorReviewData) {
           if (errorReviewData.code !== "PGRST116") {
             console.error("Error fetching user review:", errorReviewData);
@@ -73,7 +66,15 @@ export const CafeDetails = () => {
         } else {
           setUserReview(reviewData);
         }
+      }
 
+      if (selectedCafe) {
+        const { data: fetchedCafeInfo, error: errorFetchedCafeInfo } =
+          await supabase
+            .from("cafe_location_view")
+            .select("*")
+            .eq("place_id", selectedCafe.id!)
+            .single();
         if (errorFetchedCafeInfo) {
           if (errorFetchedCafeInfo.code !== "PGRST116") {
             console.error("Error fetching cafe info:", errorFetchedCafeInfo);
