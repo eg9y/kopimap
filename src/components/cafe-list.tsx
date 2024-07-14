@@ -64,8 +64,9 @@ export function CafeList() {
           }}
           className="flex gap-2 flex-wrap "
         >
-          <div className="grow">
-            <SidebarLabel>{cafe.name}</SidebarLabel>
+          <div className="grow ">
+            <SidebarLabel className="">{cafe.name}</SidebarLabel>
+            {/* <p className="text-ellipsis overflow-hidden">{cafe.address}</p> */}
           </div>
         </SidebarItem>
       ))}

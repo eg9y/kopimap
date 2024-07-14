@@ -525,6 +525,10 @@ export type Database = {
       }
     }
     Functions: {
+      is_user_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
       nearby_cafes: {
         Args: {
           long: number

@@ -122,6 +122,37 @@ export function SubmitReviewDialog({
     mutate(reviewData);
   };
 
+  if (!loggedInUser) {
+    return (
+      <Dialog
+        open={isOpen && !!cafeDetailedInfo}
+        onClose={() => setIsOpen(false)}
+        className=""
+      >
+        <DialogTitle>Create Review</DialogTitle>
+        <DialogDescription>
+          Please login to create a review 🙏
+        </DialogDescription>
+        <DialogBody>
+          <Button
+            onClick={async () => {
+              await supabase.auth.signInWithOAuth({
+                provider: "google",
+                options: {
+                  redirectTo: import.meta.env.VITE_URL,
+                },
+              });
+            }}
+            color="green"
+            className="cursor-pointer"
+          >
+            Login
+          </Button>
+        </DialogBody>
+      </Dialog>
+    );
+  }
+
   return (
     <Dialog
       open={isOpen && !!cafeDetailedInfo}
@@ -139,23 +170,6 @@ export function SubmitReviewDialog({
       </DialogDescription>
       <form onSubmit={handleSubmit(onSubmit)} className="grow">
         <DialogBody className="flex flex-col gap-2">
-          {/* Error display */}
-          {Object.keys(errors).length > 0 && (
-            <div
-              className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
-              role="alert"
-            >
-              <strong className="font-bold">
-                Please correct the following errors:
-              </strong>
-              <ul className="mt-2 list-disc list-inside">
-                {errors.rating && <li>Overall rating is required</li>}
-                {Object.keys(errors).length > 1 && (
-                  <li>Some fields have validation errors</li>
-                )}
-              </ul>
-            </div>
-          )}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {/* Overall Rating */}
             <div className="p-2 rounded-md bg-slate-100 w-full flex flex-col">
@@ -254,6 +268,23 @@ export function SubmitReviewDialog({
               </div>
             ))}
           </div>
+          {/* Error display */}
+          {Object.keys(errors).length > 0 && (
+            <div
+              className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
+              role="alert"
+            >
+              <strong className="font-bold">
+                Please correct the following errors:
+              </strong>
+              <ul className="mt-2 list-disc list-inside">
+                {errors.rating && <li>Overall rating is required</li>}
+                {Object.keys(errors).length > 1 && (
+                  <li>Some fields have validation errors</li>
+                )}
+              </ul>
+            </div>
+          )}
         </DialogBody>
         <DialogActions>
           <Button plain onClick={() => setIsOpen(false)}>

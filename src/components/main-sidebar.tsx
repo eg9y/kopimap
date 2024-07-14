@@ -36,7 +36,6 @@ import {
 } from "@heroicons/react/16/solid";
 import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
 import { Text } from "./catalyst/text";
-import { Link } from "./catalyst/link";
 import { CafeList } from "./cafe-list";
 import { Button } from "./catalyst/button";
 import {
