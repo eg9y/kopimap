@@ -16,22 +16,21 @@ import {
   SunIcon,
   CameraIcon,
   CatIcon,
-  StarIcon,
 } from "lucide-react";
 
 export const reviewAttributes: CategoryAttributes[] = [
   {
     color: "orange",
-    category: "Atmosphere",
+    category: "Ambiance",
     attributes: [
       {
-        name: "Overall Vibe",
-        options: ["Relaxed", "Energetic", "Cozy", "Modern", "Artistic"],
-        icon: HomeIcon,
+        name: "comfort_level",
+        options: ["Minimal", "Adequate", "Comfortable", "Luxurious"],
+        icon: ArmchairIcon,
       },
       {
-        name: "Seating Comfort",
-        options: ["Basic", "Comfortable", "Luxurious"],
+        name: "seating_capacity",
+        options: ["Limited", "Moderate", "Spacious"],
         icon: ArmchairIcon,
       },
     ],
@@ -41,18 +40,18 @@ export const reviewAttributes: CategoryAttributes[] = [
     category: "Work-Friendly",
     attributes: [
       {
-        name: "WiFi Reliability",
-        options: ["No WiFi", "Unreliable", "Mostly Reliable", "Very Reliable"],
+        name: "wifi_quality",
+        options: ["No WiFi", "Unreliable", "Decent", "Fast and Reliable"],
         icon: WifiIcon,
       },
       {
-        name: "Power Outlets",
-        options: ["None Visible", "Limited", "Plenty"],
+        name: "outlet_availability",
+        options: ["None Visible", "Scarce", "Adequate", "Plentiful"],
         icon: PlugIcon,
       },
       {
-        name: "Work Space",
-        options: ["Not Suitable", "Okay", "Good", "Excellent"],
+        name: "work_suitability",
+        options: ["Not Suitable", "Tolerable", "Good", "Excellent"],
         icon: BriefcaseIcon,
       },
     ],
@@ -62,17 +61,17 @@ export const reviewAttributes: CategoryAttributes[] = [
     category: "Food & Drinks",
     attributes: [
       {
-        name: "Coffee Quality",
-        options: ["Poor", "Average", "Good", "Excellent"],
+        name: "coffee_quality",
+        options: ["Subpar", "Average", "Good", "Excellent"],
         icon: CoffeeIcon,
       },
       {
-        name: "Non-Coffee Options",
-        options: ["Very Limited", "Some Options", "Great Variety"],
+        name: "non_coffee_options",
+        options: ["Very Limited", "Some Options", "Wide Variety"],
         icon: CupSodaIcon,
       },
       {
-        name: "Food Options",
+        name: "food_options",
         options: ["No Food", "Snacks Only", "Light Meals", "Full Menu"],
         icon: UtensilsIcon,
       },
@@ -83,8 +82,8 @@ export const reviewAttributes: CategoryAttributes[] = [
     category: "Value",
     attributes: [
       {
-        name: "Value for Money",
-        options: ["Poor", "Fair", "Good", "Excellent"],
+        name: "price_quality_ratio",
+        options: ["Overpriced", "Fair", "Good Value", "Excellent Value"],
         icon: ScaleIcon,
       },
     ],
@@ -94,50 +93,60 @@ export const reviewAttributes: CategoryAttributes[] = [
     category: "Facilities",
     attributes: [
       {
-        name: "Parking",
-        options: ["No Parking", "Limited", "Ample"],
+        name: "parking_options",
+        options: [
+          "No Parking",
+          "Limited Street Parking",
+          "Adequate Parking",
+          "Ample Parking",
+        ],
         icon: CarIcon,
       },
       {
-        name: "Cleanliness",
-        options: ["Poor", "Acceptable", "Clean", "Very Clean"],
+        name: "cleanliness",
+        options: ["Needs Improvement", "Acceptable", "Clean", "Spotless"],
         icon: SparklesIcon,
       },
       {
-        name: "Bathroom Availability",
-        options: ["No Bathroom", "For Customers", "Public Access"],
+        name: "restroom_quality",
+        options: [
+          "No Restroom",
+          "Needs Improvement",
+          "Acceptable",
+          "Clean",
+          "Exceptionally Clean",
+        ],
         icon: ShowerHeadIcon,
       },
       {
-        name: "Accessibility",
+        name: "accessibility",
         options: ["Not Accessible", "Partially Accessible", "Fully Accessible"],
         icon: AccessibilityIcon,
       },
     ],
   },
   {
-    color: "zinc",
+    color: "lime",
     category: "Special Features",
     attributes: [
       {
-        name: "Outdoor Seating",
+        name: "outdoor_seating",
         options: ["None", "Limited", "Ample"],
         icon: SunIcon,
       },
       {
-        name: "Instagram-worthy",
-        options: ["Not Really", "Somewhat", "Very"],
+        name: "instagram_worthiness",
+        options: [
+          "Not Particularly",
+          "Somewhat Photogenic",
+          "Very Instagrammable",
+        ],
         icon: CameraIcon,
       },
       {
-        name: "Pet-friendly",
-        options: ["no", "meow"],
+        name: "pet_friendly",
+        options: ["no", "yes"],
         icon: CatIcon,
-      },
-      {
-        name: "Unique Offering",
-        options: ["Standard", "Interesting", "Very Unique"],
-        icon: StarIcon,
       },
     ],
   },

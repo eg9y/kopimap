@@ -10,7 +10,6 @@ import {
 } from "./catalyst/dialog";
 import { Button } from "./catalyst/button";
 import { Field, Label } from "./catalyst/fieldset";
-import { Badge } from "./catalyst/badge";
 import { Rating, RoundedStar } from "@smastrom/react-rating";
 import { useUser } from "../hooks/use-user";
 import { reviewAttributes } from "./lib/review-attributes";
@@ -18,6 +17,7 @@ import { useSubmitReview } from "../hooks/use-submit-review";
 import { createClient } from "@supabase/supabase-js";
 import { Database } from "./lib/database.types";
 import { CafeDetailedInfo } from "../types";
+import { cn } from "./lib/utils";
 
 const CUSTOM_GROUP_LABEL_ID = "group_label";
 const CUSTOM_ITEM_LABELS = ["Bad", "Poor", "Average", "Great", "Excellent"];
@@ -33,6 +33,8 @@ const supabase = createClient<Database>(
   import.meta.env.VITE_SUPABASE_URL!,
   import.meta.env.VITE_SUPABASE_ANON_KEY!
 );
+
+type ReviewInsert = Database["public"]["Tables"]["reviews"]["Insert"];
 
 export function SubmitReviewDialog({
   isOpen,
@@ -103,20 +105,23 @@ export function SubmitReviewDialog({
     fetchExistingReview();
   }, [loggedInUser, cafeDetailedInfo, setValue, reset]);
 
-  const onSubmit = (data: any) => {
-    if (!loggedInUser) {
-      toast.warning("Login to Review", {
-        description: "Please login to submit your review.",
+  const onSubmit = (data: FieldValues) => {
+    if (!loggedInUser || !cafeDetailedInfo) {
+      toast.warning("Unable to submit review", {
+        description: "Please ensure you're logged in and a cafe is selected.",
         position: "top-right",
       });
       return;
     }
 
-    const reviewData = {
-      cafe_id: cafeDetailedInfo!.id,
-      cafe_place_id: cafeDetailedInfo!.place_id,
-      user_id: loggedInUser.id,
+    const reviewData: ReviewInsert = {
       ...data,
+      cafe_id: cafeDetailedInfo.id,
+      cafe_place_id: cafeDetailedInfo.place_id,
+      user_id: loggedInUser.id,
+      // Ensure rating is a number
+      rating:
+        typeof data.rating === "number" ? data.rating : parseFloat(data.rating),
     };
 
     mutate(reviewData);
@@ -235,9 +240,27 @@ export function SubmitReviewDialog({
             {reviewAttributes.map((attr) => (
               <div
                 key={attr.category}
-                className={`flex flex-col p-2 gap-4 rounded-md bg-${attr.color}-100`}
+                className={cn(
+                  `flex flex-col p-2 gap-4 rounded-md`,
+                  attr.color === "lime" && "bg-lime-200",
+                  attr.color === "fuchsia" && "bg-fuchsia-200",
+                  attr.color === "purple" && "bg-purple-200",
+                  attr.color === "emerald" && "bg-emerald-200",
+                  attr.color === "blue" && "bg-blue-200",
+                  attr.color === "orange" && "bg-orange-200"
+                )}
               >
-                <p className={`text-base font-semibold text-${attr.color}-800`}>
+                <p
+                  className={cn(
+                    `text-base font-semibold`,
+                    attr.color === "lime" && "text-lime-800",
+                    attr.color === "fuchsia" && "text-fuchsia-800",
+                    attr.color === "purple" && "text-purple-800",
+                    attr.color === "emerald" && "text-emerald-800",
+                    attr.color === "blue" && "text-blue-800",
+                    attr.color === "orange" && "text-orange-800"
+                  )}
+                >
                   {attr.category}
                 </p>
                 {attr.attributes.map((attribute) => (
@@ -249,16 +272,16 @@ export function SubmitReviewDialog({
                       render={({ field }) => (
                         <div className="flex items-center gap-1 flex-wrap">
                           {attribute.options.map((option) => (
-                            <Badge
+                            <Button
                               key={option}
                               color={
-                                field.value === option ? attr.color : "zinc"
+                                field.value === option ? attr.color : "white"
                               }
                               className="cursor-pointer"
                               onClick={() => field.onChange(option)}
                             >
                               {option}
-                            </Badge>
+                            </Button>
                           ))}
                         </div>
                       )}

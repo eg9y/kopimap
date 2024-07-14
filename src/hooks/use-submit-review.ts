@@ -8,14 +8,12 @@ const supabase = createClient<Database>(
   import.meta.env.VITE_SUPABASE_ANON_KEY!
 );
 
-// Define a type for the review data
-type ReviewData = {
-  user_id: string;
-  cafe_id: number;
-  // Add other fields as necessary
-};
-
-const submitReview = async (reviewData: ReviewData): Promise<any> => {
+const submitReview = async (
+  reviewData: Omit<
+    Database["public"]["Tables"]["reviews"]["Insert"],
+    "id" | "created_at"
+  >
+): Promise<any> => {
   const { data, error } = await supabase
     .from("reviews")
     .upsert(reviewData, { onConflict: "user_id,cafe_id" });

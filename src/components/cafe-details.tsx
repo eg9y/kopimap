@@ -102,7 +102,7 @@ export const CafeDetails = () => {
   };
 
   const renderAggregatedReviews = () => {
-    if (!aggregatedReview) return null;
+    if (!cafeDetailedInfo) return null;
 
     return (
       <div className="grid grid-cols-2 gap-2">
@@ -117,7 +117,7 @@ export const CafeDetails = () => {
               category.color === "purple" && "bg-purple-100",
               category.color === "yellow" && "bg-yellow-100",
               category.color === "fuchsia" && "bg-fuchsia-100",
-              category.color === "zinc" && "bg-zinc-100"
+              category.color === "lime" && "bg-lime-100"
             )}
           >
             <p
@@ -129,20 +129,16 @@ export const CafeDetails = () => {
                 category.color === "purple" && "text-purple-800",
                 category.color === "yellow" && "text-yellow-800",
                 category.color === "fuchsia" && "text-fuchsia-800",
-                category.color === "zinc" && "text-zinc-800"
+                category.color === "lime" && "text-lime-800"
               )}
             >
               {category.category}
             </p>
             <div className="flex flex-col gap-2">
               {category.attributes.map((attr) => {
-                const modeKey = `${attr.name
-                  .replace(/\s+/g, "_")
-                  .toLowerCase()}_mode`;
-                const value =
-                  aggregatedReview[
-                    modeKey as keyof Database["public"]["Tables"]["cafe_aggregated_reviews"]["Row"]
-                  ];
+                const modeKey =
+                  `${attr.name.toLowerCase()}_mode` as keyof CafeDetailedInfo;
+                const value = cafeDetailedInfo[modeKey];
                 return (
                   <div key={attr.name} className="">
                     <div className={cn(`flex flex-col gap-1`, "w-full")}>
@@ -159,7 +155,7 @@ export const CafeDetails = () => {
                               category.color === "yellow" && "text-yellow-500",
                               category.color === "fuchsia" &&
                                 "text-fuchsia-500",
-                              category.color === "zinc" && "text-zinc-500"
+                              category.color === "lime" && "text-lime-500"
                             )}
                           />
                         )}
@@ -172,7 +168,7 @@ export const CafeDetails = () => {
                             category.color === "purple" && "text-purple-500",
                             category.color === "yellow" && "text-yellow-500",
                             category.color === "fuchsia" && "text-fuchsia-500",
-                            category.color === "zinc" && "text-zinc-500"
+                            category.color === "lime" && "text-lime-500"
                           )}
                         >
                           {attr.name}
@@ -180,7 +176,9 @@ export const CafeDetails = () => {
                       </div>
                       <div className="pl-0 flex items-center gap-1 flex-wrap">
                         {value ? (
-                          <Badge color={category.color}>{value}</Badge>
+                          <Badge color={category.color}>
+                            {value as string}
+                          </Badge>
                         ) : (
                           <Badge color={category.color} className="opacity-50">
                             <MinusIcon size={20} />

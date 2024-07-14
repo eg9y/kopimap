@@ -62,11 +62,13 @@ export function CafeList() {
               zoom: 14,
             });
           }}
-          className="flex gap-2 flex-wrap "
+          className=""
         >
-          <div className="grow ">
+          <div className="grow w-full">
             <SidebarLabel className="">{cafe.name}</SidebarLabel>
-            {/* <p className="text-ellipsis overflow-hidden">{cafe.address}</p> */}
+            <p className="font-light text-ellipsis text-nowrap text-slate-500 overflow-hidden">
+              {cafe.address}
+            </p>
           </div>
         </SidebarItem>
       ))}
