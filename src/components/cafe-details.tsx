@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import Confetti from "react-confetti";
 import useWindowSize from "react-use/lib/useWindowSize";
@@ -22,17 +22,10 @@ import { Button } from "./catalyst/button";
 import { SubmitReviewDialog } from "./submit-review-dialog";
 import { reviewAttributes } from "./lib/review-attributes";
 import { useUser } from "../hooks/use-user";
-import { createClient } from "@supabase/supabase-js";
-import { Database } from "./lib/database.types";
 import { useCafeAggregatedReview } from "../hooks/use-cafe-aggregated-review";
 import { CafeDetailedInfo } from "../types";
 import { useUserReview } from "../hooks/use-user-review";
 import { useCafeDetailedInfo } from "../hooks/use-cafe-detailed-info";
-
-const supabase = createClient<Database>(
-  import.meta.env.VITE_SUPABASE_URL!,
-  import.meta.env.VITE_SUPABASE_ANON_KEY!
-);
 
 export const CafeDetails = () => {
   const { t } = useTranslation();
