@@ -6,6 +6,7 @@ import { useStore } from "../store";
 import { Heading } from "./catalyst/heading";
 import { Badge, BadgeButton } from "./catalyst/badge";
 import { StarIcon } from "@heroicons/react/20/solid";
+import { useTranslation } from "react-i18next";
 import {
   ArrowLeftFromLineIcon,
   ArrowRightFromLineIcon,
@@ -25,6 +26,8 @@ import { createClient } from "@supabase/supabase-js";
 import { Database } from "./lib/database.types";
 import { useCafeAggregatedReview } from "../hooks/use-cafe-aggregated-review";
 import { CafeDetailedInfo } from "../types";
+import { useUserReview } from "../hooks/use-user-review";
+import { useCafeDetailedInfo } from "../hooks/use-cafe-detailed-info";
 
 const supabase = createClient<Database>(
   import.meta.env.VITE_SUPABASE_URL!,
@@ -32,6 +35,7 @@ const supabase = createClient<Database>(
 );
 
 export const CafeDetails = () => {
+  const { t } = useTranslation();
   const { selectedCafe, expandDetails, setExpandDetails } = useStore();
   const [letsParty, setLetsParty] = useState(false);
   const [openSubmitReviewDialog, setOpenSubmitReviewDialog] = useState(false);
@@ -39,54 +43,19 @@ export const CafeDetails = () => {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [confettiPosition, setConfettiPosition] = useState({ x: 0, y: 0 });
   const { loggedInUser } = useUser();
-  const [userReview, setUserReview] = useState<
-    Database["public"]["Tables"]["reviews"]["Row"] | null
-  >(null);
-  const [cafeDetailedInfo, setCafeDetailedInfo] =
-    useState<CafeDetailedInfo | null>(null);
+
+  const { data: userReview } = useUserReview(
+    loggedInUser?.id || null,
+    selectedCafe?.id || null
+  );
+
+  const { data: cafeDetailedInfo } = useCafeDetailedInfo(
+    selectedCafe?.id || null
+  );
 
   const { data: aggregatedReview } = useCafeAggregatedReview(
     selectedCafe ? selectedCafe.id : null
   );
-
-  useEffect(() => {
-    const fetchUserReview = async () => {
-      if (loggedInUser && selectedCafe) {
-        const { data: reviewData, error: errorReviewData } = await supabase
-          .from("reviews")
-          .select("*")
-          .eq("user_id", loggedInUser.id)
-          .eq("cafe_place_id", selectedCafe.id!)
-          .single();
-
-        if (errorReviewData) {
-          if (errorReviewData.code !== "PGRST116") {
-            console.error("Error fetching user review:", errorReviewData);
-          }
-        } else {
-          setUserReview(reviewData);
-        }
-      }
-
-      if (selectedCafe) {
-        const { data: fetchedCafeInfo, error: errorFetchedCafeInfo } =
-          await supabase
-            .from("cafe_location_view")
-            .select("*")
-            .eq("place_id", selectedCafe.id!)
-            .single();
-        if (errorFetchedCafeInfo) {
-          if (errorFetchedCafeInfo.code !== "PGRST116") {
-            console.error("Error fetching cafe info:", errorFetchedCafeInfo);
-          }
-        } else {
-          setCafeDetailedInfo(fetchedCafeInfo);
-        }
-      }
-    };
-
-    fetchUserReview();
-  }, [loggedInUser, selectedCafe]);
 
   if (!selectedCafe) return null;
 
@@ -132,7 +101,7 @@ export const CafeDetails = () => {
                 category.color === "lime" && "text-lime-800"
               )}
             >
-              {category.category}
+              {t(`categories.${category.category}`)}
             </p>
             <div className="flex flex-col gap-2">
               {category.attributes.map((attr) => {
@@ -171,13 +140,13 @@ export const CafeDetails = () => {
                             category.color === "lime" && "text-lime-500"
                           )}
                         >
-                          {attr.name}
+                          {t(`attributes.${attr.name}.name`)}
                         </p>
                       </div>
                       <div className="pl-0 flex items-center gap-1 flex-wrap">
                         {value ? (
                           <Badge color={category.color}>
-                            {value as string}
+                            {t(`attributes.${attr.name}.options.${value}`)}
                           </Badge>
                         ) : (
                           <Badge color={category.color} className="opacity-50">
@@ -313,7 +282,9 @@ export const CafeDetails = () => {
                 </div>
                 <div className="flex flex-col gap-4">
                   <div className="bg-white p-4 rounded-lg shadow-md">
-                    <Heading className="">User Reviews</Heading>
+                    <Heading className="">
+                      {t(`cafeDetails.userReviews`)}
+                    </Heading>
 
                     <Rate rating={aggregatedReview?.avg_rating ?? 0} />
                     <p className="text-center mt-2">
@@ -333,7 +304,7 @@ export const CafeDetails = () => {
                       ) : (
                         <>
                           <PlusIcon size={16} />
-                          Write a Review
+                          {t(`cafeDetails.writeAReview`)}
                         </>
                       )}
                     </Button>

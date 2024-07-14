@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useForm, Controller, FieldValues } from "react-hook-form";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
+
 import {
   Dialog,
   DialogTitle,
@@ -43,7 +45,7 @@ export function SubmitReviewDialog({
 }: {
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  cafeDetailedInfo: CafeDetailedInfo | null;
+  cafeDetailedInfo?: CafeDetailedInfo;
 }) {
   const {
     control,
@@ -54,21 +56,28 @@ export function SubmitReviewDialog({
   } = useForm<FieldValues>();
   const { loggedInUser } = useUser();
   const [isUpdating, setIsUpdating] = useState(false);
+  const { t } = useTranslation();
 
   const onSuccess = () => {
-    toast.success(isUpdating ? "Review Updated" : "Review Submitted", {
-      description: isUpdating
-        ? "Your review has been successfully updated."
-        : "Your review has been successfully submitted.",
-      position: "top-right",
-    });
+    toast.success(
+      isUpdating
+        ? t("submitReview.reviewUpdated")
+        : t("submitReview.reviewSubmitted"),
+      {
+        description: isUpdating
+          ? t("submitReview.updateSuccess")
+          : t("submitReview.submitSuccess"),
+        position: "top-right",
+      }
+    );
     setIsOpen(false);
     reset();
   };
 
   const { mutate } = useSubmitReview(
     onSuccess,
-    cafeDetailedInfo ? cafeDetailedInfo.place_id : null
+    cafeDetailedInfo ? cafeDetailedInfo.place_id : null,
+    loggedInUser?.id ?? null
   );
 
   useEffect(() => {
@@ -107,8 +116,8 @@ export function SubmitReviewDialog({
 
   const onSubmit = (data: FieldValues) => {
     if (!loggedInUser || !cafeDetailedInfo) {
-      toast.warning("Unable to submit review", {
-        description: "Please ensure you're logged in and a cafe is selected.",
+      toast.warning(t("submitReview.unableToSubmit"), {
+        description: t("submitReview.ensureLoginAndCafe"),
         position: "top-right",
       });
       return;
@@ -134,10 +143,8 @@ export function SubmitReviewDialog({
         onClose={() => setIsOpen(false)}
         className=""
       >
-        <DialogTitle>Create Review</DialogTitle>
-        <DialogDescription>
-          Please login to create a review 🙏
-        </DialogDescription>
+        <DialogTitle>{t("submitReview.createReview")}</DialogTitle>
+        <DialogDescription>{t("submitReview.pleaseLogin")}</DialogDescription>
         <DialogBody>
           <Button
             onClick={async () => {
@@ -151,7 +158,7 @@ export function SubmitReviewDialog({
             color="green"
             className="cursor-pointer"
           >
-            Login
+            {t("submitReview.login")}
           </Button>
         </DialogBody>
       </Dialog>
@@ -165,13 +172,15 @@ export function SubmitReviewDialog({
       className="!max-w-[70vw] h-[90vh] flex flex-col overflow-y-auto"
     >
       <DialogTitle>
-        {isUpdating ? "Update Review" : "Create Review"}:{" "}
-        {cafeDetailedInfo ? cafeDetailedInfo.name : "Loading..."}
+        {isUpdating
+          ? t("submitReview.updateReview")
+          : t("submitReview.createReview")}
+        : {cafeDetailedInfo ? cafeDetailedInfo.name : t("loading")}
       </DialogTitle>
       <DialogDescription>
         {isUpdating
-          ? "You're modifying your existing review. Update the fields you'd like to change."
-          : "Fill in the options you'd like to review. Only the overall rating is required."}
+          ? t("submitReview.modifyingExisting")
+          : t("submitReview.fillOptions")}
       </DialogDescription>
       <form onSubmit={handleSubmit(onSubmit)} className="grow">
         <DialogBody className="flex flex-col gap-2">
@@ -180,12 +189,12 @@ export function SubmitReviewDialog({
             <div className="p-2 rounded-md bg-slate-100 w-full flex flex-col">
               <Field className="">
                 <Label className="text-base !font-semibold text-slate-800">
-                  Overall Rating
+                  {t("submitReview.overallRating")}
                 </Label>
                 <Controller
                   name="rating"
                   control={control}
-                  rules={{ required: "Overall rating is required" }}
+                  rules={{ required: t("submitReview.ratingRequired") }}
                   render={({ field: { onChange, value } }) => (
                     <div role="group" className="flex flex-col gap-2">
                       <div className="flex items-center gap-4">
@@ -217,8 +226,10 @@ export function SubmitReviewDialog({
                         <div>
                           <p className="font-bold text-lg">
                             {value
-                              ? CUSTOM_ITEM_LABELS[value - 1]
-                              : "Select a rating"}
+                              ? t(
+                                  `ratingLabels.${CUSTOM_ITEM_LABELS[value - 1]}`
+                                )
+                              : t("submitReview.selectRating")}
                           </p>
                         </div>
                       </div>
@@ -234,7 +245,7 @@ export function SubmitReviewDialog({
             </div>
             {/* Images section (placeholder) */}
             <div className="p-2 rounded-md bg-slate-100 w-full flex flex-col">
-              <div className="">Images</div>
+              <div className="">{t("submitReview.images")}</div>
             </div>
             {/* Review attributes */}
             {reviewAttributes.map((attr) => (
@@ -261,13 +272,13 @@ export function SubmitReviewDialog({
                     attr.color === "orange" && "text-orange-800"
                   )}
                 >
-                  {attr.category}
+                  {t(`categories.${attr.category}`)}
                 </p>
                 {attr.attributes.map((attribute) => (
                   <Field key={attribute.name}>
-                    <Label>{attribute.name}</Label>
+                    <Label>{t(`attributes.${attribute.name}.name`)}</Label>
                     <Controller
-                      name={attribute.name.toLowerCase().replace(/\s+/g, "_")}
+                      name={attribute.name}
                       control={control}
                       render={({ field }) => (
                         <div className="flex items-center gap-1 flex-wrap">
@@ -280,7 +291,9 @@ export function SubmitReviewDialog({
                               className="cursor-pointer"
                               onClick={() => field.onChange(option)}
                             >
-                              {option}
+                              {t(
+                                `attributes.${attribute.name}.options.${option}`
+                              )}
                             </Button>
                           ))}
                         </div>
@@ -298,12 +311,12 @@ export function SubmitReviewDialog({
               role="alert"
             >
               <strong className="font-bold">
-                Please correct the following errors:
+                {t("submitReview.errorCorrection")}
               </strong>
               <ul className="mt-2 list-disc list-inside">
-                {errors.rating && <li>Overall rating is required</li>}
+                {errors.rating && <li>{t("submitReview.ratingRequired")}</li>}
                 {Object.keys(errors).length > 1 && (
-                  <li>Some fields have validation errors</li>
+                  <li>{t("submitReview.validationErrors")}</li>
                 )}
               </ul>
             </div>
@@ -311,10 +324,10 @@ export function SubmitReviewDialog({
         </DialogBody>
         <DialogActions>
           <Button plain onClick={() => setIsOpen(false)}>
-            Cancel
+            {t("submitReview.cancel")}
           </Button>
           <Button type="submit" color="emerald" className="cursor-pointer">
-            {isUpdating ? "Update Review" : "Submit Review"}
+            {isUpdating ? t("submitReview.update") : t("submitReview.submit")}
           </Button>
         </DialogActions>
       </form>

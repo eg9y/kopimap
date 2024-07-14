@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+
 import { Avatar } from "./catalyst/avatar";
 import {
   Dropdown,
@@ -49,6 +51,7 @@ import { Field, Label } from "./catalyst/fieldset";
 import { createClient } from "@supabase/supabase-js";
 import { useUser } from "../hooks/use-user";
 import { useSearch } from "../hooks/use-search";
+import { LanguageSwitcher } from "./language-switcher";
 
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL!,
@@ -56,6 +59,7 @@ const supabase = createClient(
 );
 
 export function MainSidebar({ children }: { children: React.ReactNode }) {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [userLocation, setUserLocation] = useState<{
     lat: number | null;
@@ -89,7 +93,7 @@ export function MainSidebar({ children }: { children: React.ReactNode }) {
           <Navbar>
             <NavbarSpacer />
             <NavbarSection>
-              <NavbarItem href="/search" aria-label="Search">
+              <NavbarItem href="/search" aria-label={t("search")}>
                 <MagnifyingGlassIcon />
               </NavbarItem>
               <Dropdown>
@@ -127,10 +131,13 @@ export function MainSidebar({ children }: { children: React.ReactNode }) {
         sidebar={
           <Sidebar>
             <SidebarHeader>
-              <div className="flex justify-between">
-                <div className="">
-                  <Heading>KopiMap</Heading>
-                  <Text>Peta cafe DKI Jakarta</Text>
+              <div className="flex justify-between items-center">
+                <div>
+                  <div className="flex items-center space-x-4">
+                    <Heading>KopiMap</Heading>
+                    <LanguageSwitcher />
+                  </div>
+                  <Text>{t("appDescription")}</Text>
                 </div>
               </div>
               <div className="flex gap-2">
@@ -139,8 +146,8 @@ export function MainSidebar({ children }: { children: React.ReactNode }) {
                     <MagnifyingGlassIcon />
                     <Input
                       name="search"
-                      placeholder="Search cafes..."
-                      aria-label="Search"
+                      placeholder={t("searchCafes")}
+                      aria-label={t("search")}
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       onKeyPress={(e) => e.key === "Enter" && performSearch()}
@@ -152,13 +159,13 @@ export function MainSidebar({ children }: { children: React.ReactNode }) {
                   className="cursor-pointer"
                   onClick={() => setIsOpen(true)}
                 >
-                  Filters
+                  {t("filters")}
                 </Button>
               </div>
             </SidebarHeader>
             <SidebarBody>
               <SidebarSection className="max-lg:hidden">
-                {isLoading && <Text>Loading...</Text>}
+                {isLoading && <Text>{t("loading")}</Text>}
                 {error && <Text color="red">{error}</Text>}
                 <CafeList />
               </SidebarSection>
@@ -188,7 +195,7 @@ export function MainSidebar({ children }: { children: React.ReactNode }) {
                     )}
                     {!loggedInUser && (
                       <Text className="flex min-w-0 items-center gap-3">
-                        Login to make a review!
+                        {t("loginToReview")}
                       </Text>
                     )}
                   </div>
@@ -223,7 +230,7 @@ export function MainSidebar({ children }: { children: React.ReactNode }) {
                         }}
                       >
                         <ArrowRightStartOnRectangleIcon />
-                        <DropdownLabel>Sign out</DropdownLabel>
+                        <DropdownLabel>{t("signOut")}</DropdownLabel>
                       </DropdownItem>
                     </>
                   )}
@@ -241,7 +248,7 @@ export function MainSidebar({ children }: { children: React.ReactNode }) {
                         }}
                       >
                         <ArrowRightStartOnRectangleIcon />
-                        <DropdownLabel>Sign in</DropdownLabel>
+                        <DropdownLabel>{t("signIn")}</DropdownLabel>
                       </DropdownItem>
                     </>
                   )}
@@ -254,10 +261,9 @@ export function MainSidebar({ children }: { children: React.ReactNode }) {
         {children}
       </SidebarLayout>
       <Dialog open={isOpen} onClose={setIsOpen}>
-        <DialogTitle>Search Filters</DialogTitle>
-        <DialogDescription>
-          Filters to search the perfect cafe for you
-        </DialogDescription>
+        <DialogTitle>{t("searchFilters")}</DialogTitle>
+
+        <DialogDescription>{t("searchFiltersDescription")}</DialogDescription>
         <DialogBody>
           <Field>
             <Label>Distance</Label>

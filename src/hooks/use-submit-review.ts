@@ -25,7 +25,8 @@ const submitReview = async (
 
 export const useSubmitReview = (
   onSuccess: () => void,
-  placeId: string | null
+  placeId: string | null,
+  userId: string | null
 ) => {
   const queryClient = useQueryClient();
 
@@ -34,6 +35,12 @@ export const useSubmitReview = (
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["cafeAggregatedReview", placeId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["userReview", userId, placeId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["cafeDetailedInfo", placeId],
       });
       onSuccess();
     },

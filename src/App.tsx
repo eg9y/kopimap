@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { I18nextProvider } from "react-i18next";
 import { Toaster } from "sonner";
 import { AnimatePresence } from "framer-motion";
 import * as pmtiles from "pmtiles";
@@ -9,6 +10,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import { CafeDetails } from "./components/cafe-details";
 import { MainSidebar } from "./components/main-sidebar";
 import { MemoizedMapComponent } from "./components/map-component";
+import i18n from "./il8n";
 
 function App() {
   const [pmTilesReady, setPmTilesReady] = useState(false);
@@ -20,7 +22,7 @@ function App() {
   }, []);
 
   return (
-    <>
+    <I18nextProvider i18n={i18n}>
       <div className="flex w-[100vw] h-[100vh] overflow-hidden">
         <MainSidebar>
           <div className="rounded-lg overflow-hidden grow relative h-full">
@@ -33,7 +35,7 @@ function App() {
         </MainSidebar>
       </div>
       <Toaster />
-    </>
+    </I18nextProvider>
   );
 }
 

@@ -1,6 +1,5 @@
 import { CategoryAttributes } from "../../types";
 import {
-  HomeIcon,
   ArmchairIcon,
   WifiIcon,
   PlugIcon,
