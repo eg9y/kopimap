@@ -9,7 +9,7 @@ export const LanguageSwitcher: React.FC = () => {
     if (userLanguage === "id" || userLanguage === "en") {
       i18n.changeLanguage(userLanguage);
     } else {
-      i18n.changeLanguage("en"); // Default to English if not Indonesian or English
+      i18n.changeLanguage("id"); // Default to English if not Indonesian or English
     }
   }, [i18n]);
 
