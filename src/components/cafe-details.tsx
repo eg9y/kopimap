@@ -14,7 +14,9 @@ import {
   PlusIcon,
   EditIcon,
   MinusIcon,
+  Loader2Icon,
 } from "lucide-react";
+
 import { cn } from "./lib/utils";
 import { Rate } from "./rate";
 import { CafeImages } from "./cafe-images";
@@ -316,6 +318,11 @@ export const CafeDetails = () => {
                 </div>
               </div>
             </>
+          )}
+          {!cafeDetailedInfo && (
+            <div className="h-full w-full flex items-center justify-center">
+              <Loader2Icon size={100} className="animate-spin text-slate-300" />
+            </div>
           )}
         </div>
       </motion.div>

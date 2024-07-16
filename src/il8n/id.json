@@ -1,5 +1,6 @@
 {
   "appDescription": "Peta Cafe di DKI Jakarta",
+  "searchCafes": "Cari...",
   "categories": {
     "Ambiance": "Suasana",
     "Work-Friendly": "Ramah untuk Bekerja",
@@ -151,6 +152,7 @@
   "submitReview": {
     "createReview": "Buat Ulasan",
     "updateReview": "Perbarui Ulasan",
+    "imageUploadComingSoon": "Fitur berbagi foto segera hadir",
     "pleaseLogin": "Silakan masuk untuk membuat ulasan 🙏",
     "login": "Masuk",
     "modifyingExisting": "Anda sedang mengubah ulasan yang ada. Perbarui bidang yang ingin Anda ubah.",

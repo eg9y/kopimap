@@ -21,15 +21,7 @@ import { Database } from "./lib/database.types";
 import { CafeDetailedInfo } from "../types";
 import { cn } from "./lib/utils";
 
-const CUSTOM_GROUP_LABEL_ID = "group_label";
 const CUSTOM_ITEM_LABELS = ["Bad", "Poor", "Average", "Great", "Excellent"];
-const CUSTOM_ITEM_LABELS_IDS = [
-  "label_1",
-  "label_2",
-  "label_3",
-  "label_4",
-  "label_5",
-];
 
 const supabase = createClient<Database>(
   import.meta.env.VITE_SUPABASE_URL!,
@@ -188,16 +180,16 @@ export function SubmitReviewDialog({
             {/* Overall Rating */}
             <div className="p-2 rounded-md bg-slate-100 w-full flex flex-col">
               <Field className="">
-                <Label className="text-base !font-semibold text-slate-800">
+                <p className="text-base font-semibold">
                   {t("submitReview.overallRating")}
-                </Label>
+                </p>
                 <Controller
                   name="rating"
                   control={control}
                   rules={{ required: t("submitReview.ratingRequired") }}
                   render={({ field: { onChange, value } }) => (
-                    <div role="group" className="flex flex-col gap-2">
-                      <div className="flex items-center gap-4">
+                    <div role="group" className="flex flex-col gap-2 pt-2">
+                      <div className="flex flex-col">
                         <div className="max-w-[250px]">
                           <Rating
                             value={value}
@@ -216,8 +208,6 @@ export function SubmitReviewDialog({
                               ],
                             }}
                             onChange={onChange}
-                            visibleLabelId={CUSTOM_GROUP_LABEL_ID}
-                            visibleItemLabelIds={CUSTOM_ITEM_LABELS_IDS}
                             spaceBetween="small"
                             spaceInside="medium"
                             transition="position"
@@ -245,7 +235,12 @@ export function SubmitReviewDialog({
             </div>
             {/* Images section (placeholder) */}
             <div className="p-2 rounded-md bg-slate-100 w-full flex flex-col">
-              <div className="">{t("submitReview.images")}</div>
+              <p className="text-base font-semibold">
+                {t("submitReview.images")}
+              </p>
+              <p className="text-slate-700">
+                {t("submitReview.imageUploadComingSoon")}
+              </p>
             </div>
             {/* Review attributes */}
             {reviewAttributes.map((attr) => (

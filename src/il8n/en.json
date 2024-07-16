@@ -1,5 +1,6 @@
 {
   "appDescription": "Map of Cafes in DKI Jakarta",
+  "searchCafes": "Search...",
   "categories": {
     "Ambiance": "Ambiance",
     "Work-Friendly": "Work-Friendly",
@@ -151,6 +152,7 @@
   "submitReview": {
     "createReview": "Create Review",
     "updateReview": "Update Review",
+    "imageUploadComingSoon": "Photo sharing feature arriving shortly",
     "pleaseLogin": "Please login to create a review 🙏",
     "login": "Login",
     "modifyingExisting": "You're modifying your existing review. Update the fields you'd like to change.",

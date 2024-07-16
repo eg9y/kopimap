@@ -4,6 +4,7 @@ import { Toaster } from "sonner";
 import { AnimatePresence } from "framer-motion";
 import * as pmtiles from "pmtiles";
 import maplibregl from "maplibre-gl";
+import useMedia from "react-use/lib/useMedia";
 
 import "@smastrom/react-rating/style.css";
 import "maplibre-gl/dist/maplibre-gl.css";
@@ -14,6 +15,7 @@ import i18n from "./il8n";
 
 function App() {
   const [pmTilesReady, setPmTilesReady] = useState(false);
+  const isWide = useMedia("(min-width: 640px)");
 
   useEffect(() => {
     const protocol = new pmtiles.Protocol();
@@ -27,9 +29,11 @@ function App() {
         <MainSidebar>
           <div className="rounded-lg overflow-hidden grow relative h-full">
             <MemoizedMapComponent pmTilesReady={pmTilesReady}>
-              <AnimatePresence>
-                <CafeDetails />
-              </AnimatePresence>
+              {isWide && (
+                <AnimatePresence>
+                  <CafeDetails />
+                </AnimatePresence>
+              )}
             </MemoizedMapComponent>
           </div>
         </MainSidebar>
