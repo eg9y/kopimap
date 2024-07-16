@@ -6,7 +6,7 @@ export const mapStyle: string | StyleSpecification | undefined = {
   sources: {
     protomaps: {
       type: "vector",
-      url: "pmtiles://https://map.kopimap.com/jakarta.pmtiles",
+      tiles: ["https://worker.kopimap.com/jakarta/{z}/{x}/{y}.pbf"],
       attribution:
         '<a href="https://protomaps.com">Protomaps</a> © <a href="https://openstreetmap.org">OpenStreetMap</a>',
     },
