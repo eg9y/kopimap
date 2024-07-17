@@ -1,16 +1,13 @@
-// searchUtils.ts
 import { useState, useCallback } from "react";
 import { useStore } from "../store";
-import { MeiliSearchCafe, SearchFilters } from "../types";
+import { MeiliSearchCafe } from "../types";
 
 export const useSearch = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [filters, setFilters] = useState<Partial<SearchFilters>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Get the setFetchedCafes function from the Zustand store
-  const setFetchedCafes = useStore((state) => state.setFetchedCafes);
+  const { searchFilters, setFetchedCafes } = useStore();
 
   const handleSearch = useCallback(
     async (userLocation: { lat: number | null; lng: number | null }) => {
@@ -25,23 +22,23 @@ export const useSearch = () => {
             lng: userLocation.lng.toString(),
           }),
         ...Object.fromEntries(
-          Object.entries(filters).filter(([_, v]) => v !== "")
+          Object.entries(searchFilters).filter(([_, v]) => v !== "").map((key, value) => [`${key}_mode`,value])
         ),
       });
 
+      console.log('params', params);
+
       try {
         const response = await fetch(
-          `${import.meta.env
-            .VITE_MEILISEARCH_URL!}/api/search?${params.toString()}`
+          `${import.meta.env.VITE_MEILISEARCH_URL!}/api/search?${params.toString()}`
         );
         if (!response.ok) throw new Error("Search failed");
         const data = await response.json();
 
         console.log("data", data);
 
-        // Update the fetched cafes in the Zustand store
         const parsedCafes = data.hits.map((cafe: MeiliSearchCafe) => ({
-          gmaps_featured_image: "", // Not provided in the Meilisearch response
+          gmaps_featured_image: "",
           gmaps_ratings: cafe.gmaps_rating.toString(),
           latitude: cafe._geo.lat,
           longitude: cafe._geo.lng,
@@ -57,18 +54,12 @@ export const useSearch = () => {
         setIsLoading(false);
       }
     },
-    [searchTerm, filters, setFetchedCafes]
+    [searchTerm, searchFilters, setFetchedCafes]
   );
-
-  const handleFilterChange = (name: keyof SearchFilters, value: string) => {
-    setFilters((prev) => ({ ...prev, [name]: value }));
-  };
 
   return {
     searchTerm,
     setSearchTerm,
-    filters,
-    handleFilterChange,
     handleSearch,
     isLoading,
     error,

@@ -1,12 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
 import { MeiliSearchCafe } from "../types";
+import { useStore } from "../store";
 
-const CLUSTER_SIZE = 0.05; // Approximately 1km
-const DECIMAL_PLACES = 4; // Number of decimal places to use for clustering
+const CLUSTER_SIZE = 0.05;
+const DECIMAL_PLACES = 4;
 
 export const useCafes = (lat: number, long: number) => {
-  // Cluster coordinates
+  const { searchFilters } = useStore();
+
   const clusterKey = useMemo(() => {
     const latCluster = (Math.floor(lat / CLUSTER_SIZE) * CLUSTER_SIZE).toFixed(
       DECIMAL_PLACES
@@ -18,26 +20,41 @@ export const useCafes = (lat: number, long: number) => {
   }, [lat, long]);
 
   const fetchCafes = useCallback(async () => {
+    const filterParams = new URLSearchParams();
+
+    // Add location parameters
+    filterParams.append("lat", lat.toString());
+    filterParams.append("lng", long.toString());
+    // filterParams.append("radius", "3000");
+
+    // Add filter parameters
+    Object.entries(searchFilters).forEach(([key, value]) => {
+      if (value) {
+        filterParams.append(`${key}_mode`, value);
+      }
+    });
+
     const response = await fetch(
-      `${import.meta.env
-        .VITE_MEILISEARCH_URL!}/api/search?q=&lat=${lat}&lng=${long}&radius=3000`
+      `${import.meta.env.VITE_MEILISEARCH_URL!}/api/search?${filterParams.toString()}`
     );
+
     if (!response.ok) {
       throw new Error("Failed to fetch cafes");
     }
-    const data: { hits: any[] } = (await response.json()) ?? { hits: [] };
+
+    const data: { hits: any[] } = await response.json();
     return data.hits.map((cafe: MeiliSearchCafe) => ({
-      gmaps_featured_image: "", // Not provided in the Meilisearch response
+      gmaps_featured_image: "",
       gmaps_ratings: cafe.gmaps_rating.toString(),
       latitude: cafe._geo.lat,
       longitude: cafe._geo.lng,
       distance: cafe._geoDistance,
       ...cafe,
     }));
-  }, [lat, long]);
+  }, [lat, long, searchFilters]);
 
   return useQuery<MeiliSearchCafe[]>({
-    queryKey: ["cafes", clusterKey],
+    queryKey: ["cafes", clusterKey, searchFilters],
     queryFn: fetchCafes,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });

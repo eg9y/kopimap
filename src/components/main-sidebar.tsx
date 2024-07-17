@@ -52,6 +52,9 @@ import { createClient } from "@supabase/supabase-js";
 import { useUser } from "../hooks/use-user";
 import { useSearch } from "../hooks/use-search";
 import { LanguageSwitcher } from "./language-switcher";
+import { cn } from "./lib/utils";
+import { SearchFilters } from "./search-filters";
+import { useStore } from "../store";
 
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL!,
@@ -65,6 +68,8 @@ export function MainSidebar({ children }: { children: React.ReactNode }) {
     lat: number | null;
     lng: number | null;
   }>({ lat: null, lng: null });
+  const [selectedTab, setSelectedTab] = useState<string>("cafes");
+
   const { loggedInUser } = useUser();
 
   const { searchTerm, setSearchTerm, handleSearch, isLoading, error } =
@@ -131,16 +136,44 @@ export function MainSidebar({ children }: { children: React.ReactNode }) {
         sidebar={
           <Sidebar>
             <SidebarHeader>
-              <div className="flex justify-between items-center">
-                <div>
-                  <div className="flex items-center space-x-4">
-                    <Heading>KopiMap</Heading>
-                    <LanguageSwitcher />
+              <div className="flex flex-col gap-4">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <div className="flex items-center space-x-4">
+                      <Heading>KopiMap</Heading>
+                      <LanguageSwitcher />
+                    </div>
+                    <Text>{t("appDescription")}</Text>
                   </div>
-                  <Text>{t("appDescription")}</Text>
+                </div>
+                <div className="flex items-end">
+                  <button
+                    className={cn(
+                      "px-1 py-2 border-x border-t rounded-t-md border-slate-400",
+                      selectedTab === "cafes" ? "" : "border-b bg-slate-200"
+                    )}
+                    onClick={() => {
+                      setSelectedTab("cafes");
+                    }}
+                  >
+                    Cafes
+                  </button>
+                  <div className="w-2 border-b border-slate-400"></div>
+                  <button
+                    className={cn(
+                      "px-1 py-2 border-x border-t rounded-t-md border-slate-400",
+                      selectedTab === "filters" ? "" : "border-b bg-slate-200"
+                    )}
+                    onClick={() => {
+                      setSelectedTab("filters");
+                    }}
+                  >
+                    Filters
+                  </button>
+                  <div className="grow border-b border-slate-400"></div>
                 </div>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 pt-2">
                 <div className="grow">
                   <InputGroup className="">
                     <MagnifyingGlassIcon />
@@ -154,20 +187,29 @@ export function MainSidebar({ children }: { children: React.ReactNode }) {
                     />
                   </InputGroup>
                 </div>
-                <Button
+                {/* <Button
                   plain
                   className="cursor-pointer"
                   onClick={() => setIsOpen(true)}
                 >
                   {t("filters")}
-                </Button>
+                </Button> */}
               </div>
             </SidebarHeader>
             <SidebarBody>
               <SidebarSection className="max-lg:hidden">
-                {isLoading && <Text>{t("loading")}</Text>}
-                {error && <Text color="red">{error}</Text>}
-                <CafeList />
+                {selectedTab === "cafes" && (
+                  <>
+                    {isLoading && <Text>{t("loading")}</Text>}
+                    {error && <Text color="red">{error}</Text>}
+                    <CafeList />
+                  </>
+                )}
+                {selectedTab === "filters" && (
+                  <>
+                    <SearchFilters />
+                  </>
+                )}
               </SidebarSection>
               <SidebarSpacer />
             </SidebarBody>

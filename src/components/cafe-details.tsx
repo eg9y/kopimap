@@ -218,7 +218,7 @@ export const CafeDetails = () => {
                   </div>
 
                   <div className="flex items-center gap-1 flex-wrap">
-                    <Badge>
+                    {/* <Badge>
                       <img src="/instagram.svg" alt="Instagram" />
                     </Badge>
                     <Badge>
@@ -233,7 +233,7 @@ export const CafeDetails = () => {
                         <img src="/phone.svg" className="size-4" alt="Phone" />
                       </span>
                       <span>{cafeDetailedInfo.phone}</span>
-                    </Badge>
+                    </Badge> */}
                     {cafeDetailedInfo.menu_link && (
                       <BadgeButton href={cafeDetailedInfo.menu_link}>
                         Menu
@@ -283,7 +283,15 @@ export const CafeDetails = () => {
 
                     <Rate rating={aggregatedReview?.avg_rating ?? 0} />
                     <p className="text-center mt-2">
-                      Based on {aggregatedReview?.review_count ?? 0} reviews
+                      Based on {aggregatedReview?.review_count ?? 0} reviews.
+                      Last review:{" "}
+                      {new Date(
+                        aggregatedReview?.last_updated!
+                      ).toLocaleDateString("id-ID", {
+                        day: "numeric",
+                        month: "short",
+                        year: "2-digit",
+                      })}
                     </p>
                     <Button
                       color={userReview ? "blue" : "emerald"}

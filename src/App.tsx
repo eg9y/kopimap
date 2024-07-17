@@ -30,9 +30,11 @@ function App() {
           <div className="rounded-lg overflow-hidden grow relative h-full">
             <MemoizedMapComponent pmTilesReady={pmTilesReady}>
               {isWide && (
-                <AnimatePresence>
-                  <CafeDetails />
-                </AnimatePresence>
+                <>
+                  <AnimatePresence>
+                    <CafeDetails />
+                  </AnimatePresence>
+                </>
               )}
             </MemoizedMapComponent>
           </div>
