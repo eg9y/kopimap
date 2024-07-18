@@ -54,7 +54,6 @@ import { useSearch } from "../hooks/use-search";
 import { LanguageSwitcher } from "./language-switcher";
 import { cn } from "./lib/utils";
 import { SearchFilters } from "./search-filters";
-import { useStore } from "../store";
 
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL!,

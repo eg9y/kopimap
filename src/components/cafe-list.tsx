@@ -17,7 +17,6 @@ export const CafeList: React.FC = () => {
     mapRef,
     fetchedCafes,
     setFetchedCafes,
-    searchFilters,
   } = useStore();
 
   const { data: newCafes, isLoading } = useCafes(mapCenter.lat, mapCenter.long);
