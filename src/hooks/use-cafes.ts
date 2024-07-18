@@ -25,7 +25,7 @@ export const useCafes = (lat: number, long: number) => {
     // Add location parameters
     filterParams.append("lat", lat.toString());
     filterParams.append("lng", long.toString());
-    // filterParams.append("radius", "3000");
+    filterParams.append("radius", "3000");
 
     // Add filter parameters
     Object.entries(searchFilters).forEach(([key, value]) => {

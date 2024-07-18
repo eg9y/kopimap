@@ -15,7 +15,13 @@ export const SearchFilters: React.FC = () => {
     attributeName: keyof SearchFiltersType,
     value: string
   ) => {
-    setSearchFilters({ ...searchFilters, [attributeName]: value });
+    if (value === "") {
+      const newFilters = { ...searchFilters };
+      delete newFilters[attributeName];
+      setSearchFilters(newFilters);
+    } else {
+      setSearchFilters({ ...searchFilters, [attributeName]: value });
+    }
   };
 
   return (
@@ -42,7 +48,7 @@ export const SearchFilters: React.FC = () => {
                   }
                   value={searchFilters[attribute.name] || ""}
                 >
-                  <option value="">{t("selectOption")}</option>
+                  <option value="">{t(`attributes.${attribute.name}.name`)}</option>
                   {attribute.options.map((option) => (
                     <option key={option} value={option}>
                       {t(`attributes.${attribute.name}.options.${option}`)}

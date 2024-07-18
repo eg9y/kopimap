@@ -52,7 +52,7 @@ export const CafeList: React.FC = () => {
   }
 
   return (
-    <SidebarSection className="max-lg:hidden overflow-scroll">
+    <SidebarSection className="max-lg:hidden">
       <SidebarHeading>Results ({fetchedCafes.length})</SidebarHeading>
 
       {fetchedCafes.map((cafe: MeiliSearchCafe) => (
@@ -71,7 +71,7 @@ export const CafeList: React.FC = () => {
           className=""
         >
           <div className="grow w-full">
-            <SidebarLabel className="">{cafe.name}</SidebarLabel>
+            <p className="text-nowrap text-ellipsis overflow-hidden">{cafe.name}</p>
             <p className="font-light text-ellipsis text-nowrap text-slate-500 overflow-hidden">
               {cafe.address}
             </p>

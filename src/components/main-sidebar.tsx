@@ -145,32 +145,24 @@ export function MainSidebar({ children }: { children: React.ReactNode }) {
                     <Text>{t("appDescription")}</Text>
                   </div>
                 </div>
-                <div className="flex items-end">
-                  <button
-                    className={cn(
-                      "px-1 py-2 border-x border-t rounded-t-md border-slate-400",
-                      selectedTab === "cafes" ? "" : "border-b bg-slate-200"
-                    )}
-                    onClick={() => {
-                      setSelectedTab("cafes");
-                    }}
-                  >
-                    Cafes
-                  </button>
-                  <div className="w-2 border-b border-slate-400"></div>
-                  <button
-                    className={cn(
-                      "px-1 py-2 border-x border-t rounded-t-md border-slate-400",
-                      selectedTab === "filters" ? "" : "border-b bg-slate-200"
-                    )}
-                    onClick={() => {
-                      setSelectedTab("filters");
-                    }}
-                  >
-                    Filters
-                  </button>
-                  <div className="grow border-b border-slate-400"></div>
-                </div>
+                <Navbar>
+                <NavbarSection className="">
+        <NavbarItem
+        current={selectedTab === "cafes"}
+         onClick={() => {
+          setSelectedTab("cafes");
+        }}
+        >
+          Cafes
+        </NavbarItem>
+        <NavbarItem 
+        current={selectedTab === "filters"}
+        onClick={() => {
+         setSelectedTab("filters");
+       }}
+        >Filters</NavbarItem>
+      </NavbarSection>
+                </Navbar>
               </div>
               <div className="flex gap-2 pt-2">
                 <div className="grow">
