@@ -1,33 +1,21 @@
 import { useQuery } from "@tanstack/react-query";
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import { MeiliSearchCafe } from "../types";
 import { useStore } from "../store";
 
-const CLUSTER_SIZE = 0.05;
-const DECIMAL_PLACES = 4;
-
-export const useCafes = (lat: number, long: number) => {
+export const useCafes = (lat: number, lng: number, searchTerm: string) => {
   const { searchFilters } = useStore();
 
-  const clusterKey = useMemo(() => {
-    const latCluster = (Math.floor(lat / CLUSTER_SIZE) * CLUSTER_SIZE).toFixed(
-      DECIMAL_PLACES
-    );
-    const longCluster = (
-      Math.floor(long / CLUSTER_SIZE) * CLUSTER_SIZE
-    ).toFixed(DECIMAL_PLACES);
-    return `${latCluster},${longCluster}`;
-  }, [lat, long]);
-
   const fetchCafes = useCallback(async () => {
+
     const filterParams = new URLSearchParams();
 
-    // Add location parameters
     filterParams.append("lat", lat.toString());
-    filterParams.append("lng", long.toString());
-    filterParams.append("radius", "3000");
+    filterParams.append("lng", lng.toString());
+    if (searchTerm) {
+      filterParams.append("q", searchTerm);
+    }
 
-    // Add filter parameters
     Object.entries(searchFilters).forEach(([key, value]) => {
       if (value) {
         filterParams.append(`${key}_mode`, value);
@@ -43,6 +31,8 @@ export const useCafes = (lat: number, long: number) => {
     }
 
     const data: { hits: any[] } = await response.json();
+
+    console.log('Search results:', data);
     return data.hits.map((cafe: MeiliSearchCafe) => ({
       gmaps_featured_image: "",
       gmaps_ratings: cafe.gmaps_rating.toString(),
@@ -51,11 +41,12 @@ export const useCafes = (lat: number, long: number) => {
       distance: cafe._geoDistance,
       ...cafe,
     }));
-  }, [lat, long, searchFilters]);
+  }, [lat, lng, searchTerm, searchFilters]);
 
-  return useQuery<MeiliSearchCafe[]>({
-    queryKey: ["cafes", clusterKey, searchFilters],
+  return useQuery<MeiliSearchCafe[] | null, Error>({
+    queryKey: ["searchCafes", lat, lng, searchFilters, searchTerm],
     queryFn: fetchCafes,
+    enabled: !!searchTerm,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 };

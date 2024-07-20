@@ -13,16 +13,15 @@ import { mapStyle } from "../config";
 import { useCafes } from "../hooks/use-cafes";
 import { GeolocateResultEvent } from "react-map-gl/dist/esm/types";
 import Clusters, { ClustersRef } from "./clusters"; // Adjust the path as necessary
+import { useMapCafes } from "../hooks/use-map-cafes";
+
 
 interface MapComponentProps {
   pmTilesReady: boolean;
   children: ReactNode;
 }
 
-const MapComponent: React.FC<MapComponentProps> = ({
-  pmTilesReady,
-  children,
-}) => {
+const MapComponent: React.FC<MapComponentProps> = ({ pmTilesReady, children }) => {
   const { selectCafe, setMapRef, mapRef, mapCenter, setMapCenter } = useStore();
   const [popupInfo, setPopupInfo] = useState<any>(null);
   const popupTimeoutRef = useRef<number | null>(null);
@@ -36,15 +35,15 @@ const MapComponent: React.FC<MapComponentProps> = ({
     zoom: 14,
   });
 
-  const { refetch: refetchCafes } = useCafes(mapCenter.lat, mapCenter.long);
+  const { data: mapCafesData, refetch: refetchMapCafes } = useMapCafes(mapCenter.lat, mapCenter.long);
 
   useEffect(() => {
     const debounceTimer = setTimeout(() => {
-      refetchCafes();
-    }, 300); // Debounce refetch to avoid excessive API calls
+      refetchMapCafes();
+    }, 300);
 
     return () => clearTimeout(debounceTimer);
-  }, [mapCenter, refetchCafes]);
+  }, [mapCenter, refetchMapCafes]);
 
   const handlePopupMouseEnter = () => {
     isHoveringPopupRef.current = true;
@@ -151,6 +150,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
         mapCenter={mapCenter}
         handleFlyTo={handleFlyTo}
         setPopupInfo={setPopupInfo}
+        cafes={mapCafesData?.visibleCafes || []}
       />
       {popupInfo && (
         <Popup

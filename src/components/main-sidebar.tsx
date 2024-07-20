@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import useDebounce from "react-use/esm/useDebounce"
 
 import { Avatar } from "./catalyst/avatar";
 import {
@@ -50,45 +51,55 @@ import {
 import { Field, Label } from "./catalyst/fieldset";
 import { createClient } from "@supabase/supabase-js";
 import { useUser } from "../hooks/use-user";
-import { useSearch } from "../hooks/use-search";
 import { LanguageSwitcher } from "./language-switcher";
-import { cn } from "./lib/utils";
 import { SearchFilters } from "./search-filters";
+import { useStore } from "../store";
+import { useCafes } from "../hooks/use-cafes";
+import { useMapCafes } from "../hooks/use-map-cafes";
 
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL!,
   import.meta.env.VITE_SUPABASE_ANON_KEY!
 );
 
+
 export function MainSidebar({ children }: { children: React.ReactNode }) {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
-  const [userLocation, setUserLocation] = useState<{
-    lat: number | null;
-    lng: number | null;
-  }>({ lat: null, lng: null });
   const [selectedTab, setSelectedTab] = useState<string>("cafes");
-
+  const { mapCenter, setMapCenter } = useStore();
   const { loggedInUser } = useUser();
 
-  const { searchTerm, setSearchTerm, handleSearch, isLoading, error } =
-    useSearch();
+  const [searchInput, setSearchInput] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+
+  const { data: searchCafes, isLoading: isSearchLoading, error: searchError } = useCafes(mapCenter.lat, mapCenter.long, debouncedSearchTerm);
+  const { data: mapCafesData, isLoading: isMapCafesLoading, error: mapCafesError } = useMapCafes(mapCenter.lat, mapCenter.long);
+
+  useDebounce(
+    () => {
+      setDebouncedSearchTerm(searchInput);
+    },
+    300,
+    [searchInput]
+  );
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        setUserLocation({
+        setMapCenter({
           lat: position.coords.latitude,
-          lng: position.coords.longitude,
+          long: position.coords.longitude,
         });
       },
       (error) => console.error("Error getting location:", error)
     );
-  }, []);
+  }, [setMapCenter]);
 
-  const performSearch = () => {
-    handleSearch(userLocation);
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchInput(e.target.value);
   };
+
 
   return (
     <>
@@ -146,22 +157,24 @@ export function MainSidebar({ children }: { children: React.ReactNode }) {
                   </div>
                 </div>
                 <Navbar>
-                <NavbarSection className="">
-        <NavbarItem
-        current={selectedTab === "cafes"}
-         onClick={() => {
-          setSelectedTab("cafes");
-        }}
-        >
-          Cafes
-        </NavbarItem>
-        <NavbarItem 
-        current={selectedTab === "filters"}
-        onClick={() => {
-         setSelectedTab("filters");
-       }}
-        >Filters</NavbarItem>
-      </NavbarSection>
+                  <NavbarSection className="">
+                    <NavbarItem
+                      current={selectedTab === "cafes"}
+                      onClick={() => {
+                        setSelectedTab("cafes");
+                      }}
+                    >
+                      Cafes
+                    </NavbarItem>
+                    <NavbarItem 
+                      current={selectedTab === "filters"}
+                      onClick={() => {
+                        setSelectedTab("filters");
+                      }}
+                    >
+                      Filters
+                    </NavbarItem>
+                  </NavbarSection>
                 </Navbar>
               </div>
               <div className="flex gap-2 pt-2">
@@ -172,28 +185,24 @@ export function MainSidebar({ children }: { children: React.ReactNode }) {
                       name="search"
                       placeholder={t("searchCafes")}
                       aria-label={t("search")}
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      onKeyPress={(e) => e.key === "Enter" && performSearch()}
+                      onChange={handleSearch}
+                      value={searchInput}
                     />
                   </InputGroup>
                 </div>
-                {/* <Button
-                  plain
-                  className="cursor-pointer"
-                  onClick={() => setIsOpen(true)}
-                >
-                  {t("filters")}
-                </Button> */}
               </div>
             </SidebarHeader>
             <SidebarBody>
               <SidebarSection className="max-lg:hidden">
-                {selectedTab === "cafes" && (
+              {selectedTab === "cafes" && (
                   <>
-                    {isLoading && <Text>{t("loading")}</Text>}
-                    {error && <Text color="red">{error}</Text>}
-                    <CafeList />
+                    {(isSearchLoading || isMapCafesLoading) && <Text>{t("loading")}</Text>}
+                    {(searchError || mapCafesError) && <Text color="red">{JSON.stringify(searchError || mapCafesError)}</Text>}
+                    <CafeList 
+  searchInput={searchInput} 
+  mapCafes={mapCafesData} 
+  searchCafes={searchCafes} 
+/>
                   </>
                 )}
                 {selectedTab === "filters" && (
@@ -291,11 +300,10 @@ export function MainSidebar({ children }: { children: React.ReactNode }) {
           </Sidebar>
         }
       >
-        {children}
+         {children}
       </SidebarLayout>
       <Dialog open={isOpen} onClose={setIsOpen}>
         <DialogTitle>{t("searchFilters")}</DialogTitle>
-
         <DialogDescription>{t("searchFiltersDescription")}</DialogDescription>
         <DialogBody>
           <Field>

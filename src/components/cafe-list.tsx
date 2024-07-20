@@ -1,61 +1,28 @@
-import React, { useEffect } from "react";
-import {
-  SidebarHeading,
-  SidebarItem,
-  SidebarLabel,
-  SidebarSection,
-} from "./catalyst/sidebar";
+import React from "react";
+import { SidebarHeading, SidebarItem, SidebarSection } from "./catalyst/sidebar";
 import { useStore } from "../store";
-import { useCafes } from "../hooks/use-cafes";
-import { calculateDistance } from "../components/lib/calculate-distance";
 import { MeiliSearchCafe } from "../types";
 
-export const CafeList: React.FC = () => {
-  const {
-    selectCafe,
-    mapCenter,
-    mapRef,
-    fetchedCafes,
-    setFetchedCafes,
-  } = useStore();
+interface CafeListProps {
+  searchInput: string;
+  mapCafes: { visibleCafes: MeiliSearchCafe[], allCafes: MeiliSearchCafe[] } | undefined;
+  searchCafes: MeiliSearchCafe[] | null | undefined;
+}
 
-  const { data: newCafes, isLoading } = useCafes(mapCenter.lat, mapCenter.long);
+export const CafeList: React.FC<CafeListProps> = ({ searchInput, mapCafes, searchCafes }) => {
+  const { selectCafe, mapRef } = useStore();
 
-  useEffect(() => {
-    if (newCafes) {
-      const uniqueCafes = newCafes.filter(
-        (cafe, index, self) => index === self.findIndex((t) => t.id === cafe.id)
-      );
-
-      const sortedCafes = uniqueCafes.sort((a, b) => {
-        const distanceA = calculateDistance(
-          mapCenter.lat,
-          mapCenter.long,
-          a._geo.lat!,
-          a._geo.lng!
-        );
-        const distanceB = calculateDistance(
-          mapCenter.lat,
-          mapCenter.long,
-          b._geo.lat!,
-          b._geo.lng!
-        );
-        return distanceA - distanceB;
-      });
-
-      setFetchedCafes(sortedCafes);
-    }
-  }, [newCafes, mapCenter, setFetchedCafes]);
-
-  if (isLoading && fetchedCafes.length === 0) {
-    return <div>Loading...</div>;
-  }
+  const displayedCafes = searchInput ? (searchCafes || []) : (mapCafes?.visibleCafes || []);
+  const totalCafes = mapCafes?.allCafes?.length || 0;
 
   return (
     <SidebarSection className="max-lg:hidden">
-      <SidebarHeading>Results ({fetchedCafes.length})</SidebarHeading>
+      <SidebarHeading>
+        Results ({displayedCafes.length})
+        {!searchInput && ` of ${totalCafes} total`}
+      </SidebarHeading>
 
-      {fetchedCafes.map((cafe: MeiliSearchCafe) => (
+      {displayedCafes.map((cafe: MeiliSearchCafe) => (
         <SidebarItem
           key={cafe.id}
           onClick={() => {

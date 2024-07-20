@@ -10,10 +10,10 @@ import React, {
 import { Source, Layer, useMap, Marker } from "react-map-gl/maplibre";
 import type { MapRef } from "react-map-gl/maplibre";
 import type { LayerSpecification } from "maplibre-gl";
-import { useCafes } from "../hooks/use-cafes";
 import { useStore } from "../store";
 import { StarIcon } from "lucide-react";
 import { motion, Variants } from "framer-motion";
+import { MeiliSearchCafe } from "../types";
 
 const AnimatedStar = motion(StarIcon);
 
@@ -41,6 +41,7 @@ interface ClustersProps {
   mapCenter: { lat: number; long: number };
   handleFlyTo: (lat: number, lng: number) => void;
   setPopupInfo: React.Dispatch<React.SetStateAction<any>>;
+  cafes: MeiliSearchCafe[] | undefined;
 }
 
 const clusterLayer: LayerSpecification = {
@@ -108,22 +109,21 @@ const unclusteredPointLayer: LayerSpecification = {
   },
 };
 
+
 const Clusters = forwardRef<ClustersRef, ClustersProps>(
-  ({ mapCenter, handleFlyTo, setPopupInfo }, ref) => {
+  ({ mapCenter, handleFlyTo, setPopupInfo, cafes }, ref) => {
     const { current: map } = useMap() as { current: MapRef };
-    const { selectCafe, selectedCafe, fetchedCafes } = useStore();
-    const { data: newlyFetchedCafes } = useCafes(mapCenter.lat, mapCenter.long);
-    const [visibleCafes, setVisibleCafes] = useState<any[]>([]);
-    const visibleCafesRef = useRef<any[]>([]);
+    const { selectCafe, selectedCafe } = useStore();
+    const [visibleCafes, setVisibleCafes] = useState<MeiliSearchCafe[]>([]);
+    const visibleCafesRef = useRef<MeiliSearchCafe[]>([]);
 
     const updateVisibleCafes = useCallback(() => {
-      if (map && fetchedCafes) {
+      if (map && cafes) {
         const bounds = map.getBounds();
-        const visible = fetchedCafes.filter((cafe) =>
+        const visible = cafes.filter((cafe) =>
           bounds.contains([cafe._geo.lng, cafe._geo.lat])
         );
 
-        // Check if the visible cafes have actually changed
         if (
           JSON.stringify(visible) !== JSON.stringify(visibleCafesRef.current)
         ) {
@@ -131,7 +131,7 @@ const Clusters = forwardRef<ClustersRef, ClustersProps>(
           setVisibleCafes(visible);
         }
       }
-    }, [map, fetchedCafes]);
+    }, [map, cafes]);
 
     useEffect(() => {
       updateVisibleCafes();
@@ -146,7 +146,7 @@ const Clusters = forwardRef<ClustersRef, ClustersProps>(
 
     useEffect(() => {
       updateVisibleCafes();
-    }, [newlyFetchedCafes, updateVisibleCafes]);
+    }, [cafes, updateVisibleCafes]);
 
     const geojson = useMemo(() => {
       return {
@@ -156,12 +156,12 @@ const Clusters = forwardRef<ClustersRef, ClustersProps>(
           properties: {
             ...cafe,
             cluster: false,
-            gmaps_rating: parseFloat(cafe.gmaps_ratings),
+            gmaps_rating: cafe.gmaps_rating,
             selectedCafeId: selectedCafe?.id || "",
           },
           geometry: {
             type: "Point",
-            coordinates: [cafe.longitude, cafe.latitude],
+            coordinates: [cafe._geo.lng, cafe._geo.lat],
           },
         })),
       };
@@ -268,8 +268,8 @@ const Clusters = forwardRef<ClustersRef, ClustersProps>(
         </Source>
         {selectedCafe && (
           <Marker
-            latitude={selectedCafe.latitude!}
-            longitude={selectedCafe.longitude!}
+            latitude={selectedCafe.latitude}
+            longitude={selectedCafe.longitude}
             offset={[0, -20]}
           >
             <AnimatedStar
@@ -285,5 +285,6 @@ const Clusters = forwardRef<ClustersRef, ClustersProps>(
     );
   }
 );
+
 
 export default Clusters;
