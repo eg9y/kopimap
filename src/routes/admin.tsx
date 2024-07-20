@@ -1,11 +1,9 @@
 import { createClient } from "@supabase/supabase-js";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { Database } from "../components/lib/database.types";
-import { Description, Field, FieldGroup, Fieldset, Label, Legend } from "../components/catalyst/fieldset";
+import {  Field, FieldGroup, Fieldset, Label, Legend } from "../components/catalyst/fieldset";
 import { Text } from "../components/catalyst/text";
 import { Input } from "../components/catalyst/input";
-import { Select } from "../components/catalyst/select";
-import { Textarea } from "../components/catalyst/textarea";
 import { Button } from "../components/catalyst/button";
 
 export const Route = createFileRoute("/admin")({
