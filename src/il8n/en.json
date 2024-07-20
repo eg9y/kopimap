@@ -1,5 +1,8 @@
 {
   "appDescription": "Map of Cafes in DKI Jakarta",
+  "noReviews": "No Reviews",
+  "basedOnReviews": "Based on {{count}} review",
+  "signOut": "Sign Out",
   "searchCafes": "Search...",
   "categories": {
     "Ambiance": "Ambiance",

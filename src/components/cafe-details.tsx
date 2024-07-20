@@ -283,15 +283,22 @@ export const CafeDetails = () => {
 
                     <Rate rating={aggregatedReview?.avg_rating ?? 0} />
                     <p className="text-center mt-2">
-                      Based on {aggregatedReview?.review_count ?? 0} reviews.
-                      Last review:{" "}
-                      {new Date(
-                        aggregatedReview?.last_updated!
-                      ).toLocaleDateString("id-ID", {
-                        day: "numeric",
-                        month: "short",
-                        year: "2-digit",
-                      })}
+                      {t('basedOnReviews', { count: aggregatedReview?.review_count ?? 0})}
+                      {
+                        aggregatedReview?.review_count && aggregatedReview?.review_count > 0 &&
+                        (
+                          <>
+                          Last review:{" "}
+                          { new Date(
+                            aggregatedReview?.last_updated!
+                          ).toLocaleDateString("id-ID", {
+                            day: "numeric",
+                            month: "short",
+                            year: "2-digit",
+                          })}
+                          </>
+                        )
+                      }
                     </p>
                     <Button
                       color={userReview ? "blue" : "emerald"}

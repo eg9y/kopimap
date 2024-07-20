@@ -2,6 +2,7 @@ import React from "react";
 import { SidebarHeading, SidebarItem, SidebarSection } from "./catalyst/sidebar";
 import { useStore } from "../store";
 import { MeiliSearchCafe } from "../types";
+import { Badge } from "./catalyst/badge";
 
 interface CafeListProps {
   searchInput: string;
@@ -39,6 +40,10 @@ export const CafeList: React.FC<CafeListProps> = ({ searchInput, mapCafes, searc
         >
           <div className="grow w-full">
             <p className="text-nowrap text-ellipsis overflow-hidden">{cafe.name}</p>
+              <div className="flex gap-2">
+              <Badge>gmaps rating: {cafe.gmaps_rating}</Badge>
+              <Badge>rating: {cafe.avg_rating ?? "-"}</Badge>
+              </div>
             <p className="font-light text-ellipsis text-nowrap text-slate-500 overflow-hidden">
               {cafe.address}
             </p>

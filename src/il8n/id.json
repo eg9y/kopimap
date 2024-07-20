@@ -1,5 +1,8 @@
 {
   "appDescription": "Peta Cafe di DKI Jakarta",
+  "noReviews": "Belum Ada Ulasan",
+  "basedOnReviews": "Berdasarkan {{count}} ulasan",
+  "signOut": "Sign Out",
   "searchCafes": "Cari...",
   "categories": {
     "Ambiance": "Suasana",

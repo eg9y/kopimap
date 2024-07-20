@@ -111,7 +111,7 @@ const unclusteredPointLayer: LayerSpecification = {
 
 
 const Clusters = forwardRef<ClustersRef, ClustersProps>(
-  ({ mapCenter, handleFlyTo, setPopupInfo, cafes }, ref) => {
+  ({ handleFlyTo, setPopupInfo, cafes }, ref) => {
     const { current: map } = useMap() as { current: MapRef };
     const { selectCafe, selectedCafe } = useStore();
     const [visibleCafes, setVisibleCafes] = useState<MeiliSearchCafe[]>([]);

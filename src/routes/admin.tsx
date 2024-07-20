@@ -1,6 +1,12 @@
 import { createClient } from "@supabase/supabase-js";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { Database } from "../components/lib/database.types";
+import { Description, Field, FieldGroup, Fieldset, Label, Legend } from "../components/catalyst/fieldset";
+import { Text } from "../components/catalyst/text";
+import { Input } from "../components/catalyst/input";
+import { Select } from "../components/catalyst/select";
+import { Textarea } from "../components/catalyst/textarea";
+import { Button } from "../components/catalyst/button";
 
 export const Route = createFileRoute("/admin")({
   beforeLoad: async ({ location }) => {
@@ -33,5 +39,46 @@ export const Route = createFileRoute("/admin")({
 });
 
 function Admin() {
-  return <div className="p-2">Hello from Admin!</div>;
+  return <div className="p-2">
+    <div>
+      <p>Upload cafe</p>
+      <form action="/orders" method="POST">
+      {/* ... */}
+      <Fieldset>
+        <Legend>Shipping details</Legend>
+        <Text>Without this your odds of getting your order are low.</Text>
+        <FieldGroup>
+          <Field>
+            <Label>Cafe Name</Label>
+            <Input name="street_address" />
+          </Field>
+          <Field>
+          <Label>Address</Label>
+          <Input name="street_address" />
+          </Field>
+          <Field>
+          <Label>Gmaps rating</Label>
+          <Input name="street_address" />
+          </Field>
+          <Field>
+          <Label>Gmaps total reviews</Label>
+          <Input name="street_address" />
+          </Field>
+          <Field>
+          <Label>Open times</Label>
+          <Input name="street_address" />
+          </Field>
+        
+          <Field>
+          <Label>Images</Label>
+          <Input name="street_address" />
+          </Field>
+        
+        </FieldGroup>
+        <Button>Submit</Button>
+      </Fieldset>
+      {/* ... */}
+    </form>
+    </div>
+  </div>;
 }

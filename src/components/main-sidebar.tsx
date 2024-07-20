@@ -56,6 +56,7 @@ import { SearchFilters } from "./search-filters";
 import { useStore } from "../store";
 import { useCafes } from "../hooks/use-cafes";
 import { useMapCafes } from "../hooks/use-map-cafes";
+import { BadgeButton } from "./catalyst/badge";
 
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL!,
@@ -152,6 +153,9 @@ export function MainSidebar({ children }: { children: React.ReactNode }) {
                     <div className="flex items-center space-x-4">
                       <Heading>KopiMap</Heading>
                       <LanguageSwitcher />
+                      <BadgeButton target="_blank" href="https://www.instagram.com/kopimap/">
+                      <img src="/instagram.svg" alt="Instagram"  />
+                      </BadgeButton>
                     </div>
                     <Text>{t("appDescription")}</Text>
                   </div>

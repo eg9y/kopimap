@@ -10,7 +10,6 @@ import { Map as Mapgl, GeolocateControl, Popup } from "react-map-gl/maplibre";
 import maplibregl from "maplibre-gl";
 import { useStore } from "../store";
 import { mapStyle } from "../config";
-import { useCafes } from "../hooks/use-cafes";
 import { GeolocateResultEvent } from "react-map-gl/dist/esm/types";
 import Clusters, { ClustersRef } from "./clusters"; // Adjust the path as necessary
 import { useMapCafes } from "../hooks/use-map-cafes";
