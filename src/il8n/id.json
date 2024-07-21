@@ -1,7 +1,7 @@
 {
   "appDescription": "Peta Cafe di DKI Jakarta",
   "noReviews": "Belum Ada Ulasan",
-  "basedOnReviews": "Berdasarkan {{count}} ulasan",
+  "basedOnReviews": "Berdasarkan {{count}} ulasan. ",
   "ratingsBreakdown": "Ulasan",
   "signOut": "Sign Out",
   "searchCafes": "Cari...",

@@ -197,17 +197,8 @@ export function SubmitReviewDialog({
                             value={value}
                             itemStyles={{
                               itemShapes: RoundedStar,
-                              activeFillColor: "white",
-                              inactiveFillColor: "white",
-                              activeBoxBorderColor: "#000",
-                              inactiveBoxColor: "grey",
-                              activeBoxColor: [
-                                "#da1600",
-                                "#db711a",
-                                "#dcb000",
-                                "#61bb00",
-                                "#009664",
-                              ],
+                              activeFillColor: "#ffb700",
+                              inactiveFillColor: "grey",
                             }}
                             onChange={onChange}
                             spaceBetween="small"
