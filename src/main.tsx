@@ -3,13 +3,23 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
-// import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-
 import { routeTree } from "./routeTree.gen";
 import { useUser } from "./hooks/use-user";
+import { User } from "@supabase/supabase-js";
 
 const queryClient = new QueryClient();
-const router = createRouter({ routeTree });
+
+// Define the type for our router context
+interface MyRouterContext {
+  loggedInUser: User | null;
+}
+
+const router = createRouter({
+  routeTree,
+  context: {
+    loggedInUser: null, // Initialize with null
+  } as MyRouterContext,
+});
 
 // Register the router instance for type safety
 declare module "@tanstack/react-router" {

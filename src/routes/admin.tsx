@@ -41,7 +41,6 @@ function Admin() {
     <div>
       <p>Upload cafe</p>
       <form action="/orders" method="POST">
-      {/* ... */}
       <Fieldset>
         <Legend>Shipping details</Legend>
         <Text>Without this your odds of getting your order are low.</Text>
@@ -75,7 +74,6 @@ function Admin() {
         </FieldGroup>
         <Button>Submit</Button>
       </Fieldset>
-      {/* ... */}
     </form>
     </div>
   </div>;

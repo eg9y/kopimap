@@ -50,13 +50,13 @@ import {
 } from "./catalyst/dialog";
 import { Field, Label } from "./catalyst/fieldset";
 import { createClient } from "@supabase/supabase-js";
-import { useUser } from "../hooks/use-user";
 import { LanguageSwitcher } from "./language-switcher";
 import { SearchFilters } from "./search-filters";
 import { useStore } from "../store";
 import { useCafes } from "../hooks/use-cafes";
 import { useMapCafes } from "../hooks/use-map-cafes";
 import { BadgeButton } from "./catalyst/badge";
+import { useRouter } from "@tanstack/react-router";
 
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL!,
@@ -69,7 +69,8 @@ export function MainSidebar({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedTab, setSelectedTab] = useState<string>("cafes");
   const { mapCenter, setMapCenter } = useStore();
-  const { loggedInUser } = useUser();
+  const router = useRouter();
+  const { loggedInUser } = router.options.context as any;
 
   const [searchInput, setSearchInput] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");

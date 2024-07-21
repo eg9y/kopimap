@@ -13,13 +13,13 @@ import {
 import { Button } from "./catalyst/button";
 import { Field, Label } from "./catalyst/fieldset";
 import { Rating, RoundedStar } from "@smastrom/react-rating";
-import { useUser } from "../hooks/use-user";
 import { reviewAttributes } from "./lib/review-attributes";
 import { useSubmitReview } from "../hooks/use-submit-review";
 import { createClient } from "@supabase/supabase-js";
 import { Database } from "./lib/database.types";
 import { CafeDetailedInfo } from "../types";
 import { cn } from "./lib/utils";
+import { useRouter } from "@tanstack/react-router";
 
 const CUSTOM_ITEM_LABELS = ["Bad", "Poor", "Average", "Great", "Excellent"];
 
@@ -46,7 +46,9 @@ export function SubmitReviewDialog({
     setValue,
     formState: { errors },
   } = useForm<FieldValues>();
-  const { loggedInUser } = useUser();
+  const router = useRouter();
+  const { loggedInUser } = router.options.context as any;
+
   const [isUpdating, setIsUpdating] = useState(false);
   const { t } = useTranslation();
 

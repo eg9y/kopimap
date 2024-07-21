@@ -7,6 +7,8 @@ import { Heading } from "./catalyst/heading";
 import { Badge, BadgeButton } from "./catalyst/badge";
 import { StarIcon } from "@heroicons/react/20/solid";
 import { useTranslation } from "react-i18next";
+import { useRouter } from "@tanstack/react-router";
+
 import {
   ArrowLeftFromLineIcon,
   ArrowRightFromLineIcon,
@@ -23,7 +25,6 @@ import { CafeImages } from "./cafe-images";
 import { Button } from "./catalyst/button";
 import { SubmitReviewDialog } from "./submit-review-dialog";
 import { reviewAttributes } from "./lib/review-attributes";
-import { useUser } from "../hooks/use-user";
 import { useCafeAggregatedReview } from "../hooks/use-cafe-aggregated-review";
 import { CafeDetailedInfo } from "../types";
 import { useUserReview } from "../hooks/use-user-review";
@@ -37,7 +38,9 @@ export const CafeDetails = () => {
   const { width, height } = useWindowSize();
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [confettiPosition, setConfettiPosition] = useState({ x: 0, y: 0 });
-  const { loggedInUser } = useUser();
+  const router = useRouter();
+  const { loggedInUser } = router.options.context as any;
+
 
   const { data: userReview } = useUserReview(
     loggedInUser?.id || null,
@@ -325,7 +328,7 @@ export const CafeDetails = () => {
                     )}
                   </div>
                   <div className="bg-white p-4 rounded-lg shadow-md">
-                    <Heading className="mb-2">Ratings Breakdown</Heading>
+                    <Heading className="mb-2">{t("ratingsBreakdown")}</Heading>
                     <div className="flex flex-col gap-2">
                       {renderAggregatedReviews()}
                     </div>
