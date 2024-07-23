@@ -67,6 +67,7 @@ const supabase = createClient(
 export function MainSidebar({ children }: { children: React.ReactNode }) {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
+  const [isFeatureRoadmapOpen, setIsFeatureRoadmapOpen] = useState(false);
   const [selectedTab, setSelectedTab] = useState<string>("cafes");
   const { mapCenter, setMapCenter } = useStore();
   const router = useRouter();
@@ -149,7 +150,7 @@ export function MainSidebar({ children }: { children: React.ReactNode }) {
           <Sidebar>
             <SidebarHeader>
               <div className="flex flex-col gap-4">
-                <div className="flex justify-between items-center">
+                <div className="flex flex-col">
                   <div>
                     <div className="flex items-center space-x-4">
                       <Heading>KopiMap</Heading>
@@ -218,7 +219,11 @@ export function MainSidebar({ children }: { children: React.ReactNode }) {
               </SidebarSection>
               <SidebarSpacer />
             </SidebarBody>
-            <SidebarFooter className="max-lg:hidden">
+            <SidebarFooter className="max-lg:hidden pb-4">
+            <div className="flex items-center gap-2">
+                    <Button color="green" className="grow cursor-pointer" onClick={() => setIsFeatureRoadmapOpen(true)}>Upcoming</Button>
+                    <a href="https://www.nihbuatjajan.com/egan" target="_blank"><img src="https://d4xyvrfd64gfm.cloudfront.net/buttons/default-cta.png" alt="Nih buat jajan" className="h-[36px]" /></a>
+                  </div>
               <Dropdown>
                 <DropdownButton as={SidebarItem}>
                   <div className="flex items-baseline justify-between w-full">
@@ -321,6 +326,33 @@ export function MainSidebar({ children }: { children: React.ReactNode }) {
             Cancel
           </Button>
           <Button onClick={() => setIsOpen(false)}>Search</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={isFeatureRoadmapOpen} onClose={setIsFeatureRoadmapOpen}>
+        <DialogTitle>Upcoming Features</DialogTitle>
+        <DialogDescription>Here are the list of features coming soon...</DialogDescription>
+        <DialogBody>
+          <ul className="list-disc">
+            <li>
+                Ratings filter
+            </li>
+            <li>
+                Total ratings filter
+            </li>
+            <li>
+                Mushola filter
+            </li>
+            <li>
+                Chain cafes filter
+            </li>
+            <li>
+                Mobile support
+            </li>
+          </ul>
+        </DialogBody>
+        <DialogActions>
+          <Button onClick={() => setIsFeatureRoadmapOpen(false)}>Close</Button>
         </DialogActions>
       </Dialog>
     </>
