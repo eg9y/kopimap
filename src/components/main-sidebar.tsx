@@ -1,7 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
-import useDebounce from "react-use/esm/useDebounce"
-
 import { Avatar } from "./catalyst/avatar";
 import {
   Dropdown,
@@ -12,7 +10,7 @@ import {
   DropdownMenu,
 } from "./catalyst/dropdown";
 import { Heading } from "./catalyst/heading";
-import { Input, InputGroup } from "./catalyst/input";
+import { Input } from "./catalyst/input";
 import {
   Navbar,
   NavbarItem,
@@ -55,7 +53,6 @@ import { SearchFilters } from "./search-filters";
 import { useStore } from "../store";
 import { useCafes } from "../hooks/use-cafes";
 import { useMapCafes } from "../hooks/use-map-cafes";
-import { BadgeButton } from "./catalyst/badge";
 import { useRouter } from "@tanstack/react-router";
 
 const supabase = createClient(
@@ -63,45 +60,23 @@ const supabase = createClient(
   import.meta.env.VITE_SUPABASE_ANON_KEY!
 );
 
+interface MainSidebarProps {
+  children: React.ReactNode;
+  searchInput: string;
+  debouncedSearchTerm: string;
+}
 
-export function MainSidebar({ children }: { children: React.ReactNode }) {
+export function MainSidebar({ children, searchInput, debouncedSearchTerm }: MainSidebarProps) {
   const { t } = useTranslation();
-  const [isOpen, setIsOpen] = useState(false);
-  const [isFeatureRoadmapOpen, setIsFeatureRoadmapOpen] = useState(false);
-  const [selectedTab, setSelectedTab] = useState<string>("cafes");
-  const { mapCenter, setMapCenter } = useStore();
+  const [isOpen, setIsOpen] = React.useState(false);
+  const [isFeatureRoadmapOpen, setIsFeatureRoadmapOpen] = React.useState(false);
+  const [selectedTab, setSelectedTab] = React.useState<string>("cafes");
+  const { mapCenter } = useStore();
   const router = useRouter();
   const { loggedInUser } = router.options.context as any;
 
-  const [searchInput, setSearchInput] = useState("");
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
-
   const { data: searchCafes, isLoading: isSearchLoading, error: searchError } = useCafes(mapCenter.lat, mapCenter.long, debouncedSearchTerm);
   const { data: mapCafesData, isLoading: isMapCafesLoading, error: mapCafesError } = useMapCafes(mapCenter.lat, mapCenter.long);
-
-  useDebounce(
-    () => {
-      setDebouncedSearchTerm(searchInput);
-    },
-    300,
-    [searchInput]
-  );
-
-  useEffect(() => {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setMapCenter({
-          lat: position.coords.latitude,
-          long: position.coords.longitude,
-        });
-      },
-      (error) => console.error("Error getting location:", error)
-    );
-  }, [setMapCenter]);
-
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchInput(e.target.value);
-  };
 
 
   return (
@@ -155,9 +130,6 @@ export function MainSidebar({ children }: { children: React.ReactNode }) {
                     <div className="flex items-center space-x-4">
                       <Heading>KopiMap</Heading>
                       <LanguageSwitcher />
-                      <BadgeButton target="_blank" href="https://www.instagram.com/kopimap/">
-                      <img src="/instagram.svg" alt="Instagram"  />
-                      </BadgeButton>
                     </div>
                     <Text>{t("appDescription")}</Text>
                   </div>
@@ -183,45 +155,32 @@ export function MainSidebar({ children }: { children: React.ReactNode }) {
                   </NavbarSection>
                 </Navbar>
               </div>
-              <div className="flex gap-2 pt-2">
-                <div className="grow">
-                  <InputGroup className="">
-                    <MagnifyingGlassIcon />
-                    <Input
-                      name="search"
-                      placeholder={t("searchCafes")}
-                      aria-label={t("search")}
-                      onChange={handleSearch}
-                      value={searchInput}
-                    />
-                  </InputGroup>
-                </div>
-              </div>
             </SidebarHeader>
             <SidebarBody>
               <SidebarSection className="max-lg:hidden">
-              {selectedTab === "cafes" && (
+                {selectedTab === "cafes" && (
                   <>
                     {(isSearchLoading || isMapCafesLoading) && <Text>{t("loading")}</Text>}
                     {(searchError || mapCafesError) && <Text color="red">{JSON.stringify(searchError || mapCafesError)}</Text>}
                     <CafeList 
-  searchInput={searchInput} 
-  mapCafes={mapCafesData} 
-  searchCafes={searchCafes} 
-/>
+                      searchInput={searchInput} 
+                      mapCafes={mapCafesData} 
+                      searchCafes={searchCafes} 
+                    />
                   </>
                 )}
                 {selectedTab === "filters" && (
-                  <>
-                    <SearchFilters />
-                  </>
+                  <SearchFilters />
                 )}
               </SidebarSection>
               <SidebarSpacer />
             </SidebarBody>
             <SidebarFooter className="max-lg:hidden pb-4">
             <div className="flex items-center gap-2">
-                    <Button color="green" className="grow cursor-pointer" onClick={() => setIsFeatureRoadmapOpen(true)}>Upcoming</Button>
+            <Button color="white" target="_blank" href="https://www.instagram.com/kopimap/">
+                      <img src="/instagram.svg" alt="Instagram"  />
+                      </Button>
+                      <Button color="green" className="grow cursor-pointer" onClick={() => setIsFeatureRoadmapOpen(true)}>Upcoming</Button>
                     <a href="https://www.nihbuatjajan.com/egan" target="_blank"><img src="https://d4xyvrfd64gfm.cloudfront.net/buttons/default-cta.png" alt="Nih buat jajan" className="h-[36px]" /></a>
                   </div>
               <Dropdown>

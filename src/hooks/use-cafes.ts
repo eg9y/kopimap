@@ -12,6 +12,7 @@ export const useCafes = (lat: number, lng: number, searchTerm: string) => {
 
     filterParams.append("lat", lat.toString());
     filterParams.append("lng", lng.toString());
+    
     if (searchTerm) {
       filterParams.append("q", searchTerm);
     }

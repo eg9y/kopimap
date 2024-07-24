@@ -167,7 +167,7 @@ export const CafeDetails = () => {
     <>
       <motion.div
         className={cn(
-          "h-full overflow-scroll pointer-events-auto bg-slate-50 rounded-l-md z-[100] absolute ring-1 ring-slate-300 shadow-md flex flex-col gap-2",
+          "h-full top-0 overflow-scroll pointer-events-auto bg-slate-50 rounded-l-md z-[100] absolute ring-1 ring-slate-300 shadow-md flex flex-col gap-2",
           expandDetails ? "w-full" : "min-w-[400px] w-[30vw]"
         )}
         animate={{

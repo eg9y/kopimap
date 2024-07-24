@@ -21,6 +21,8 @@ interface MapState {
   setFetchedCafes: (cafes: MeiliSearchCafe[]) => void;
   searchFilters: Record<string, string>;
   setSearchFilters: (filters: Record<string, string>) => void;
+  searchInput: string;
+  setSearchInput: (input: string) => void;
 }
 
 export const useStore = create<MapState>()(
@@ -53,6 +55,8 @@ export const useStore = create<MapState>()(
         },
         searchFilters: {},
         setSearchFilters: (filters) => set({ searchFilters: filters }),
+        searchInput: "",
+        setSearchInput: (input: string) => set({ searchInput: input }),
       }),
       {
         name: "map-storage",
