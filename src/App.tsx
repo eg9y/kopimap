@@ -57,7 +57,7 @@ function App() {
                     aria-label={t("search")}
                     onChange={handleSearch}
                     value={searchInput}
-                    className="w-[400px]"
+                    className="!w-[400px]"
                     autoComplete="off"
                   />
                 </InputGroup>

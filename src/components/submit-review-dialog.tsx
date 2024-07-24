@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useForm, Controller, FieldValues } from "react-hook-form";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
@@ -51,6 +51,7 @@ export function SubmitReviewDialog({
 
   const [isUpdating, setIsUpdating] = useState(false);
   const { t } = useTranslation();
+  const ratingRef = useRef<HTMLDivElement>(null);
 
   const onSuccess = () => {
     toast.success(
@@ -107,6 +108,27 @@ export function SubmitReviewDialog({
 
     fetchExistingReview();
   }, [loggedInUser, cafeDetailedInfo, setValue, reset]);
+
+  useEffect(() => {
+    if (isOpen && ratingRef.current) {
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+            const displayStyle = window.getComputedStyle(ratingRef.current!).display;
+            if (displayStyle !== 'none') {
+              // Force re-render of the Rating component
+              setValue('rating', control._formValues.rating);
+              observer.disconnect();
+            }
+          }
+        });
+      });
+
+      observer.observe(ratingRef.current, { attributes: true });
+
+      return () => observer.disconnect();
+    }
+  }, [isOpen, control, setValue]);
 
   const onSubmit = (data: FieldValues) => {
     if (!loggedInUser || !cafeDetailedInfo) {
@@ -192,7 +214,7 @@ export function SubmitReviewDialog({
                   render={({ field: { onChange, value } }) => (
                     <div role="group" className="flex flex-col gap-2 pt-2">
                       <div className="flex flex-col">
-                        <div className="max-w-[250px]">
+                      <div className="max-w-[250px]" ref={ratingRef}>
                           <Rating
                             value={value}
                             itemStyles={{

@@ -349,6 +349,7 @@ export const CafeDetails = () => {
         setIsOpen={setOpenSubmitReviewDialog}
         cafeDetailedInfo={cafeDetailedInfo}
       />
+      
       <Confetti
         style={{
           pointerEvents: "none",
