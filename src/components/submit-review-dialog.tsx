@@ -1,7 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm, Controller, FieldValues } from "react-hook-form";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
+import { Rating } from 'react-simple-star-rating';
 
 import {
   Dialog,
@@ -12,7 +13,6 @@ import {
 } from "./catalyst/dialog";
 import { Button } from "./catalyst/button";
 import { Field, Label } from "./catalyst/fieldset";
-import { Rating, RoundedStar } from "@smastrom/react-rating";
 import { reviewAttributes } from "./lib/review-attributes";
 import { useSubmitReview } from "../hooks/use-submit-review";
 import { createClient } from "@supabase/supabase-js";
@@ -51,7 +51,6 @@ export function SubmitReviewDialog({
 
   const [isUpdating, setIsUpdating] = useState(false);
   const { t } = useTranslation();
-  const ratingRef = useRef<HTMLDivElement>(null);
 
   const onSuccess = () => {
     toast.success(
@@ -108,27 +107,6 @@ export function SubmitReviewDialog({
 
     fetchExistingReview();
   }, [loggedInUser, cafeDetailedInfo, setValue, reset]);
-
-  useEffect(() => {
-    if (isOpen && ratingRef.current) {
-      const observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-          if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
-            const displayStyle = window.getComputedStyle(ratingRef.current!).display;
-            if (displayStyle !== 'none') {
-              // Force re-render of the Rating component
-              setValue('rating', control._formValues.rating);
-              observer.disconnect();
-            }
-          }
-        });
-      });
-
-      observer.observe(ratingRef.current, { attributes: true });
-
-      return () => observer.disconnect();
-    }
-  }, [isOpen, control, setValue]);
 
   const onSubmit = (data: FieldValues) => {
     if (!loggedInUser || !cafeDetailedInfo) {
@@ -203,7 +181,7 @@ export function SubmitReviewDialog({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {/* Overall Rating */}
             <div className="p-2 rounded-md bg-slate-100 w-full flex flex-col">
-              <Field className="">
+            <Field className="">
                 <p className="text-base font-semibold">
                   {t("submitReview.overallRating")}
                 </p>
@@ -214,25 +192,30 @@ export function SubmitReviewDialog({
                   render={({ field: { onChange, value } }) => (
                     <div role="group" className="flex flex-col gap-2 pt-2">
                       <div className="flex flex-col">
-                      <div className="max-w-[250px]" ref={ratingRef}>
+                        <div className="max-w-[250px]">
                           <Rating
-                            value={value}
-                            itemStyles={{
-                              itemShapes: RoundedStar,
-                              activeFillColor: "#ffb700",
-                              inactiveFillColor: "grey",
-                            }}
-                            onChange={onChange}
-                            spaceBetween="small"
-                            spaceInside="medium"
-                            transition="position"
+                            onClick={onChange}
+                            initialValue={value}
+                            allowFraction
+                            size={30}
+                            transition={false}
+                            fillColorArray={[
+                              "#f14f45",
+                              "#f16c45",
+                              "#f18845",
+                              "#f1b345",
+                              "#f1d045"
+                            ]}
+                            onPointerEnter={() => console.log('Enter')}
+                            onPointerLeave={() => console.log('Leave')}
+                            SVGclassName={`inline-block`}
                           />
                         </div>
                         <div>
                           <p className="font-bold text-lg">
                             {value
                               ? t(
-                                  `ratingLabels.${CUSTOM_ITEM_LABELS[value - 1]}`
+                                  `ratingLabels.${CUSTOM_ITEM_LABELS[Math.floor(value) - 1]}`
                                 )
                               : t("submitReview.selectRating")}
                           </p>
