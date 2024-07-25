@@ -25,7 +25,9 @@ export const SearchFilters: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="h-full bg-slate-200 flex flex-col px-2 pt-16 overflow-scroll">
+                  <h2 className="text-2xl">Filters</h2>
+
       {reviewAttributes.map((category) => (
         <div key={category.category} className="mb-4">
           <h3 className="text-lg font-semibold mb-2">

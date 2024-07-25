@@ -17,6 +17,8 @@ interface MapState {
   setMapRef: (element: MapRef | undefined) => void;
   expandDetails: boolean;
   setExpandDetails: (expand: boolean) => void;
+  openFilters: boolean;
+  setOpenFilters: (expand: boolean) => void;
   fetchedCafes: MeiliSearchCafe[];
   setFetchedCafes: (cafes: MeiliSearchCafe[]) => void;
   searchFilters: Record<string, string>;
@@ -49,6 +51,8 @@ export const useStore = create<MapState>()(
         },
         expandDetails: false,
         setExpandDetails: (expand: boolean) => set({ expandDetails: expand }),
+        openFilters: false,
+        setOpenFilters: (expand: boolean) => set({ openFilters: expand }),
         fetchedCafes: [],
         setFetchedCafes: (cafes: MeiliSearchCafe[]) => {
           set({ fetchedCafes: cafes });

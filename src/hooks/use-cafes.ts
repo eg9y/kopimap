@@ -7,7 +7,6 @@ export const useCafes = (lat: number, lng: number, searchTerm: string) => {
   const { searchFilters } = useStore();
 
   const fetchCafes = useCallback(async () => {
-
     const filterParams = new URLSearchParams();
 
     filterParams.append("lat", lat.toString());
@@ -33,9 +32,7 @@ export const useCafes = (lat: number, lng: number, searchTerm: string) => {
 
     const data: { hits: any[] } = await response.json();
 
-    console.log('Search results:', data);
     return data.hits.map((cafe: MeiliSearchCafe) => ({
-      gmaps_featured_image: "",
       gmaps_ratings: cafe.gmaps_rating.toString(),
       latitude: cafe._geo.lat,
       longitude: cafe._geo.lng,
@@ -45,9 +42,10 @@ export const useCafes = (lat: number, lng: number, searchTerm: string) => {
   }, [lat, lng, searchTerm, searchFilters]);
 
   return useQuery<MeiliSearchCafe[] | null, Error>({
-    queryKey: ["searchCafes", lat, lng, searchFilters, searchTerm],
+    queryKey: ["searchCafes", lat, lng, {searchTerm, ...searchFilters}],
     queryFn: fetchCafes,
-    enabled: !!searchTerm,
+    enabled: !!searchTerm || Object.keys(searchFilters).length > 0,
     staleTime: 1000 * 60 * 5, // 5 minutes
+    refetchOnWindowFocus: false,
   });
 };

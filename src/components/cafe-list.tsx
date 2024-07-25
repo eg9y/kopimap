@@ -2,7 +2,7 @@ import React from "react";
 import { SidebarHeading, SidebarItem, SidebarSection } from "./catalyst/sidebar";
 import { useStore } from "../store";
 import { MeiliSearchCafe } from "../types";
-import { Badge } from "./catalyst/badge";
+import { BadgeButton } from "./catalyst/badge";
 
 interface CafeListProps {
   searchInput: string;
@@ -11,17 +11,30 @@ interface CafeListProps {
 }
 
 export const CafeList: React.FC<CafeListProps> = ({ searchInput, mapCafes, searchCafes }) => {
-  const { selectCafe, mapRef } = useStore();
+  const { selectCafe, mapRef, searchFilters, setSearchFilters} = useStore();
 
-  const displayedCafes = searchInput ? (searchCafes || []) : (mapCafes?.visibleCafes || []);
+  const displayedCafes = (searchInput || Object.keys(searchFilters).length > 0) ? (searchCafes || []) : (mapCafes?.visibleCafes || []);
   const totalCafes = mapCafes?.allCafes?.length || 0;
+
+  const removeSearchFilter = (key: string) => {
+    const temp = { ...searchFilters };
+    delete temp[key];
+    setSearchFilters(temp);
+  };
 
   return (
     <SidebarSection className="max-lg:hidden">
       <SidebarHeading>
         Results ({displayedCafes.length})
-        {!searchInput && ` of ${totalCafes} total`}
+        {!searchInput && Object.keys(searchFilters).length === 0  && ` of ${totalCafes} total`}
       </SidebarHeading>
+      <div className="">
+      {Object.entries(searchFilters).map(([key, val]) => {
+        return (
+          <BadgeButton onClick={() => removeSearchFilter(key)}>{key.replace(/_/g, " ")}: {val}</BadgeButton>
+        )
+      })}
+      </div>
 
       {displayedCafes.map((cafe: MeiliSearchCafe) => (
         <SidebarItem
@@ -41,8 +54,8 @@ export const CafeList: React.FC<CafeListProps> = ({ searchInput, mapCafes, searc
           <div className="grow w-full">
             <p className="text-nowrap text-ellipsis overflow-hidden">{cafe.name}</p>
               <div className="flex gap-2">
-              <Badge>gmaps rating: {cafe.gmaps_rating}</Badge>
-              <Badge>rating: {cafe.avg_rating ?? "-"}</Badge>
+              <BadgeButton>gmaps rating: {cafe.gmaps_rating}</BadgeButton>
+              <BadgeButton>rating: {cafe.avg_rating ?? "-"}</BadgeButton>
               </div>
             <p className="font-light text-ellipsis text-nowrap text-slate-500 overflow-hidden">
               {cafe.address}

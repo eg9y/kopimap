@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Avatar } from "./catalyst/avatar";
 import {
@@ -10,7 +10,7 @@ import {
   DropdownMenu,
 } from "./catalyst/dropdown";
 import { Heading } from "./catalyst/heading";
-import { Input } from "./catalyst/input";
+import { Input, InputGroup } from "./catalyst/input";
 import {
   Navbar,
   NavbarItem,
@@ -49,11 +49,11 @@ import {
 import { Field, Label } from "./catalyst/fieldset";
 import { createClient } from "@supabase/supabase-js";
 import { LanguageSwitcher } from "./language-switcher";
-import { SearchFilters } from "./search-filters";
 import { useStore } from "../store";
 import { useCafes } from "../hooks/use-cafes";
 import { useMapCafes } from "../hooks/use-map-cafes";
 import { useRouter } from "@tanstack/react-router";
+import useDebounce from "react-use/esm/useDebounce";
 
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL!,
@@ -62,22 +62,34 @@ const supabase = createClient(
 
 interface MainSidebarProps {
   children: React.ReactNode;
-  searchInput: string;
-  debouncedSearchTerm: string;
 }
 
-export function MainSidebar({ children, searchInput, debouncedSearchTerm }: MainSidebarProps) {
+export function MainSidebar({ children }: MainSidebarProps) {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = React.useState(false);
-  const [isFeatureRoadmapOpen, setIsFeatureRoadmapOpen] = React.useState(false);
-  const [selectedTab, setSelectedTab] = React.useState<string>("cafes");
-  const { mapCenter } = useStore();
+  const [isFeatureRoadmapOpen, setIsFeatureRoadmapOpen] = useState(false);
+  const [searchInput, setSearchInput] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const { mapCenter, setOpenFilters, openFilters } = useStore();
   const router = useRouter();
   const { loggedInUser } = router.options.context as any;
 
   const { data: searchCafes, isLoading: isSearchLoading, error: searchError } = useCafes(mapCenter.lat, mapCenter.long, debouncedSearchTerm);
   const { data: mapCafesData, isLoading: isMapCafesLoading, error: mapCafesError } = useMapCafes(mapCenter.lat, mapCenter.long);
 
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchInput(e.target.value);
+  };
+
+  
+  useDebounce(
+    () => {
+      setDebouncedSearchTerm(searchInput);
+    },
+    300,
+    [searchInput]
+  );
 
   return (
     <>
@@ -134,44 +146,31 @@ export function MainSidebar({ children, searchInput, debouncedSearchTerm }: Main
                     <Text>{t("appDescription")}</Text>
                   </div>
                 </div>
-                <Navbar>
-                  <NavbarSection className="">
-                    <NavbarItem
-                      current={selectedTab === "cafes"}
-                      onClick={() => {
-                        setSelectedTab("cafes");
-                      }}
-                    >
-                      Cafes
-                    </NavbarItem>
-                    <NavbarItem 
-                      current={selectedTab === "filters"}
-                      onClick={() => {
-                        setSelectedTab("filters");
-                      }}
-                    >
-                      Filters
-                    </NavbarItem>
-                  </NavbarSection>
-                </Navbar>
+              </div>
+              <div className="flex gap-2">
+              <InputGroup className="">
+                  <MagnifyingGlassIcon />
+                  <Input
+                    name="search"
+                    placeholder={t("searchCafes")}
+                    aria-label={t("search")}
+                    onChange={handleSearch}
+                    value={searchInput}
+                    autoComplete="off"
+                  />
+                </InputGroup>
+                <Button color="orange" className="cursor-pointer" onClick={() => setOpenFilters(!openFilters)}>Filters</Button>
               </div>
             </SidebarHeader>
             <SidebarBody>
               <SidebarSection className="max-lg:hidden">
-                {selectedTab === "cafes" && (
-                  <>
-                    {(isSearchLoading || isMapCafesLoading) && <Text>{t("loading")}</Text>}
+              {(isSearchLoading || isMapCafesLoading) && <Text>{t("loading")}</Text>}
                     {(searchError || mapCafesError) && <Text color="red">{JSON.stringify(searchError || mapCafesError)}</Text>}
                     <CafeList 
                       searchInput={searchInput} 
                       mapCafes={mapCafesData} 
                       searchCafes={searchCafes} 
                     />
-                  </>
-                )}
-                {selectedTab === "filters" && (
-                  <SearchFilters />
-                )}
               </SidebarSection>
               <SidebarSpacer />
             </SidebarBody>
