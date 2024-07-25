@@ -2,7 +2,7 @@ import React from "react";
 import { SidebarHeading, SidebarItem, SidebarSection } from "./catalyst/sidebar";
 import { useStore } from "../store";
 import { MeiliSearchCafe } from "../types";
-import { BadgeButton } from "./catalyst/badge";
+import { Badge, BadgeButton } from "./catalyst/badge";
 
 interface CafeListProps {
   searchInput: string;
@@ -54,8 +54,8 @@ export const CafeList: React.FC<CafeListProps> = ({ searchInput, mapCafes, searc
           <div className="grow w-full">
             <p className="text-nowrap text-ellipsis overflow-hidden">{cafe.name}</p>
               <div className="flex gap-2">
-              <BadgeButton>gmaps rating: {cafe.gmaps_rating}</BadgeButton>
-              <BadgeButton>rating: {cafe.avg_rating ?? "-"}</BadgeButton>
+              <Badge className="grow">gmaps rating: {cafe.gmaps_rating} ({cafe.gmaps_total_reviews.toLocaleString("id-ID")})</Badge>
+              <Badge className="grow">rating: {cafe.avg_rating ?  `${cafe.avg_rating} (${cafe.review_count})` : "-"}</Badge>
               </div>
             <p className="font-light text-ellipsis text-nowrap text-slate-500 overflow-hidden">
               {cafe.address}

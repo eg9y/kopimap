@@ -38,6 +38,7 @@ export type MeiliSearchCafe = {
   id: string;
   name: string;
   gmaps_rating: number;
+  gmaps_total_reviews: number;
   address: string;
   _geo: {
     lat: number;
@@ -45,6 +46,7 @@ export type MeiliSearchCafe = {
   };
   _geoDistance: number;
   avg_rating: number;
+  review_count: number;
 } & CafeAttributes;
 
 export type Cafe = {
