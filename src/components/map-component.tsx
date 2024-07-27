@@ -8,6 +8,8 @@ import React, {
 } from "react";
 import { Map as Mapgl, GeolocateControl, Popup } from "react-map-gl/maplibre";
 import maplibregl from "maplibre-gl";
+import useMedia from "react-use/lib/useMedia";
+
 import { useStore } from "../store";
 import { mapStyle } from "../config";
 import { GeolocateResultEvent } from "react-map-gl/dist/esm/types";
@@ -27,6 +29,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ pmTilesReady, children }) =
   const isHoveringPopupRef = useRef<boolean>(false);
   const geoControlRef = useRef<maplibregl.GeolocateControl>();
   const clustersRef = useRef<ClustersRef>(null);
+  const isWide = useMedia("(min-width: 640px)");
 
   const [viewport, setViewport] = useState({
     latitude: -6.274163,
@@ -78,8 +81,8 @@ const MapComponent: React.FC<MapComponentProps> = ({ pmTilesReady, children }) =
       if (mapRef && mapRef.current && !isNaN(lat) && !isNaN(lng)) {
         mapRef.current.flyTo({
           center: {
-            lat: lat,
-            lon: lng - 0.0025,
+            lat: lat + (isWide ? 0 : 0.0025),
+            lon: lng - (isWide ? 0.0025 : -0.0025),
           },
           zoom: 16,
           essential: true, // this animation is considered essential with respect to prefers-reduced-motion
