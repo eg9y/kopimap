@@ -30,7 +30,7 @@ function App() {
 
   return (
     <I18nextProvider i18n={i18n}>
-      <div className="flex w-[100vw] h-[100vh] overflow-hidden">
+      <div className="flex w-[100vw] h-[100dvh] overflow-hidden">
         {isWide && (
           <MainSidebar>
             <div className="rounded-lg overflow-hidden grow relative h-full">
