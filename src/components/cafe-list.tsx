@@ -14,7 +14,6 @@ export const CafeList: React.FC<CafeListProps> = ({ searchInput, mapCafes, searc
   const { selectCafe, mapRef, searchFilters, setSearchFilters} = useStore();
 
   const displayedCafes = (searchInput || Object.keys(searchFilters).length > 0) ? (searchCafes || []) : (mapCafes?.visibleCafes || []);
-  const totalCafes = mapCafes?.allCafes?.length || 0;
 
   const removeSearchFilter = (key: string) => {
     const temp = { ...searchFilters };
@@ -26,7 +25,6 @@ export const CafeList: React.FC<CafeListProps> = ({ searchInput, mapCafes, searc
     <SidebarSection className="max-lg:hidden">
       <SidebarHeading>
         Results ({displayedCafes.length})
-        {!searchInput && Object.keys(searchFilters).length === 0  && ` of ${totalCafes} total`}
       </SidebarHeading>
       <div className="">
       {Object.entries(searchFilters).map(([key, val]) => {

@@ -26,7 +26,6 @@ export const MobileCafeList: React.FC<CafeListProps> = ({ searchInput, mapCafes,
   const isWide = useMedia("(min-width: 640px)");
 
   const displayedCafes = (searchInput || Object.keys(searchFilters).length > 0) ? (searchCafes || []) : (mapCafes?.visibleCafes || []);
-  const totalCafes = mapCafes?.allCafes?.length || 0;
 
   const removeSearchFilter = (key: string) => {
     const temp = { ...searchFilters };
@@ -82,7 +81,7 @@ export const MobileCafeList: React.FC<CafeListProps> = ({ searchInput, mapCafes,
       setListHeight(snappedHeight);
     } else {
       // During drag, update height immediately without animation
-      containerRef.current!.style.height = `calc(${clampedHeight}vh - ${SEARCH_BAR_HEIGHT}px)`;
+      containerRef.current!.style.height = `calc(${clampedHeight}vh)`;
     }
   }, {
     from: () => [0, listHeight],
@@ -122,8 +121,7 @@ export const MobileCafeList: React.FC<CafeListProps> = ({ searchInput, mapCafes,
         >
           <div className="flex justify-between items-center mb-2">
             <h2 className="text-lg font-semibold">
-              Results ({displayedCafes.length}
-              {!searchInput && Object.keys(searchFilters).length === 0 && ` of ${totalCafes} total`})
+              Results ({displayedCafes.length})
             </h2>
             {listHeight <= DEFAULT_HEIGHT && (
               <button 

@@ -63,7 +63,7 @@ export const useMapCafes = (lat: number, lng: number) => {
       });
 
       return {
-        visibleCafes: data,
+        visibleCafes: Array.from(allCafesRef.current.values()),
         allCafes: Array.from(allCafesRef.current.values()),
       };
     },

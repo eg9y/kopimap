@@ -1,9 +1,8 @@
-// components/CafeImages.tsx
 import React from "react";
-import { Database } from "./lib/database.types";
+import { CafeDetailedInfo } from "../types";
 
 interface CafeImagesProps {
-  cafe: Database["public"]["Views"]["cafe_location_view"]["Row"] | null; // Replace 'any' with a proper type for your cafe object
+  cafe: CafeDetailedInfo | null;
   expandDetails: boolean;
 }
 
@@ -16,7 +15,9 @@ export const CafeImages: React.FC<CafeImagesProps> = ({
   cafe,
   expandDetails,
 }) => {
-  const parseImages = (imagesString: string) => {
+  if (!cafe) return null;
+
+  const parseImages = (imagesString: string): CafeImage[] => {
     try {
       return JSON.parse(imagesString);
     } catch (error) {
@@ -25,19 +26,27 @@ export const CafeImages: React.FC<CafeImagesProps> = ({
     }
   };
 
+  const userUploadedImages = cafe.all_image_urls || [];
+  const gMapsImages = parseImages(cafe.gmaps_images as string);
+
+  // Combine user-uploaded images with Google Maps images
+  const allImages = [
+    ...userUploadedImages.map(url => ({ link: url, about: "User Uploaded" })),
+    ...gMapsImages
+  ];
+
   const filterImages = (images: CafeImage[], categories: string[]) => {
     return images
       .filter((image) => categories.includes(image.about.toLowerCase().trim()))
       .slice(0, 1);
   };
 
-  const images = parseImages(cafe?.gmaps_images as string);
-
-  if (!expandDetails && cafe) {
+  if (!expandDetails) {
+    const featuredImage = allImages[0]?.link || cafe.gmaps_featured_image;
     return (
       <div className="w-full h-[200px]">
         <img
-          src={cafe.gmaps_featured_image as string}
+          src={featuredImage as string}
           className="w-full object-cover h-full"
           alt={cafe.name!}
         />
@@ -47,19 +56,15 @@ export const CafeImages: React.FC<CafeImagesProps> = ({
 
   return (
     <div className="w-full flex flex-col gap-2">
-      {filterImages(images, ["semua", "oleh pemilik", "terbaru"]).map(
-        (image: CafeImage, index: number) => (
-          <ImageTile key={`atmosphere-${index}`} image={image} />
-        )
-      )}
-      {filterImages(images, ["menu"]).map((image: CafeImage, index: number) => (
+      {allImages.map((image, index) => (
+        <ImageTile key={`image-${index}`} image={image} />
+      ))}
+      {filterImages(gMapsImages, ["menu"]).map((image, index) => (
         <ImageTile key={`menu-${index}`} image={image} />
       ))}
-      {filterImages(images, ["suasana"]).map(
-        (image: CafeImage, index: number) => (
-          <ImageTile key={`other-${index}`} image={image} />
-        )
-      )}
+      {filterImages(gMapsImages, ["suasana"]).map((image, index) => (
+        <ImageTile key={`atmosphere-${index}`} image={image} />
+      ))}
     </div>
   );
 };

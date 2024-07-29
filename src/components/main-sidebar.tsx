@@ -35,7 +35,7 @@ import {
   ShieldCheckIcon,
   UserIcon,
 } from "@heroicons/react/16/solid";
-import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
+import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import { Text } from "./catalyst/text";
 import { CafeList } from "./cafe-list";
 import { Button } from "./catalyst/button";
@@ -149,16 +149,29 @@ export function MainSidebar({ children }: MainSidebarProps) {
               </div>
               <div className="flex gap-2">
               <InputGroup className="">
-                  <MagnifyingGlassIcon />
-                  <Input
-                    name="search"
-                    placeholder={t("searchCafes")}
-                    aria-label={t("search")}
-                    onChange={handleSearch}
-                    value={searchInput}
-                    autoComplete="off"
-                  />
-                </InputGroup>
+  <MagnifyingGlassIcon />
+  <Input
+    name="search"
+    placeholder={t("searchCafes")}
+    aria-label={t("search")}
+    onChange={handleSearch}
+    value={searchInput}
+    autoComplete="off"
+  />
+</InputGroup>
+  {searchInput && (
+    <Button
+      plain
+      aria-label="Clear search"
+      className="cursor-pointer"
+      onClick={() => {
+        setSearchInput("");
+        setDebouncedSearchTerm("");
+      }}
+    >
+      <XMarkIcon className="h-5 w-5" />
+    </Button>
+  )}
                 <Button color="orange" className="cursor-pointer" onClick={() => setOpenFilters(!openFilters)}>Filters</Button>
               </div>
             </SidebarHeader>

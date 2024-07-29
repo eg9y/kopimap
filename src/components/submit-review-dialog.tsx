@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useForm, Controller, FieldValues } from "react-hook-form";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
@@ -15,29 +15,32 @@ import { Button } from "./catalyst/button";
 import { Field, Label } from "./catalyst/fieldset";
 import { reviewAttributes } from "./lib/review-attributes";
 import { useSubmitReview } from "../hooks/use-submit-review";
-import { createClient } from "@supabase/supabase-js";
+import { createClient, Session } from "@supabase/supabase-js";
 import { Database } from "./lib/database.types";
 import { CafeDetailedInfo } from "../types";
 import { cn } from "./lib/utils";
 import { useRouter } from "@tanstack/react-router";
+import { ImageUpload, ImageUploadRef } from "./image-upload";
 
 const CUSTOM_ITEM_LABELS = ["Bad", "Poor", "Average", "Great", "Excellent"];
+
+type ReviewInsert = Database["public"]["Tables"]["reviews"]["Insert"];
 
 const supabase = createClient<Database>(
   import.meta.env.VITE_SUPABASE_URL!,
   import.meta.env.VITE_SUPABASE_ANON_KEY!
 );
 
-type ReviewInsert = Database["public"]["Tables"]["reviews"]["Insert"];
-
 export function SubmitReviewDialog({
   isOpen,
   setIsOpen,
   cafeDetailedInfo,
+  userReview,
 }: {
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   cafeDetailedInfo?: CafeDetailedInfo;
+  userReview?: ReviewInsert | null;
 }) {
   const {
     control,
@@ -48,9 +51,41 @@ export function SubmitReviewDialog({
   } = useForm<FieldValues>();
   const router = useRouter();
   const { loggedInUser } = router.options.context as any;
-
+  const [selectedFiles, setSelectedFiles] = useState<any[]>([]);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const { t } = useTranslation();
+  const imageUploadRef = useRef<ImageUploadRef>(null);
+  const [sessionInfo, setSessionInfo] = useState<Session | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setSessionInfo(session);
+    })();
+  }, []);
+
+  useEffect(() => {
+    if (userReview) {
+      setIsUpdating(true);
+      // Pre-fill the form with existing review data
+      Object.entries(userReview).forEach(([key, value]) => {
+        setValue(key, value);
+      });
+      // Set existing images if any
+      if (userReview.image_urls) {
+        setSelectedFiles(userReview.image_urls.map(url => ({ preview: url })));
+      }
+    } else {
+      setIsUpdating(false);
+      reset();
+      setSelectedFiles([]);
+    }
+  }, [userReview, setValue, reset]);
+
+  const handleFilesSelected = (files: any[]) => {
+    setSelectedFiles(files);
+  };
 
   const onSuccess = () => {
     toast.success(
@@ -66,6 +101,7 @@ export function SubmitReviewDialog({
     );
     setIsOpen(false);
     reset();
+    setSelectedFiles([]);
   };
 
   const { mutate } = useSubmitReview(
@@ -74,41 +110,7 @@ export function SubmitReviewDialog({
     loggedInUser?.id ?? null
   );
 
-  useEffect(() => {
-    const fetchExistingReview = async () => {
-      if (loggedInUser && cafeDetailedInfo) {
-        const { data, error } = await supabase
-          .from("reviews")
-          .select("*")
-          .eq("user_id", loggedInUser.id)
-          .eq("cafe_id", cafeDetailedInfo.id!)
-          .single();
-
-        if (error) {
-          if (error.code !== "PGRST116") {
-            console.error("Error fetching existing review:", error);
-          }
-          setIsUpdating(false);
-          return;
-        }
-
-        if (data) {
-          // Populate form with existing review data
-          Object.entries(data).forEach(([key, value]) => {
-            setValue(key as any, value);
-          });
-          setIsUpdating(true);
-        } else {
-          setIsUpdating(false);
-          reset(); // Clear form if no existing review
-        }
-      }
-    };
-
-    fetchExistingReview();
-  }, [loggedInUser, cafeDetailedInfo, setValue, reset]);
-
-  const onSubmit = (data: FieldValues) => {
+  const onSubmit = async (data: FieldValues) => {
     if (!loggedInUser || !cafeDetailedInfo) {
       toast.warning(t("submitReview.unableToSubmit"), {
         description: t("submitReview.ensureLoginAndCafe"),
@@ -117,14 +119,29 @@ export function SubmitReviewDialog({
       return;
     }
 
+    setIsUploading(true);
+    let uploadedUrls: string[] = [];
+
+    if (selectedFiles.length > 0 && imageUploadRef.current) {
+      try {
+        uploadedUrls = await imageUploadRef.current.triggerUpload();
+      } catch (error) {
+        console.error('Error uploading images:', error);
+        toast.error(t("submitReview.imageUploadError"));
+        setIsUploading(false);
+        return;
+      }
+    }
+
+    setIsUploading(false);
+
     const reviewData: ReviewInsert = {
       ...data,
       cafe_id: cafeDetailedInfo.id,
       cafe_place_id: cafeDetailedInfo.place_id,
       user_id: loggedInUser.id,
-      // Ensure rating is a number
-      rating:
-        typeof data.rating === "number" ? data.rating : parseFloat(data.rating),
+      rating: typeof data.rating === "number" ? data.rating : parseFloat(data.rating),
+      image_urls: uploadedUrls,
     };
 
     mutate(reviewData);
@@ -177,11 +194,11 @@ export function SubmitReviewDialog({
           : t("submitReview.fillOptions")}
       </DialogDescription>
       <form onSubmit={handleSubmit(onSubmit)} className="grow">
-        <DialogBody className="flex flex-col gap-2">
+        <DialogBody className="flex flex-col gap-2 h-[70vh] overflow-scroll">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {/* Overall Rating */}
             <div className="p-2 rounded-md bg-slate-100 w-full flex flex-col">
-            <Field className="">
+              <Field className="">
                 <p className="text-base font-semibold">
                   {t("submitReview.overallRating")}
                 </p>
@@ -231,14 +248,36 @@ export function SubmitReviewDialog({
                 />
               </Field>
             </div>
-            {/* Images section (placeholder) */}
+            {/* Images section */}
             <div className="p-2 rounded-md bg-slate-100 w-full flex flex-col">
               <p className="text-base font-semibold">
                 {t("submitReview.images")}
               </p>
-              <p className="text-slate-700">
-                {t("submitReview.imageUploadComingSoon")}
-              </p>
+              {sessionInfo && (
+                <ImageUpload
+                  ref={imageUploadRef}
+                  onFilesSelected={handleFilesSelected}
+                  onUploadComplete={(urls) => {
+                    console.log('Uploaded URLs:', urls);
+                  }}
+                  sessionInfo={sessionInfo}
+                />
+              )}
+              {selectedFiles.length > 0 && (
+                <div className="mt-2">
+                  <p>Existing Images:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedFiles.map((file, index) => (
+                      <img
+                        key={index}
+                        src={file.preview}
+                        alt={`Existing image ${index + 1}`}
+                        className="w-20 h-20 object-cover rounded"
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
             {/* Review attributes */}
             {reviewAttributes.map((attr) => (
@@ -319,7 +358,7 @@ export function SubmitReviewDialog({
           <Button plain onClick={() => setIsOpen(false)}>
             {t("submitReview.cancel")}
           </Button>
-          <Button type="submit" color="emerald" className="cursor-pointer">
+          <Button type="submit" color="emerald" className="cursor-pointer" disabled={isUploading}>
             {isUpdating ? t("submitReview.update") : t("submitReview.submit")}
           </Button>
         </DialogActions>

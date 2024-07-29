@@ -183,10 +183,10 @@ export const CafeDetails = () => {
         <div className={cn("flex gap-4 p-4 flex-col grow")}>
           {cafeDetailedInfo && (
             <>
-              {!expandDetails && cafeDetailedInfo.gmaps_featured_image && (
+              {!expandDetails && (cafeDetailedInfo.gmaps_featured_image || cafeDetailedInfo.all_image_urls) && (
                 <div className="w-full h-[200px]">
                   <img
-                    src={cafeDetailedInfo.gmaps_featured_image}
+                    src={cafeDetailedInfo.all_image_urls ? cafeDetailedInfo.all_image_urls[0] : cafeDetailedInfo.gmaps_featured_image!}
                     className="w-full object-cover h-full"
                     alt={cafeDetailedInfo.name!}
                   />
@@ -220,6 +220,8 @@ export const CafeDetails = () => {
                     )}
                   </div>
 
+<div className="flex gap-2">
+<div className="flex flex-col justify-around">
                   <div className="flex items-center gap-1 flex-wrap">
                     {/* <Badge>
                       <img src="/instagram.svg" alt="Instagram" />
@@ -271,14 +273,8 @@ export const CafeDetails = () => {
                       {cafeDetailedInfo.address}
                     </p>
                   </div>
-                  {expandDetails && (
-                    <CafeImages
-                      cafe={cafeDetailedInfo}
-                      expandDetails={expandDetails}
-                    />
-                  )}
-                </div>
-                <div className="flex flex-col gap-4">
+</div>
+<div className="flex flex-col gap-4">
                   <div className="bg-white p-4 rounded-lg shadow-md">
                     <Heading className="">
                       {t(`cafeDetails.userReviews`)}
@@ -327,12 +323,20 @@ export const CafeDetails = () => {
                       </p>
                     )}
                   </div>
+                </div>
+</div>
                   <div className="bg-white p-4 rounded-lg shadow-md">
                     <Heading className="mb-2">{t("ratingsBreakdown")}</Heading>
                     <div className="flex flex-col gap-2">
                       {renderAggregatedReviews()}
                     </div>
                   </div>
+                  {expandDetails && (
+                    <CafeImages
+                      cafe={cafeDetailedInfo}
+                      expandDetails={expandDetails}
+                    />
+                  )}
                 </div>
               </div>
             </>
@@ -348,6 +352,7 @@ export const CafeDetails = () => {
         isOpen={openSubmitReviewDialog}
         setIsOpen={setOpenSubmitReviewDialog}
         cafeDetailedInfo={cafeDetailedInfo}
+        userReview={userReview}
       />
       
       <Confetti

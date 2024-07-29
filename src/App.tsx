@@ -5,6 +5,8 @@ import { AnimatePresence } from "framer-motion";
 import * as pmtiles from "pmtiles";
 import maplibregl from "maplibre-gl";
 import useMedia from "react-use/lib/useMedia";
+import { Capacitor } from '@capacitor/core';
+import { StatusBar, Style } from '@capacitor/status-bar';
 
 import "@smastrom/react-rating/style.css";
 import "maplibre-gl/dist/maplibre-gl.css";
@@ -26,6 +28,13 @@ function App() {
     const protocol = new pmtiles.Protocol();
     maplibregl.addProtocol("pmtiles", protocol.tile);
     setPmTilesReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (Capacitor.isNativePlatform()) {
+      StatusBar.setStyle({ style: Style.Dark });
+      StatusBar.setOverlaysWebView({ overlay: false });
+    }
   }, []);
 
   return (

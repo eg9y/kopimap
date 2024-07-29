@@ -56,7 +56,7 @@ export const MobileBar: React.FC = () => {
         </InputGroup>
       </div>
 
-      {(isSearchLoading || isMapCafesLoading) && (
+      {/* {(isSearchLoading || isMapCafesLoading) && (
         <div className="absolute top-16 left-0 right-0 z-20 p-4 bg-white">
           <p>{t("loading")}</p>
         </div>
@@ -66,7 +66,7 @@ export const MobileBar: React.FC = () => {
         <div className="absolute top-16 left-0 right-0 z-20 p-4 bg-white">
           <p className="text-red-500">{JSON.stringify(searchError || mapCafesError)}</p>
         </div>
-      )}
+      )} */}
 
       <MobileCafeList
         searchInput={searchInput}
