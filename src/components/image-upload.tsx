@@ -1,9 +1,11 @@
-import { useState, useImperativeHandle, forwardRef } from 'react';
-import Uppy from '@uppy/core';
+import { useState, useImperativeHandle, forwardRef, useCallback } from 'react';
+import Uppy, { UppyFile } from '@uppy/core';
 import { Dashboard, useUppyEvent } from '@uppy/react';
 import Compressor from '@uppy/compressor';
 import Tus from '@uppy/tus';
 import { Session } from '@supabase/supabase-js';
+import NSFWFilter from 'nsfw-filter';
+import { toast } from 'sonner';
 
 import '@uppy/core/dist/style.min.css';
 import '@uppy/dashboard/dist/style.min.css';
@@ -18,8 +20,45 @@ export interface ImageUploadRef {
   triggerUpload: () => Promise<string[]>;
 }
 
+async function isSafe(file: File) {
+  try {
+    const predictions = await NSFWFilter.predictImg(file, 3);
+    const pornPrediction = predictions.find(
+      ({ className }) => className === 'Porn'
+    );
+    const hentaiPrediction = predictions.find(
+      ({ className }) => className === 'Hentai'
+    );
+
+    // Check if either Porn or Hentai probability exceeds the threshold
+    return !(
+      (pornPrediction && pornPrediction.probability > 0.25) ||
+      (hentaiPrediction && hentaiPrediction.probability > 0.25)
+    );
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
 export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(({ onFilesSelected, onUploadComplete, sessionInfo }, ref) => {
   const [uploadedUrls, setUploadedUrls] = useState<string[]>([]);
+
+  const checkNSFW = useCallback(async (file: UppyFile<{},{}>) => {
+    try {
+      const isImgSafe = await isSafe(file.data as File);
+      if (!isImgSafe) {
+        toast.error('Inappropriate content detected. Please upload a different image.');
+        return false;
+      }
+      console.log('its safe!');
+      return true;
+    } catch (error) {
+      console.error('Error checking NSFW:', error);
+      toast.error('Error checking image content. Please try again.');
+      return false;
+    }
+  }, []);
 
   const [uppy] = useState(() => new Uppy({
     id: 'imageUploader',
@@ -43,14 +82,20 @@ export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(({ onFil
     allowedMetaFields: ['bucketName', 'objectName', 'contentType', 'cacheControl'],
   }));
 
-  useUppyEvent(uppy, 'file-added', (file) => {
+  useUppyEvent(uppy, 'file-added', async (file) => {
+    const isSafe = await checkNSFW(file);
+    if (!isSafe) {
+      uppy.removeFile(file.id);
+      return;
+    }
+
     uppy?.setFileMeta(file.id, {
       ...file.meta,
       bucketName: 'review-images',
       objectName: `${Date.now()}-${file.name}`,
       cacheControl: 'max-age=31536000',
       contentType: file.type,
-    })
+    });
     console.log('file meta', {
       ...file.meta,
       bucketName: 'review-images',
@@ -59,18 +104,19 @@ export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(({ onFil
       contentType: file.type,
     });
     onFilesSelected([file]);
-  })
+  });
 
   useUppyEvent(uppy, 'upload-success', (file) => {
     const uploadUrl = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/review-images/${file?.meta.objectName}`;
     setUploadedUrls(prevUrls => [...prevUrls, uploadUrl]);
-  })
+  });
 
   uppy.on('complete', () => {
     onUploadComplete(uploadedUrls);
   });
   uppy.on('error', (error) => {
     console.error('Upload error:', error);
+    toast.error('An error occurred during upload. Please try again.');
   });
 
   useImperativeHandle(ref, () => ({
