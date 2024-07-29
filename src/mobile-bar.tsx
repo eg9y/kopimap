@@ -18,13 +18,13 @@ export const MobileBar: React.FC = () => {
 
   const {
     data: searchCafes,
-    isLoading: isSearchLoading,
-    error: searchError,
+    // isLoading: isSearchLoading,
+    // error: searchError,
   } = useCafes(mapCenter.lat, mapCenter.long, debouncedSearchTerm);
   const {
     data: mapCafesData,
-    isLoading: isMapCafesLoading,
-    error: mapCafesError,
+    // isLoading: isMapCafesLoading,
+    // error: mapCafesError,
   } = useMapCafes(mapCenter.lat, mapCenter.long);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
