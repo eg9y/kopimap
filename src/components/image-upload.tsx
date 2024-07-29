@@ -14,6 +14,7 @@ interface ImageUploadProps {
   onFilesSelected: (files: any[]) => void;
   onUploadComplete: (urls: string[]) => void;
   sessionInfo: Session;
+  existingUrls?: string[];
 }
 
 export interface ImageUploadRef {
@@ -41,8 +42,9 @@ async function isSafe(file: File) {
   }
 }
 
-export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(({ onFilesSelected, onUploadComplete, sessionInfo }, ref) => {
-  const [uploadedUrls, setUploadedUrls] = useState<string[]>([]);
+export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(({ onFilesSelected, onUploadComplete, sessionInfo, existingUrls = [] }, ref) => {
+  const [uploadedUrls, setUploadedUrls] = useState<string[]>(existingUrls);
+
 
   const checkNSFW = useCallback(async (file: UppyFile<{},{}>) => {
     try {
@@ -120,16 +122,18 @@ export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(({ onFil
   });
 
   useImperativeHandle(ref, () => ({
-    triggerUpload: async () => {
-      const result = await uppy.upload();
-      if (!result?.successful) {
-        return [];
-      }
-      return result.successful.map(file => 
-        `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/review-images/${file.meta.objectName}`
-      );
+  triggerUpload: async () => {
+    if (!uppy) return [];
+    const result = await uppy.upload();
+    if (!result?.successful) {
+      return uploadedUrls;
     }
-  }));
+    const newUrls = result.successful.map(file => 
+      `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/review-images/${file.meta.objectName}`
+    );
+    return [...uploadedUrls, ...newUrls];
+  }
+}));
 
   if (!uppy) {
     return <div>Loading...</div>;

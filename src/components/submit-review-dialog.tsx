@@ -52,6 +52,7 @@ export function SubmitReviewDialog({
   const router = useRouter();
   const { loggedInUser } = router.options.context as any;
   const [selectedFiles, setSelectedFiles] = useState<any[]>([]);
+  const [existingImageUrls, setExistingImageUrls] = useState<string[]>([]);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const { t } = useTranslation();
@@ -74,13 +75,14 @@ export function SubmitReviewDialog({
       });
       // Set existing images if any
       if (userReview.image_urls) {
-        setSelectedFiles(userReview.image_urls.map(url => ({ preview: url })));
+        setExistingImageUrls(userReview.image_urls);
       }
     } else {
       setIsUpdating(false);
       reset();
-      setSelectedFiles([]);
+      setExistingImageUrls([]);
     }
+    setSelectedFiles([]);
   }, [userReview, setValue, reset]);
 
   const handleFilesSelected = (files: any[]) => {
@@ -102,6 +104,7 @@ export function SubmitReviewDialog({
     setIsOpen(false);
     reset();
     setSelectedFiles([]);
+    setExistingImageUrls([]);
   };
 
   const { mutate } = useSubmitReview(
@@ -120,11 +123,11 @@ export function SubmitReviewDialog({
     }
 
     setIsUploading(true);
-    let uploadedUrls: string[] = [];
+    let newUploadedUrls: string[] = [];
 
     if (selectedFiles.length > 0 && imageUploadRef.current) {
       try {
-        uploadedUrls = await imageUploadRef.current.triggerUpload();
+        newUploadedUrls = await imageUploadRef.current.triggerUpload();
       } catch (error) {
         console.error('Error uploading images:', error);
         toast.error(t("submitReview.imageUploadError"));
@@ -141,7 +144,7 @@ export function SubmitReviewDialog({
       cafe_place_id: cafeDetailedInfo.place_id,
       user_id: loggedInUser.id,
       rating: typeof data.rating === "number" ? data.rating : parseFloat(data.rating),
-      image_urls: uploadedUrls,
+      image_urls: [...existingImageUrls, ...newUploadedUrls],
     };
 
     mutate(reviewData);
@@ -263,15 +266,30 @@ export function SubmitReviewDialog({
                   sessionInfo={sessionInfo}
                 />
               )}
-              {selectedFiles.length > 0 && (
+              {existingImageUrls.length > 0 && (
                 <div className="mt-2">
                   <p>Existing Images:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {existingImageUrls.map((url, index) => (
+                      <img
+                        key={index}
+                        src={url}
+                        alt={`Existing image ${index + 1}`}
+                        className="w-20 h-20 object-cover rounded"
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+              {selectedFiles.length > 0 && (
+                <div className="mt-2">
+                  <p>New Images to Upload:</p>
                   <div className="flex flex-wrap gap-2">
                     {selectedFiles.map((file, index) => (
                       <img
                         key={index}
-                        src={file.preview}
-                        alt={`Existing image ${index + 1}`}
+                        src={URL.createObjectURL(file.data)}
+                        alt={`New image ${index + 1}`}
                         className="w-20 h-20 object-cover rounded"
                       />
                     ))}
