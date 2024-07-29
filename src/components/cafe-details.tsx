@@ -186,7 +186,7 @@ export const CafeDetails = () => {
               {!expandDetails && (cafeDetailedInfo.gmaps_featured_image || cafeDetailedInfo.all_image_urls) && (
                 <div className="w-full h-[200px]">
                   <img
-                    src={cafeDetailedInfo.all_image_urls ? cafeDetailedInfo.all_image_urls[0] : cafeDetailedInfo.gmaps_featured_image!}
+                    src={cafeDetailedInfo.all_image_urls && cafeDetailedInfo.all_image_urls.length > 0 ? cafeDetailedInfo.all_image_urls[0] : cafeDetailedInfo.gmaps_featured_image!}
                     className="w-full object-cover h-full"
                     alt={cafeDetailedInfo.name!}
                   />
