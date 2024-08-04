@@ -13,10 +13,10 @@
     "cap:sync": "npx cap sync",
     "cap:run:android": "npx cap run android",
     "cap:run:ios": "npx cap run ios",
-    "preview": "run-s build preview:wrangler",
-    "preview:wrangler": "wrangler pages dev",
-    "deploy:wrangler": "wrangler pages deploy",
-    "deploy": "run-s build deploy:wrangler",
+    "build:preview": "pnpm run build && wrangler pages dev",
+    "build:deploy": "pnpm run build && wrangler pages deploy",
+    "preview": "wrangler pages dev",
+    "deploy": "wrangler pages deploy",
     "typesafe-i18n": "typesafe-i18n"
   },
   "dependencies": {
@@ -92,6 +92,6 @@
     "tailwindcss": "^3.4.4",
     "typescript": "^5.2.2",
     "vite": "^5.3.1",
-    "vite-plugin-cjs-interop": "^2.1.1"
+    "wrangler": "^3.61.0"
   }
 }

@@ -37,7 +37,8 @@
     "*.ts",
     "*.tsx",
     "src",
-    "**/*.json"
+    "**/*.json",
+    "hono-entry.ts" 
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "dist"]
 }
