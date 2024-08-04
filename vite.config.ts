@@ -9,9 +9,13 @@ import { nodePolyfills } from "vite-plugin-node-polyfills";
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
-    nodePolyfills({
-      // To add only specific polyfills, add them here. If no option is passed, adds all polyfills
-      include: ["path", "stream", "assert", "events", "zlib", "util", "buffer"],
+     nodePolyfills({
+      include: ["path", "stream", "zlib", "util", "buffer", "events"],
+      globals: {
+        Buffer: true,
+        global: true,
+        process: true,
+      },
     }),
     vike(),
     pages({
