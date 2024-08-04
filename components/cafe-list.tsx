@@ -39,6 +39,7 @@ export const CafeList: React.FC<CafeListProps> = ({ searchInput, mapCafes, searc
     // Set the new parameters, replacing any existing ones
     url.searchParams.set('cafe', cafe.name);
     url.searchParams.set('place_id', cafe.id);
+
   
     // Use history.pushState to update the URL without causing a reload
     window.history.pushState({ triggeredBy: 'user' }, '', url.toString());

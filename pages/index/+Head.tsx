@@ -7,7 +7,7 @@ export function Head() {
     return (
       <>
         <meta charSet="UTF-8" />
-        <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+        {/* <link rel="icon" type="image/svg+xml" href="/vite.svg" /> */}
         <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
         {/* <title>{data && data.cafeToSelect ? `Kopimap | ${data.cafeToSelect.name}` : `Kopimap - Discover Jakarta's Best Cafes 🗺️☕️`}</title> */}
         <meta
