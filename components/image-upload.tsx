@@ -4,7 +4,7 @@ import { useUppyEvent, Dashboard } from '@uppy/react';
 import Compressor from '@uppy/compressor';
 import Tus from '@uppy/tus';
 import { Session } from '@supabase/supabase-js';
-import NSFWFilter from 'nsfw-filter';
+// import NSFWFilter from 'nsfw-filter';
 import { toast } from 'sonner';
 
 import '@uppy/core/dist/style.min.css';
@@ -13,7 +13,6 @@ import '@uppy/dashboard/dist/style.min.css';
 
 interface ImageUploadProps {
   onFilesSelected: (files: any[]) => void;
-  onUploadComplete: (urls: string[]) => void;
   sessionInfo: Session;
   existingUrls?: string[];
 }
@@ -23,30 +22,28 @@ export interface ImageUploadRef {
 }
 
 async function isSafe(file: File) {
-  try {
-    const predictions = await NSFWFilter.predictImg(file, 3);
-    const pornPrediction = predictions.find(
-      ({ className }) => className === 'Porn'
-    );
-    const hentaiPrediction = predictions.find(
-      ({ className }) => className === 'Hentai'
-    );
+  return true;
+  // try {
+  //   const predictions = await NSFWFilter.predictImg(file, 3);
+  //   const pornPrediction = predictions.find(
+  //     ({ className }) => className === 'Porn'
+  //   );
+  //   const hentaiPrediction = predictions.find(
+  //     ({ className }) => className === 'Hentai'
+  //   );
 
-    // Check if either Porn or Hentai probability exceeds the threshold
-    return !(
-      (pornPrediction && pornPrediction.probability > 0.25) ||
-      (hentaiPrediction && hentaiPrediction.probability > 0.25)
-    );
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
+  //   // Check if either Porn or Hentai probability exceeds the threshold
+  //   return !(
+  //     (pornPrediction && pornPrediction.probability > 0.25) ||
+  //     (hentaiPrediction && hentaiPrediction.probability > 0.25)
+  //   );
+  // } catch (error) {
+  //   console.error(error);
+  //   throw error;
+  // }
 }
 
-export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(({ onFilesSelected, onUploadComplete, sessionInfo, existingUrls = [] }, ref) => {
-  const [uploadedUrls, setUploadedUrls] = useState<string[]>(existingUrls);
-
-
+export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(({ onFilesSelected,  sessionInfo, existingUrls = [] }, ref) => {
   const checkNSFW = useCallback(async (file: UppyFile<{},{}>) => {
     try {
       const isImgSafe = await isSafe(file.data as File);
@@ -98,25 +95,19 @@ export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(({ onFil
       objectName: `${Date.now()}-${file.name}`,
       cacheControl: 'max-age=31536000',
       contentType: file.type,
-    });
+    }); 
     console.log('file meta', {
       ...file.meta,
-      bucketName: 'review-images',
+      bucketName: 'review-images',  
       objectName: `${Date.now()}-${file.name}`,
       cacheControl: 'max-age=31536000',
       contentType: file.type,
     });
+    console.log('.file.meta', uppy.getFiles());
+
     onFilesSelected([file]);
   });
 
-  useUppyEvent(uppy, 'upload-success', (file) => {
-    const uploadUrl = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/review-images/${file?.meta.objectName}`;
-    setUploadedUrls(prevUrls => [...prevUrls, uploadUrl]);
-  });
-
-  uppy.on('complete', () => {
-    onUploadComplete(uploadedUrls);
-  });
   uppy.on('error', (error) => {
     console.error('Upload error:', error);
     toast.error('An error occurred during upload. Please try again.');
@@ -125,14 +116,21 @@ export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(({ onFil
   useImperativeHandle(ref, () => ({
   triggerUpload: async () => {
     if (!uppy) return [];
+
+    console.log('object', uppy.getFiles());
+
     const result = await uppy.upload();
-    if (!result?.successful) {
-      return uploadedUrls;
+
+    console.log('hmm ', result);
+
+    if (!result?.successful)  {
+      return [];
+
     }
-    const newUrls = result.successful.map(file => 
+    const newUrls = result?.successful?.map(file => 
       `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/review-images/${file.meta.objectName}`
     );
-    return [...uploadedUrls, ...newUrls];
+    return newUrls;
   }
 }));
 

@@ -198,7 +198,7 @@ export const CafeDetails = () => {
                 <div className="w-full h-[200px]">
                   <img
                     src={cafeDetailedInfo.all_image_urls && cafeDetailedInfo.all_image_urls.length > 0 ? cafeDetailedInfo.all_image_urls[0] : cafeDetailedInfo.gmaps_featured_image!}
-                    className="w-full object-cover h-full"
+                    className="w-full object-contain h-full"
                     alt={cafeDetailedInfo.name!}
                   />
                 </div>

@@ -18,10 +18,10 @@ import { createClient, Session } from "@supabase/supabase-js";
 import { Database } from "./lib/database.types";
 import { CafeDetailedInfo } from "../types";
 import { cn } from "./lib/utils";
-import { clientOnly } from "vike-react/clientOnly";
 import { useUser } from "../hooks/use-user";
 import { useI18nContext } from "@/src/i18n/i18n-react";
 import { LocalizedString } from "typesafe-i18n";
+import { ImageUpload } from "./image-upload";
 
 const CUSTOM_ITEM_LABELS = ["Bad", "Poor", "Average", "Great", "Excellent"];
 
@@ -62,8 +62,6 @@ export function SubmitReviewDialog({
   const [isUploading, setIsUploading] = useState(false);
   const imageUploadRef = useRef<ImageUploadRef>(null);
   const [sessionInfo, setSessionInfo] = useState<Session | null>(null);
-
-  const ClientOnlyImageUpload = clientOnly(() => import('./image-upload').then(module => module.ImageUpload ));
 
   useEffect(() => {
     (async () => {
@@ -152,6 +150,8 @@ export function SubmitReviewDialog({
       rating: typeof data.rating === "number" ? data.rating : parseFloat(data.rating),
       image_urls: [...existingImageUrls, ...newUploadedUrls],
     };
+
+    console.log('reviewData', reviewData);
 
     mutate(reviewData);
   };
@@ -261,12 +261,9 @@ export function SubmitReviewDialog({
                 {LL.submitReview.images()}
               </p>
               {sessionInfo && (
-                <ClientOnlyImageUpload
+                <ImageUpload
                   ref={imageUploadRef}
                   onFilesSelected={handleFilesSelected}
-                  onUploadComplete={(urls) => {
-                    console.log('Uploaded URLs:', urls);
-                  }}
                   sessionInfo={sessionInfo}
                 />
               )}
