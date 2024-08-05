@@ -1,4 +1,5 @@
 import { PageContext } from "vike/types"
+import fetch from 'node-fetch';
 
 export { data }
  
