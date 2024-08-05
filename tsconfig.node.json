@@ -12,7 +12,8 @@
   "files": [
     "vite.config.ts",
     "hono-entry.node.ts",
-    "hono-entry.ts"
+    "hono-entry.ts",
+    "vite-plugin-node-polyfill-prefix.ts"
   ],
   "include": [
     "server/**/*.ts"
