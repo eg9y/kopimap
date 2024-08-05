@@ -31,7 +31,6 @@ export default defineConfig({
     }),
     react(),
   ],
-  assetsInclude: ['**/*.xml', '**/*.txt'], 
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./"),
