@@ -31,7 +31,7 @@ import { useCafeDetailedInfo } from "../hooks/use-cafe-detailed-info";
 import { useUser } from "../hooks/use-user";
 import { LocalizedString } from "typesafe-i18n";
 
-export const CafeDetails = () => {
+export default function CafeDetails (){
   const { LL } = useI18nContext();
   const { selectedCafe, expandDetails, setExpandDetails } = useStore();
   const [letsParty, setLetsParty] = useState(false);

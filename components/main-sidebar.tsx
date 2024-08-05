@@ -64,7 +64,7 @@ interface MainSidebarProps {
   children: React.ReactNode;
 }
 
-export function MainSidebar({ children }: MainSidebarProps) {
+export default function MainSidebar({ children }: MainSidebarProps) {
   const { LL } = useI18nContext();
   const [isOpen, setIsOpen] = React.useState(false);
   const [isFeatureRoadmapOpen, setIsFeatureRoadmapOpen] = useState(false);

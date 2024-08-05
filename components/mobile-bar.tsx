@@ -12,7 +12,7 @@ import { useStore } from "../store";
 import { MobileCafeList } from "./mobile-cafe-list";
 import { useI18nContext } from "@/src/i18n/i18n-react";
 
-export const MobileBar: React.FC = () => {
+export default function MobileBar() {
   const { LL } = useI18nContext();
   const { mapCenter } = useStore();
   const [searchInput, setSearchInput] = useState("");

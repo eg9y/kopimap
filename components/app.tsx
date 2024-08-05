@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy } from "react";
 import { AnimatePresence } from "framer-motion";
 import * as pmtiles from "pmtiles";
 import maplibregl from "maplibre-gl";
@@ -8,11 +8,6 @@ import { StatusBar, Style } from '@capacitor/status-bar';
 import { Toaster } from "sonner";
 import { useData } from 'vike-react/useData'
 
-import { MainSidebar } from "../components/main-sidebar";
-import { MobileBar } from "../components/mobile-bar";
-import { MemoizedMapComponent } from "../components/map-component";
-import { SearchFilters } from "../components/search-filters";
-import { CafeDetails } from "../components/cafe-details";
 
 import "maplibre-gl/dist/maplibre-gl.css";
 import "@smastrom/react-rating/style.css";
@@ -23,6 +18,12 @@ import TypesafeI18n from '@/src/i18n/i18n-react'
 import { detectLocale } from '@/src/i18n/i18n-util'
 import { loadLocaleAsync } from "@/src/i18n/i18n-util.async";
 import { MeiliSearchCafe } from "@/types";
+
+const MainSidebar = lazy(() => import("../components/main-sidebar"));
+const MobileBar = lazy(() => import("../components/mobile-bar"));
+const MemoizedMapComponent = lazy(() => import("../components/map-component"));
+const SearchFilters = lazy(() => import("../components/search-filters"));
+const CafeDetails = lazy(() => import("../components/cafe-details"));
 
 export const App = () => {
   const { openFilters, selectCafe, selectedCafe } = useStore();

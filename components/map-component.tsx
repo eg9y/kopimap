@@ -22,7 +22,7 @@ interface MapComponentProps {
   children: ReactNode;
 }
 
-const MapComponent: React.FC<MapComponentProps> = ({ pmTilesReady, children }) => {
+export default function MapComponent({ pmTilesReady, children }: MapComponentProps){
   const { selectCafe, setMapRef, mapRef, mapCenter, setMapCenter } = useStore();
   const [popupInfo, setPopupInfo] = useState<any>(null);
   const popupTimeoutRef = useRef<number | null>(null);

@@ -8,7 +8,7 @@ import { reviewAttributes } from "./lib/review-attributes";
 import { useStore } from "../store";
 import { SearchFilters as SearchFiltersType } from "../types";
 
-export const SearchFilters: React.FC = () => {
+export default function SearchFilters() {
   const { LL } = useI18nContext();
   const { searchFilters, setSearchFilters } = useStore();
 
