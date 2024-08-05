@@ -9,14 +9,7 @@ import { nodePolyfills } from "vite-plugin-node-polyfills";
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
-     nodePolyfills({
-      include: ["path", "stream", "zlib", "util", "buffer", "events"],
-      globals: {
-        Buffer: true,
-        global: true,
-        process: true,
-      },
-    }),
+     nodePolyfills(),
     vike(),
     pages({
       server: {
