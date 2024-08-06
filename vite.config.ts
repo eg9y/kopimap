@@ -31,6 +31,9 @@ export default defineConfig({
     }),
     react(),
   ],
+  build: {
+    outDir: 'dist/cloudflare', 
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./"),
