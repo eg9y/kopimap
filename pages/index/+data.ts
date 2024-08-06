@@ -1,5 +1,6 @@
 import { PageContext } from "vike/types"
-import fetch from 'node-fetch';
+import ky from 'ky';
+
 
 export { data }
  
@@ -10,10 +11,9 @@ async function data(pageContext: PageContext) {
     return;
   }
   
-  const response = await fetch(
+  const response = await ky.get(
     `${import.meta.env.VITE_MEILISEARCH_URL!}/api/cafe/${place_id}`
   );
-
 
   if (!response.ok) {
     throw new Error("Failed to fetch cafe");
