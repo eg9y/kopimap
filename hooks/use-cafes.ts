@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useCallback } from "react";
-import { MeiliSearchCafe } from "../types";
 import { useStore } from "../store";
+import type { MeiliSearchCafe } from "../types";
 
 export const useCafes = (lat: number, lng: number, searchTerm: string) => {
   const { searchFilters } = useStore();
@@ -11,19 +11,25 @@ export const useCafes = (lat: number, lng: number, searchTerm: string) => {
 
     filterParams.append("lat", lat.toString());
     filterParams.append("lng", lng.toString());
-    
+
     if (searchTerm) {
       filterParams.append("q", searchTerm);
     }
 
-    Object.entries(searchFilters).forEach(([key, value]) => {
+    for (const [key, value] of Object.entries(searchFilters)) {
       if (value) {
-        filterParams.append(`${key}_mode`, value);
+        if (key === "gmaps_rating" || key === "gmaps_total_reviews") {
+          // For rating filters, don't add the _mode suffix
+          filterParams.append(key, value);
+        } else {
+          // For other filters, add the _mode suffix
+          filterParams.append(`${key}_mode`, value);
+        }
       }
-    });
+    }
 
     const response = await fetch(
-      `${import.meta.env.VITE_MEILISEARCH_URL!}/api/search?${filterParams.toString()}`
+      `${import.meta.env.VITE_MEILISEARCH_URL}/api/search?${filterParams.toString()}`
     );
 
     if (!response.ok) {
@@ -42,7 +48,7 @@ export const useCafes = (lat: number, lng: number, searchTerm: string) => {
   }, [lat, lng, searchTerm, searchFilters]);
 
   return useQuery<MeiliSearchCafe[] | null, Error>({
-    queryKey: ["searchCafes", lat, lng, {searchTerm, ...searchFilters}],
+    queryKey: ["searchCafes", lat, lng, { searchTerm, ...searchFilters }],
     queryFn: fetchCafes,
     enabled: !!searchTerm || Object.keys(searchFilters).length > 0,
     staleTime: 1000 * 60 * 5, // 5 minutes

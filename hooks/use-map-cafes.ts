@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useCallback, useMemo, useRef } from "react";
-import { MeiliSearchCafe } from "../types";
 import { useStore } from "../store";
+import { MeiliSearchCafe } from "../types";
 
 const CLUSTER_SIZE = 0.05;
 const DECIMAL_PLACES = 4;
@@ -14,9 +14,9 @@ export const useMapCafes = (lat: number, lng: number) => {
     const latCluster = (Math.floor(lat / CLUSTER_SIZE) * CLUSTER_SIZE).toFixed(
       DECIMAL_PLACES
     );
-    const longCluster = (
-      Math.floor(lng / CLUSTER_SIZE) * CLUSTER_SIZE
-    ).toFixed(DECIMAL_PLACES);
+    const longCluster = (Math.floor(lng / CLUSTER_SIZE) * CLUSTER_SIZE).toFixed(
+      DECIMAL_PLACES
+    );
     return `${latCluster},${longCluster}`;
   }, [lat, lng]);
 
@@ -27,12 +27,17 @@ export const useMapCafes = (lat: number, lng: number) => {
     filterParams.append("lng", lng.toString());
     filterParams.append("radius", "3000");
 
-    Object.entries(searchFilters).forEach(([key, value]) => {
+    for (const [key, value] of Object.entries(searchFilters)) {
       if (value) {
-        filterParams.append(`${key}_mode`, value);
+        if (key === "gmaps_rating" || key === "gmaps_total_reviews") {
+          // For rating filters, don't add the _mode suffix
+          filterParams.append(key, value);
+        } else {
+          // For other filters, add the _mode suffix
+          filterParams.append(`${key}_mode`, value);
+        }
       }
-    });
-
+    }
     const response = await fetch(
       `${import.meta.env.VITE_MEILISEARCH_URL!}/api/search?${filterParams.toString()}`
     );
@@ -52,13 +57,17 @@ export const useMapCafes = (lat: number, lng: number) => {
     }));
   }, [lat, lng, searchFilters]);
 
-  return useQuery<MeiliSearchCafe[], Error, { visibleCafes: MeiliSearchCafe[], allCafes: MeiliSearchCafe[] }>({
+  return useQuery<
+    MeiliSearchCafe[],
+    Error,
+    { visibleCafes: MeiliSearchCafe[]; allCafes: MeiliSearchCafe[] }
+  >({
     queryKey: ["mapCafes", clusterKey, searchFilters],
     queryFn: fetchMapCafes,
     staleTime: 1000 * 60 * 5, // 5 minutes
     select: (data) => {
       // Update the cache with new cafes
-      data.forEach(cafe => {
+      data.forEach((cafe) => {
         allCafesRef.current.set(cafe.id, cafe);
       });
 

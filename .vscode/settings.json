@@ -1,3 +1,9 @@
 {
-  "editor.formatOnSave": true
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "quickfix.biome": "explicit",
+    "source.organizeImports.biome": "explicit"
+  },
+  "biome.requireConfiguration": false,
+  "biome.lspBin": "./node_modules/@biomejs/biome/bin/biome",
 }

@@ -1,11 +1,11 @@
 // vite.config.ts
 
 import path from "path";
-import { defineConfig } from "vite";
-import vike from 'vike/plugin';
 import devServer from "@hono/vite-dev-server";
-import { pages } from "vike-cloudflare";
 import react from "@vitejs/plugin-react";
+import { pages } from "vike-cloudflare";
+import vike from "vike/plugin";
+import { defineConfig } from "vite";
 
 export default defineConfig({
   plugins: [

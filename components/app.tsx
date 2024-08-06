@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy } from "react";
+import React, { useState, useEffect, lazy, Suspense } from "react";
 import { AnimatePresence } from "framer-motion";
 import * as pmtiles from "pmtiles";
 import maplibregl from "maplibre-gl";
@@ -8,7 +8,6 @@ import { StatusBar, Style } from '@capacitor/status-bar';
 import { Toaster } from "sonner";
 import { useData } from 'vike-react/useData'
 import { navigatorDetector } from 'typesafe-i18n/detectors'
-
 
 import "maplibre-gl/dist/maplibre-gl.css";
 import "@smastrom/react-rating/style.css";
@@ -24,6 +23,11 @@ import MobileBar from "./mobile-bar";
 const MemoizedMapComponent = lazy(() => import("../components/map-component"));
 const SearchFilters = lazy(() => import("../components/search-filters"));
 const CafeDetails = lazy(() => import("../components/cafe-details"));
+
+// Loading components
+const MapComponentLoader = () => <div className="w-full h-full bg-gray-200 animate-pulse">Loading Map...</div>;
+const SearchFiltersLoader = () => <div className="w-[200px] h-full bg-gray-100 animate-pulse">Loading Filters...</div>;
+const CafeDetailsLoader = () => <div className="w-full h-full bg-white animate-pulse">Loading Cafe Details...</div>;
 
 export const App = () => {
   const { openFilters, selectCafe, selectedCafe } = useStore();
@@ -61,49 +65,52 @@ export const App = () => {
   }, []);
 
   // Detect locale
-   // (Use as advanaced locale detection strategy as you like.
-   // More info: https://github.com/ivanhofer/typesafe-i18n/tree/main/packages/detectors)
-   const locale = detectLocale(navigatorDetector)
+  const locale = detectLocale(navigatorDetector)
 
-   // Load locales
-   // (Use a data fetching solution that you prefer)
-   const [localesLoaded, setLocalesLoaded] = useState(false)
-   useEffect(() => {
-    loadLocaleAsync(locale).then(() => setLocalesLoaded(true))
-   }, [locale])
+  // Load locales
+  const [localesLoaded, setLocalesLoaded] = useState(false)
+  useEffect(() => {
+   loadLocaleAsync(locale).then(() => setLocalesLoaded(true))
+  }, [locale])
 
-   if(!localesLoaded) {
-      return null
-   }
+  if(!localesLoaded) {
+     return null
+  }
 
   return (
-    <>
-      <TypesafeI18n locale={locale}>
+    <TypesafeI18n locale={locale}>
       <div className="flex w-[100vw] h-[100dvh] overflow-hidden">
         {isWide && (
           <MainSidebar>
             <div className="rounded-lg overflow-hidden grow relative h-full">
-              <MemoizedMapComponent pmTilesReady={pmTilesReady}>
-                {openFilters && (
-                  <div className="z-[90] absolute w-[200px] h-full top-0 left-0 flex flex-col justify-end">
-                    <SearchFilters />
-                  </div>
-                )}
-                <AnimatePresence>
-                  <CafeDetails />
-                </AnimatePresence>
-              </MemoizedMapComponent>
+              <Suspense fallback={<MapComponentLoader />}>
+                <MemoizedMapComponent pmTilesReady={pmTilesReady}>
+                  {openFilters && (
+                    <div className="z-[90] absolute w-[200px] h-full top-0 left-0 flex flex-col justify-end">
+                      <Suspense fallback={<SearchFiltersLoader />}>
+                        <SearchFilters />
+                      </Suspense>
+                    </div>
+                  )}
+                  <AnimatePresence>
+                    <Suspense fallback={<CafeDetailsLoader />}>
+                      <CafeDetails />
+                    </Suspense>
+                  </AnimatePresence>
+                </MemoizedMapComponent>
+              </Suspense>
             </div>
           </MainSidebar>
         )}
         {!isWide && (
-          <MemoizedMapComponent pmTilesReady={pmTilesReady}>
-            <MobileBar />
-          </MemoizedMapComponent>
+          <Suspense fallback={<MapComponentLoader />}>
+            <MemoizedMapComponent pmTilesReady={pmTilesReady}>
+              <MobileBar />
+            </MemoizedMapComponent>
+          </Suspense>
         )}
       </div>
       <Toaster />
-      </TypesafeI18n>
-    </>
+    </TypesafeI18n>
   );
 }
