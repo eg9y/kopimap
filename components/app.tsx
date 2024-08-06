@@ -7,20 +7,20 @@ import { Capacitor } from '@capacitor/core';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { Toaster } from "sonner";
 import { useData } from 'vike-react/useData'
+import { navigatorDetector } from 'typesafe-i18n/detectors'
 
 
 import "maplibre-gl/dist/maplibre-gl.css";
 import "@smastrom/react-rating/style.css";
-import { useStore } from "../store";
 
-import { navigatorDetector } from 'typesafe-i18n/detectors'
 import TypesafeI18n from '@/src/i18n/i18n-react'
 import { detectLocale } from '@/src/i18n/i18n-util'
 import { loadLocaleAsync } from "@/src/i18n/i18n-util.async";
 import { MeiliSearchCafe } from "@/types";
+import { useStore } from "../store";
+import MainSidebar from "./main-sidebar";
+import MobileBar from "./mobile-bar";
 
-const MainSidebar = lazy(() => import("../components/main-sidebar"));
-const MobileBar = lazy(() => import("../components/mobile-bar"));
 const MemoizedMapComponent = lazy(() => import("../components/map-component"));
 const SearchFilters = lazy(() => import("../components/search-filters"));
 const CafeDetails = lazy(() => import("../components/cafe-details"));
