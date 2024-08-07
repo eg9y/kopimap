@@ -69,6 +69,7 @@
     "tailwindcss-animate": "^1.0.7",
     "typesafe-i18n": "^5.26.2",
     "vike": "^0.4.182",
+    "vike-cloudflare": "^0.0.4",
     "vike-react": "^0.5.0",
     "vite-plugin-node-polyfills": "^0.22.0",
     "zustand": "^4.5.4"

@@ -149,6 +149,9 @@ dependencies:
   vike:
     specifier: ^0.4.182
     version: 0.4.182(vite@5.3.1)
+  vike-cloudflare:
+    specifier: ^0.0.4
+    version: 0.0.4(vike@0.4.182)(vite@5.3.1)
   vike-react:
     specifier: ^0.5.0
     version: 0.5.0(react-dom@18.3.1)(react@18.3.1)(vike@0.4.182)(vite@5.3.1)
@@ -902,6 +905,12 @@ packages:
     os: [win32]
     requiresBuild: true
     dev: true
+    optional: true
+
+  /@cloudflare/workers-types@4.20240806.0:
+    resolution: {integrity: sha512-8lvgrwXGTZEBsUQJ8YUnMk72Anh9omwr6fqWLw/EwVgcw1nQxs/bfdadBEbdP48l9fWXjE4E5XERLUrrFuEpsg==}
+    requiresBuild: true
+    dev: false
     optional: true
 
   /@cspotcode/source-map-support@0.8.1:
@@ -1780,6 +1789,22 @@ packages:
   /@floating-ui/utils@0.2.3:
     resolution: {integrity: sha512-XGndio0l5/Gvd6CLIABvsav9HHezgDFFhDfHk1bvLfr9ni8dojqLSvBbotJEjmIwNHL7vK4QzBJTdBRoB+c1ww==}
     dev: false
+
+  /@hattip/adapter-cloudflare-workers@0.0.46:
+    resolution: {integrity: sha512-onPh5wcVZQkyaw+T1ckbK/zT7Fl6zD7hdXkkE/IPQZ1EFmJJoFX6Q52UM8DIXZK1tw8NyxFigWtAsQQm25q6tg==}
+    requiresBuild: true
+    dependencies:
+      '@cloudflare/kv-asset-handler': 0.3.4
+      '@cloudflare/workers-types': 4.20240806.0
+      '@hattip/core': 0.0.46
+    dev: false
+    optional: true
+
+  /@hattip/core@0.0.46:
+    resolution: {integrity: sha512-6pk22hPi9qVc6jyROu89T2yV2IcORTJZUq5OdFDfWmu4ynMP4I2avC+hnCJj6o3vlN1Io7zBbdT5OIPxpBIX7A==}
+    requiresBuild: true
+    dev: false
+    optional: true
 
   /@headlessui/react@2.1.1(react-dom@18.3.1)(react@18.3.1):
     resolution: {integrity: sha512-808gVNUbRDbDR3GMNPHy+ON0uvR8b9H7IA+Q2UbhOsNCIjgwuwb2Iuv8VPT/1AW0UzLX8g10tN6LhF15GaUJCQ==}
@@ -8374,6 +8399,18 @@ packages:
       is-generator-function: 1.0.10
       is-typed-array: 1.1.13
       which-typed-array: 1.1.15
+    dev: false
+
+  /vike-cloudflare@0.0.4(vike@0.4.182)(vite@5.3.1):
+    resolution: {integrity: sha512-jh4HmHBmgnm+lerQ+KWO7oYRvGw0pYfScS/4bBKcWLWenmEzqUfDLWsGO6t/RG4rn9f5R94ZzD4oob6loDdJrg==}
+    peerDependencies:
+      vike: ^0.4.174
+      vite: ^5.3.0
+    dependencies:
+      vike: 0.4.182(vite@5.3.1)
+      vite: 5.3.1(@types/node@20.14.9)
+    optionalDependencies:
+      '@hattip/adapter-cloudflare-workers': 0.0.46
     dev: false
 
   /vike-react@0.5.0(react-dom@18.3.1)(react@18.3.1)(vike@0.4.182)(vite@5.3.1):
