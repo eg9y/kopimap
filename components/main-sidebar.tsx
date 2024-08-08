@@ -369,15 +369,6 @@ export default function MainSidebar({ children }: MainSidebarProps) {
 								<DropdownMenu className="min-w-64" anchor="top start">
 									{loggedInUser && (
 										<>
-											{/* <DropdownItem href="/my-profile">
-                        <UserIcon />
-                        <DropdownLabel>My profile</DropdownLabel>
-                      </DropdownItem>
-                      <DropdownItem href="/share-feedback">
-                        <LightBulbIcon />
-                        <DropdownLabel>Share feedback</DropdownLabel>
-                      </DropdownItem>
-                      <DropdownDivider /> */}
 											<DropdownItem
 												onClick={async () => {
 													await supabase.auth.signOut();

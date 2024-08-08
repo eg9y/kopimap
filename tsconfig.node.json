@@ -9,12 +9,6 @@
     "strict": true,
     "noEmit": true
   },
-  "files": [
-    "vite.config.ts",
-    "hono-entry.node.ts",
-    "hono-entry.ts"
-  ],
-  "include": [
-    "server/**/*.ts"
-  ]
+  "files": ["vite.config.ts"],
+  "include": ["server/**/*.ts"]
 }
