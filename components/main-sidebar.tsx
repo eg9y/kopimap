@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { siInstagram } from "simple-icons";
+
 import { Avatar } from "./catalyst/avatar";
 import {
 	Dropdown,
@@ -301,7 +303,9 @@ export default function MainSidebar({ children }: MainSidebarProps) {
 									target="_blank"
 									href="https://www.instagram.com/kopimap/"
 								>
-									<img src="/instagram.svg" alt="Instagram" />
+									<svg viewBox="0 0 24 24" className="w-5 fill-stone-700">
+										<path d={siInstagram.path} />
+									</svg>
 								</Button>
 								<Button
 									color="green"

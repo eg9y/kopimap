@@ -1,12 +1,11 @@
-// src/hooks/useCafeDetailedInfo.ts
-import { useQuery } from "@tanstack/react-query";
 import { createClient } from "@supabase/supabase-js";
-import { Database } from "../components/lib/database.types";
-import { CafeDetailedInfo } from "../types";
+import { useQuery } from "@tanstack/react-query";
+import type { Database } from "../components/lib/database.types";
+import type { CafeDetailedInfo } from "../types";
 
 const supabase = createClient<Database>(
-  import.meta.env.VITE_SUPABASE_URL!,
-  import.meta.env.VITE_SUPABASE_ANON_KEY!
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_ANON_KEY
 );
 
 const fetchCafeDetailedInfo = async (
