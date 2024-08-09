@@ -186,6 +186,7 @@ export type Database = {
           gmaps_reviews_link: string | null
           gmaps_reviews_per_rating: Json | null
           gmaps_total_reviews: number | null
+          hosted_gmaps_images: Json | null
           hours: Json | null
           id: number
           location: unknown
@@ -214,6 +215,7 @@ export type Database = {
           gmaps_reviews_link?: string | null
           gmaps_reviews_per_rating?: Json | null
           gmaps_total_reviews?: number | null
+          hosted_gmaps_images?: Json | null
           hours?: Json | null
           id?: number
           location: unknown
@@ -242,6 +244,7 @@ export type Database = {
           gmaps_reviews_link?: string | null
           gmaps_reviews_per_rating?: Json | null
           gmaps_total_reviews?: number | null
+          hosted_gmaps_images?: Json | null
           hours?: Json | null
           id?: number
           location?: unknown
@@ -255,33 +258,6 @@ export type Database = {
           price_range?: string | null
           website?: string | null
           workday_timings?: string | null
-        }
-        Relationships: []
-      }
-      function_logs: {
-        Row: {
-          created_at: string | null
-          error: boolean | null
-          function_name: string | null
-          id: number
-          message: string | null
-          step: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          error?: boolean | null
-          function_name?: string | null
-          id?: number
-          message?: string | null
-          step?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          error?: boolean | null
-          function_name?: string | null
-          id?: number
-          message?: string | null
-          step?: string | null
         }
         Relationships: []
       }
@@ -306,45 +282,6 @@ export type Database = {
             foreignKeyName: "profiles_id_fkey"
             columns: ["id"]
             isOneToOne: true
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      review_images: {
-        Row: {
-          created_at: string | null
-          id: string
-          image_url: string
-          review_id: string | null
-          user_id: string
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          image_url: string
-          review_id?: string | null
-          user_id: string
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          image_url?: string
-          review_id?: string | null
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "review_images_review_id_fkey"
-            columns: ["review_id"]
-            isOneToOne: false
-            referencedRelation: "reviews"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "review_images_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
           },
@@ -534,6 +471,7 @@ export type Database = {
           gmaps_reviews_link: string | null
           gmaps_reviews_per_rating: Json | null
           gmaps_total_reviews: number | null
+          hosted_gmaps_images: Json | null
           hours: Json | null
           id: number | null
           instagram_worthiness_mode:

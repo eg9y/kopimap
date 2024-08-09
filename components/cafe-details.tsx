@@ -208,6 +208,7 @@ export default function CafeDetails() {
 						<>
 							{!expandDetails &&
 								(cafeDetailedInfo.gmaps_featured_image ||
+									cafeDetailedInfo.hosted_gmaps_images ||
 									cafeDetailedInfo.all_image_urls) && (
 									<div className="w-full h-[200px]">
 										<img
@@ -215,7 +216,15 @@ export default function CafeDetails() {
 												cafeDetailedInfo.all_image_urls &&
 												cafeDetailedInfo.all_image_urls.length > 0
 													? cafeDetailedInfo.all_image_urls[0]
-													: cafeDetailedInfo.gmaps_featured_image!
+													: ((cafeDetailedInfo.hosted_gmaps_images as
+															| string[]
+															| undefined) &&
+															(cafeDetailedInfo.hosted_gmaps_images as string[])
+																.length > 0 &&
+															(
+																cafeDetailedInfo.hosted_gmaps_images as string[]
+															)[0]) ||
+														cafeDetailedInfo.gmaps_featured_image!
 											}
 											className="w-full object-contain h-full"
 											alt={cafeDetailedInfo.name!}

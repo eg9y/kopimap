@@ -97,29 +97,31 @@ export const App = () => {
 					<MainSidebar>
 						<div className="rounded-lg overflow-hidden grow relative h-full">
 							<Suspense fallback={<MapComponentLoader />}>
-								<MemoizedMapComponent pmTilesReady={pmTilesReady}>
-									{openFilters && (
-										<div className="z-[90] absolute w-[200px] h-full top-0 left-0 flex flex-col justify-end">
-											<Suspense fallback={<SearchFiltersLoader />}>
-												<SearchFilters />
-											</Suspense>
-										</div>
-									)}
-									<AnimatePresence>
-										<Suspense fallback={<CafeDetailsLoader />}>
-											<CafeDetails />
+								{openFilters && (
+									<div className="z-[90] absolute w-[200px] h-full top-0 left-0 flex flex-col justify-end">
+										<Suspense fallback={<SearchFiltersLoader />}>
+											<SearchFilters />
 										</Suspense>
-									</AnimatePresence>
-								</MemoizedMapComponent>
+									</div>
+								)}
+								<AnimatePresence>
+									<Suspense fallback={<CafeDetailsLoader />}>
+										<CafeDetails />
+									</Suspense>
+								</AnimatePresence>
+								<MemoizedMapComponent
+									pmTilesReady={pmTilesReady}
+								></MemoizedMapComponent>
 							</Suspense>
 						</div>
 					</MainSidebar>
 				)}
 				{!isWide && (
 					<Suspense fallback={<MapComponentLoader />}>
-						<MemoizedMapComponent pmTilesReady={pmTilesReady}>
-							<MobileBar />
-						</MemoizedMapComponent>
+						<MobileBar />
+						<MemoizedMapComponent
+							pmTilesReady={pmTilesReady}
+						></MemoizedMapComponent>
 					</Suspense>
 				)}
 			</div>

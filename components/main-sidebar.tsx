@@ -308,23 +308,14 @@ export default function MainSidebar({ children }: MainSidebarProps) {
 									</svg>
 								</Button>
 								<Button
-									color="green"
-									className="grow cursor-pointer"
-									onClick={() => setIsFeatureRoadmapOpen(true)}
-								>
-									Upcoming
-								</Button>
-								<a
 									href="https://www.nihbuatjajan.com/egan"
 									target="_blank"
 									rel="noreferrer"
+									className="h-full"
+									color="white"
 								>
-									<img
-										src="https://d4xyvrfd64gfm.cloudfront.net/buttons/default-cta.png"
-										alt="Nih buat jajan"
-										className="h-[36px]"
-									/>
-								</a>
+									<p className="text-xs">Nih Buat Jajan</p>
+								</Button>
 							</div>
 							<Dropdown>
 								<DropdownButton as={SidebarItem}>
@@ -349,7 +340,6 @@ export default function MainSidebar({ children }: MainSidebarProps) {
 										)}
 										{!loggedInUser && (
 											<Text className="flex min-w-0 items-center gap-3">
-												Login to Review
 												{LL.loginToReview()}
 											</Text>
 										)}
