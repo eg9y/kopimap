@@ -1,12 +1,5 @@
 import maplibregl from "maplibre-gl";
-import React, {
-	useRef,
-	useEffect,
-	useState,
-	ReactNode,
-	useCallback,
-	memo,
-} from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { GeolocateControl, Map as Mapgl, Popup } from "react-map-gl/maplibre";
 import useMedia from "react-use/esm/useMedia";
 

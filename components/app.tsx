@@ -17,9 +17,10 @@ import { detectLocale } from "@/src/i18n/i18n-util";
 import { loadLocaleAsync } from "@/src/i18n/i18n-util.async";
 import type { MeiliSearchCafe } from "@/types";
 import { useStore } from "../store";
-import MainSidebar from "./main-sidebar";
-import MobileBar from "./mobile-bar";
 
+// Lazy load components
+const MainSidebar = lazy(() => import("./main-sidebar"));
+const MobileBar = lazy(() => import("./mobile-bar"));
 const MemoizedMapComponent = lazy(() => import("../components/map-component"));
 const SearchFilters = lazy(() => import("../components/search-filters"));
 const CafeDetails = lazy(() => import("../components/cafe-details"));
@@ -45,7 +46,6 @@ export const App = () => {
 	const isWide = useMedia("(min-width: 640px)", true);
 	const data = useData<undefined | { cafeToSelect?: MeiliSearchCafe }>();
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
 		if (data?.cafeToSelect) {
 			selectCafe({
@@ -56,7 +56,7 @@ export const App = () => {
 				...data.cafeToSelect,
 			});
 		}
-	}, [data]);
+	}, [data, selectCafe]);
 
 	useEffect(() => {
 		document.title = selectedCafe
@@ -96,35 +96,52 @@ export const App = () => {
 	return (
 		<TypesafeI18n locale={locale}>
 			<div className="flex w-[100vw] h-[100dvh] overflow-hidden">
-				{isWide && (
-					<MainSidebar>
-						<div className="rounded-lg overflow-hidden grow relative h-full">
-							<Suspense fallback={<MapComponentLoader />}>
-								{openFilters && (
-									<div className="z-[90] absolute w-[200px] h-full top-0 left-0 flex flex-col justify-end">
-										<Suspense fallback={<SearchFiltersLoader />}>
-											<SearchFilters />
-										</Suspense>
-									</div>
-								)}
-								<AnimatePresence>
-									<Suspense fallback={<CafeDetailsLoader />}>
-										<CafeDetails />
-									</Suspense>
-								</AnimatePresence>
-								{pmTilesReady && <MemoizedMapComponent />}
-							</Suspense>
-						</div>
-					</MainSidebar>
-				)}
-				{!isWide && (
-					<Suspense fallback={<MapComponentLoader />}>
-						<MobileBar />
-						{pmTilesReady && <MemoizedMapComponent />}
-					</Suspense>
-				)}
+				<Suspense fallback={<div>Loading...</div>}>
+					{isWide ? (
+						<DesktopView
+							openFilters={openFilters}
+							pmTilesReady={pmTilesReady}
+						/>
+					) : (
+						<MobileView pmTilesReady={pmTilesReady} />
+					)}
+				</Suspense>
 			</div>
 			<Toaster />
 		</TypesafeI18n>
 	);
 };
+
+const DesktopView = ({
+	openFilters,
+	pmTilesReady,
+}: { openFilters: boolean; pmTilesReady: boolean }) => (
+	<Suspense fallback={<div>Loading desktop view...</div>}>
+		<MainSidebar>
+			<div className="rounded-lg overflow-hidden grow relative h-full">
+				<Suspense fallback={<MapComponentLoader />}>
+					{openFilters && (
+						<div className="z-[90] absolute w-[200px] h-full top-0 left-0 flex flex-col justify-end">
+							<Suspense fallback={<SearchFiltersLoader />}>
+								<SearchFilters />
+							</Suspense>
+						</div>
+					)}
+					<AnimatePresence>
+						<Suspense fallback={<CafeDetailsLoader />}>
+							<CafeDetails />
+						</Suspense>
+					</AnimatePresence>
+					{pmTilesReady && <MemoizedMapComponent />}
+				</Suspense>
+			</div>
+		</MainSidebar>
+	</Suspense>
+);
+
+const MobileView = ({ pmTilesReady }: { pmTilesReady: boolean }) => (
+	<Suspense fallback={<MapComponentLoader />}>
+		<MobileBar />
+		{pmTilesReady && <MemoizedMapComponent />}
+	</Suspense>
+);
