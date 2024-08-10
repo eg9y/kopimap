@@ -112,9 +112,7 @@ export const App = () => {
 										<CafeDetails />
 									</Suspense>
 								</AnimatePresence>
-								<MemoizedMapComponent
-									pmTilesReady={pmTilesReady}
-								></MemoizedMapComponent>
+								{pmTilesReady && <MemoizedMapComponent />}
 							</Suspense>
 						</div>
 					</MainSidebar>
@@ -122,9 +120,7 @@ export const App = () => {
 				{!isWide && (
 					<Suspense fallback={<MapComponentLoader />}>
 						<MobileBar />
-						<MemoizedMapComponent
-							pmTilesReady={pmTilesReady}
-						></MemoizedMapComponent>
+						{pmTilesReady && <MemoizedMapComponent />}
 					</Suspense>
 				)}
 			</div>

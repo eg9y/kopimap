@@ -12,6 +12,6 @@ export const mapStyle: string | StyleSpecification | undefined = {
     },
   },
   layers: layers("protomaps", "grayscale"),
-  glyphs: "https://map.kopimap.com/fonts/{fontstack}/{range}.pbf",
-  sprite: "https://map.kopimap.com/sprites/v3/light",
+  glyphs: "https://map-assets.kopimap.com/fonts/{fontstack}/{range}.pbf",
+  sprite: "https://map-assets.kopimap.com/sprites/v3/light",
 };

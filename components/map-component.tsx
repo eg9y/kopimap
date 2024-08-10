@@ -16,11 +16,9 @@ import { useMapCafes } from "../hooks/use-map-cafes";
 import { useStore } from "../store";
 import Clusters, { ClustersRef } from "./clusters"; // Adjust the path as necessary
 
-interface MapComponentProps {
-	pmTilesReady: boolean;
-}
+interface MapComponentProps {}
 
-export default function MapComponent({ pmTilesReady }: MapComponentProps) {
+export default function MapComponent({}: MapComponentProps) {
 	const { selectCafe, setMapRef, mapRef, mapCenter, setMapCenter } = useStore();
 	const [popupInfo, setPopupInfo] = useState<any>(null);
 	const popupTimeoutRef = useRef<number | null>(null);
@@ -108,37 +106,19 @@ export default function MapComponent({ pmTilesReady }: MapComponentProps) {
 		}
 	}, [mapRef]);
 
-	const handleMapLoad = useCallback(
-		(evt: maplibregl.MapLibreEvent) => {
-			const center = evt.target.getCenter();
-			setMapCenter({
-				lat: center.lat,
-				long: center.lng,
-			});
-			geoControlRef.current?.trigger();
-		},
-		[setMapCenter],
-	);
-
-	const handleMapClick = useCallback(
-		(e: maplibregl.MapLayerMouseEvent) => {
-			selectCafe(null);
-			const feature = e.features && e.features[0];
-			if (feature?.properties?.cluster) {
-				clustersRef.current?.onClick(e);
-			} else {
-				clustersRef.current?.onClickSingle(e);
-			}
-		},
-		[selectCafe],
-	);
-
 	return (
 		<Mapgl
 			id="test"
 			{...viewport}
 			onMove={(evt) => setViewport(evt.viewState)}
-			onLoad={handleMapLoad}
+			onLoad={(evt) => {
+				const center = evt.target.getCenter();
+				setMapCenter({
+					lat: center.lat,
+					long: center.lng,
+				});
+				geoControlRef.current?.trigger();
+			}}
 			onMoveEnd={handleMapMove}
 			maxBounds={[
 				106.626998 - 0.1,
@@ -150,10 +130,18 @@ export default function MapComponent({ pmTilesReady }: MapComponentProps) {
 			minZoom={10}
 			mapLib={maplibregl as any}
 			style={{ width: "100%", height: "100%" }}
-			mapStyle={pmTilesReady ? mapStyle : undefined}
+			mapStyle={mapStyle}
 			onResize={handleMapMove}
 			ref={setMapRef as any}
-			onClick={handleMapClick}
+			onClick={(e) => {
+				selectCafe(null);
+				const feature = e.features && e.features[0];
+				if (feature && feature.properties && feature.properties.cluster) {
+					clustersRef.current?.onClick(e);
+				} else {
+					clustersRef.current?.onClickSingle(e);
+				}
+			}}
 			onMouseMove={(e) => clustersRef.current?.onMouseEnter(e)}
 			onMouseLeave={() => clustersRef.current?.onMouseLeave()}
 		>
