@@ -68,6 +68,9 @@ export const App = () => {
 		const protocol = new pmtiles.Protocol();
 		maplibregl.addProtocol("pmtiles", protocol.tile);
 		setPmTilesReady(true);
+		return () => {
+			maplibregl.removeProtocol("pmtiles");
+		};
 	}, []);
 
 	useEffect(() => {

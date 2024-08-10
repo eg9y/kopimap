@@ -80,10 +80,6 @@ export function Head() {
 			/>
 			<meta property="og:url" content="https://www.kopimap.com" />
 			<meta name="twitter:card" content="summary_large_image" />
-			<link
-				href="https://unpkg.com/maplibre-gl@4.5.0/dist/maplibre-gl.css"
-				rel="stylesheet"
-			/>
 		</>
 	);
 }
