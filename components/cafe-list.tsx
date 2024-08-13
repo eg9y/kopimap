@@ -59,7 +59,12 @@ export const CafeList: React.FC<CafeListProps> = ({
 	return (
 		<SidebarSection className="max-lg:hidden">
 			<SidebarHeading className="flex flex-col gap-2">
-				<p className="text-base">Results ({displayedCafes.length})</p>
+				<p className="text-base">
+					{searchInput || Object.keys(searchFilters).length > 0
+						? "Results"
+						: "Cafe Terdekat"}{" "}
+					({displayedCafes.length})
+				</p>
 			</SidebarHeading>
 			<div className="">
 				{Object.entries(searchFilters).map(([key, val]) => {

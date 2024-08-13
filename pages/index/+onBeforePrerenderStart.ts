@@ -1,3 +1,5 @@
+// pages/index/+onBeforePrerenderStart.ts
+
 import { Database } from "@/components/lib/database.types";
 import { createClient } from "@supabase/supabase-js";
 import type { OnBeforePrerenderStartAsync } from "vike/types";
@@ -9,10 +11,11 @@ const supabase = createClient<Database>(
   import.meta.env.VITE_SUPABASE_ANON_KEY
 );
 
-const BATCH_SIZE = 1000; // Adjust this value based on your needs and Supabase limits
+const BATCH_SIZE = 1000;
 
 export const onBeforePrerenderStart: OnBeforePrerenderStartAsync =
   async (): ReturnType<OnBeforePrerenderStartAsync> => {
+    const locales: ("en" | "id")[] = ["en", "id"];
     let allCafes: {
       id: number | null;
       name: string | null;
@@ -22,6 +25,7 @@ export const onBeforePrerenderStart: OnBeforePrerenderStartAsync =
       website: string | null;
       phone: string | null;
     }[] = [];
+
     let hasMore = true;
     let lastId = 0;
 
@@ -46,24 +50,39 @@ export const onBeforePrerenderStart: OnBeforePrerenderStartAsync =
       }
 
       hasMore = cafes.length === BATCH_SIZE;
+      break;
     }
 
-    const urls = allCafes.map((cafe) => {
-      return {
-        url: `/?cafe=${encodeURIComponent(cafe.name!)}&place_id=${cafe.place_id}`,
+    const urls: { url: string; pageContext: any }[] = [];
+
+    for (const locale of locales) {
+      // Add root URL for each locale
+      urls.push({
+        url: `/${locale}`,
         pageContext: {
-          data: {
-            name: cafe.name,
-            image:
-              cafe.all_image_urls && cafe.all_image_urls.length > 0
-                ? cafe.all_image_urls[0]
-                : cafe.gmaps_featured_image || null,
-            website: cafe.website,
-            phone: cafe.phone,
-          },
+          locale,
         },
-      };
-    });
+      });
+
+      // Add cafe-specific URLs
+      for (const cafe of allCafes) {
+        urls.push({
+          url: `/${locale}/?cafe=${encodeURIComponent(cafe.name!)}&place_id=${cafe.place_id}`,
+          pageContext: {
+            locale,
+            data: {
+              name: cafe.name,
+              image:
+                cafe.all_image_urls && cafe.all_image_urls.length > 0
+                  ? cafe.all_image_urls[0]
+                  : cafe.gmaps_featured_image || null,
+              website: cafe.website,
+              phone: cafe.phone,
+            },
+          },
+        });
+      }
+    }
 
     return urls;
   };

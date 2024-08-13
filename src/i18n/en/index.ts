@@ -1,6 +1,16 @@
-import type { BaseTranslation } from '../i18n-types'
+import type { BaseTranslation } from "../i18n-types";
 
 const en: BaseTranslation = {
+  app: {
+    title: "Kopimap - Discover Jakarta's Best Cafes 🗺️☕️",
+    description:
+      "Explore Jakarta's vibrant cafe scene with Kopimap. Find the perfect spot for coffee, work, or relaxation with our interactive map and detailed reviews.",
+    shortDescription: "Cafe terdekat di DKI Jakarta",
+    keywords: "Jakarta cafes, coffee shops, workspace, kopimap, cafe finder",
+    ogTitle: "Kopimap - Jakarta's Ultimate Cafe Guide",
+    ogDescription:
+      "Discover the best cafes in Jakarta for coffee, work, and relaxation. Interactive map and detailed reviews.",
+  },
   appDescription: "Map of Cafes in DKI Jakarta",
   noReviews: "No Reviews",
   basedOnReviews: "Based on {count:number} review. ",
@@ -15,7 +25,7 @@ const en: BaseTranslation = {
     "Food & Drinks": "Food & Drinks",
     Value: "Value",
     Facilities: "Facilities",
-    "Special Features": "Special Features"
+    "Special Features": "Special Features",
   },
   attributes: {
     comfort_level: {
@@ -24,16 +34,16 @@ const en: BaseTranslation = {
         Minimal: "Minimal",
         Adequate: "Adequate",
         Comfortable: "Comfortable",
-        Luxurious: "Luxurious"
-      }
+        Luxurious: "Luxurious",
+      },
     },
     seating_capacity: {
       name: "Seating Capacity",
       options: {
         Limited: "Limited",
         Moderate: "Moderate",
-        Spacious: "Spacious"
-      }
+        Spacious: "Spacious",
+      },
     },
     wifi_quality: {
       name: "WiFi Quality",
@@ -41,8 +51,8 @@ const en: BaseTranslation = {
         "No WiFi": "No WiFi",
         Unreliable: "Unreliable",
         Decent: "Decent",
-        "Fast and Reliable": "Fast and Reliable"
-      }
+        "Fast and Reliable": "Fast and Reliable",
+      },
     },
     outlet_availability: {
       name: "Outlet Availability",
@@ -50,8 +60,8 @@ const en: BaseTranslation = {
         "None Visible": "None Visible",
         Scarce: "Scarce",
         Adequate: "Adequate",
-        Plentiful: "Plentiful"
-      }
+        Plentiful: "Plentiful",
+      },
     },
     work_suitability: {
       name: "Work Suitability",
@@ -59,8 +69,8 @@ const en: BaseTranslation = {
         "Not Suitable": "Not Suitable",
         Tolerable: "Tolerable",
         Good: "Good",
-        Excellent: "Excellent"
-      }
+        Excellent: "Excellent",
+      },
     },
     coffee_quality: {
       name: "Coffee Quality",
@@ -68,16 +78,16 @@ const en: BaseTranslation = {
         Subpar: "Subpar",
         Average: "Average",
         Good: "Good",
-        Excellent: "Excellent"
-      }
+        Excellent: "Excellent",
+      },
     },
     non_coffee_options: {
       name: "Non-Coffee Options",
       options: {
         "Very Limited": "Very Limited",
         "Some Options": "Some Options",
-        "Wide Variety": "Wide Variety"
-      }
+        "Wide Variety": "Wide Variety",
+      },
     },
     food_options: {
       name: "Food Options",
@@ -85,8 +95,8 @@ const en: BaseTranslation = {
         "No Food": "No Food",
         "Snacks Only": "Snacks Only",
         "Light Meals": "Light Meals",
-        "Full Menu": "Full Menu"
-      }
+        "Full Menu": "Full Menu",
+      },
     },
     price_quality_ratio: {
       name: "Price-Quality Ratio",
@@ -94,8 +104,8 @@ const en: BaseTranslation = {
         Overpriced: "Overpriced",
         Fair: "Fair",
         "Good Value": "Good Value",
-        "Excellent Value": "Excellent Value"
-      }
+        "Excellent Value": "Excellent Value",
+      },
     },
     parking_options: {
       name: "Parking Options",
@@ -103,8 +113,8 @@ const en: BaseTranslation = {
         "No Parking": "No Parking",
         "Limited Street Parking": "Limited Street Parking",
         "Adequate Parking": "Adequate Parking",
-        "Ample Parking": "Ample Parking"
-      }
+        "Ample Parking": "Ample Parking",
+      },
     },
     cleanliness: {
       name: "Cleanliness",
@@ -112,8 +122,8 @@ const en: BaseTranslation = {
         "Needs Improvement": "Needs Improvement",
         Acceptable: "Acceptable",
         Clean: "Clean",
-        Spotless: "Spotless"
-      }
+        Spotless: "Spotless",
+      },
     },
     restroom_quality: {
       name: "Restroom Quality",
@@ -122,40 +132,40 @@ const en: BaseTranslation = {
         "Needs Improvement": "Needs Improvement",
         Acceptable: "Acceptable",
         Clean: "Clean",
-        "Exceptionally Clean": "Exceptionally Clean"
-      }
+        "Exceptionally Clean": "Exceptionally Clean",
+      },
     },
     accessibility: {
       name: "Accessibility",
       options: {
         "Not Accessible": "Not Accessible",
         "Partially Accessible": "Partially Accessible",
-        "Fully Accessible": "Fully Accessible"
-      }
+        "Fully Accessible": "Fully Accessible",
+      },
     },
     outdoor_seating: {
       name: "Outdoor Seating",
       options: {
         None: "None",
         Limited: "Limited",
-        Ample: "Ample"
-      }
+        Ample: "Ample",
+      },
     },
     instagram_worthiness: {
       name: "Instagram Worthiness",
       options: {
         "Not Particularly": "Not Particularly",
         "Somewhat Photogenic": "Somewhat Photogenic",
-        "Very Instagrammable": "Very Instagrammable"
-      }
+        "Very Instagrammable": "Very Instagrammable",
+      },
     },
     pet_friendly: {
       name: "Pet-Friendly",
       options: {
         no: "No",
-        yes: "Yes"
-      }
-    }
+        yes: "Yes",
+      },
+    },
   },
   submitReview: {
     createReview: "Create Review",
@@ -167,8 +177,10 @@ const en: BaseTranslation = {
     pleaseLogin: "Please login to create a review 🙏",
     login: "Login",
     userHaveReviewed: "You have reviewed this cafe",
-    modifyingExisting: "You're modifying your existing review. Update the fields you'd like to change.",
-    fillOptions: "Fill in the options you'd like to review. Only the overall rating is required.",
+    modifyingExisting:
+      "You're modifying your existing review. Update the fields you'd like to change.",
+    fillOptions:
+      "Fill in the options you'd like to review. Only the overall rating is required.",
     overallRating: "Overall Rating",
     selectRating: "Select a rating",
     images: "Images",
@@ -179,23 +191,24 @@ const en: BaseTranslation = {
     ratingRequired: "Overall rating is required",
     validationErrors: "Some fields have validation errors",
     unableToSubmit: "Unable to submit review",
-    ensureLoginAndCafe: "Please ensure you're logged in and a cafe is selected.",
+    ensureLoginAndCafe:
+      "Please ensure you're logged in and a cafe is selected.",
     reviewUpdated: "Review Updated",
     reviewSubmitted: "Review Submitted",
     updateSuccess: "Your review has been successfully updated.",
-    submitSuccess: "Your review has been successfully submitted."
+    submitSuccess: "Your review has been successfully submitted.",
   },
   cafeDetails: {
     userReviews: "User Reviews",
-    writeAReview: "Write a Review"
+    writeAReview: "Write a Review",
   },
   ratingLabels: {
     Bad: "Bad",
     Poor: "Poor",
     Average: "Average",
     Great: "Great",
-    Excellent: "Excellent"
-  }
-}
+    Excellent: "Excellent",
+  },
+};
 
-export default en
+export default en;

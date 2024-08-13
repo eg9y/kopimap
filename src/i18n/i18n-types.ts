@@ -14,6 +14,32 @@ export type Translation = RootTranslation
 export type Translations = RootTranslation
 
 type RootTranslation = {
+	app: {
+		/**
+		 * K​o​p​i​m​a​p​ ​-​ ​D​i​s​c​o​v​e​r​ ​J​a​k​a​r​t​a​'​s​ ​B​e​s​t​ ​C​a​f​e​s​ ​�​�​️​☕​️
+		 */
+		title: string
+		/**
+		 * E​x​p​l​o​r​e​ ​J​a​k​a​r​t​a​'​s​ ​v​i​b​r​a​n​t​ ​c​a​f​e​ ​s​c​e​n​e​ ​w​i​t​h​ ​K​o​p​i​m​a​p​.​ ​F​i​n​d​ ​t​h​e​ ​p​e​r​f​e​c​t​ ​s​p​o​t​ ​f​o​r​ ​c​o​f​f​e​e​,​ ​w​o​r​k​,​ ​o​r​ ​r​e​l​a​x​a​t​i​o​n​ ​w​i​t​h​ ​o​u​r​ ​i​n​t​e​r​a​c​t​i​v​e​ ​m​a​p​ ​a​n​d​ ​d​e​t​a​i​l​e​d​ ​r​e​v​i​e​w​s​.
+		 */
+		description: string
+		/**
+		 * C​a​f​e​ ​t​e​r​d​e​k​a​t​ ​d​i​ ​D​K​I​ ​J​a​k​a​r​t​a
+		 */
+		shortDescription: string
+		/**
+		 * J​a​k​a​r​t​a​ ​c​a​f​e​s​,​ ​c​o​f​f​e​e​ ​s​h​o​p​s​,​ ​w​o​r​k​s​p​a​c​e​,​ ​k​o​p​i​m​a​p​,​ ​c​a​f​e​ ​f​i​n​d​e​r
+		 */
+		keywords: string
+		/**
+		 * K​o​p​i​m​a​p​ ​-​ ​J​a​k​a​r​t​a​'​s​ ​U​l​t​i​m​a​t​e​ ​C​a​f​e​ ​G​u​i​d​e
+		 */
+		ogTitle: string
+		/**
+		 * D​i​s​c​o​v​e​r​ ​t​h​e​ ​b​e​s​t​ ​c​a​f​e​s​ ​i​n​ ​J​a​k​a​r​t​a​ ​f​o​r​ ​c​o​f​f​e​e​,​ ​w​o​r​k​,​ ​a​n​d​ ​r​e​l​a​x​a​t​i​o​n​.​ ​I​n​t​e​r​a​c​t​i​v​e​ ​m​a​p​ ​a​n​d​ ​d​e​t​a​i​l​e​d​ ​r​e​v​i​e​w​s​.
+		 */
+		ogDescription: string
+	}
 	/**
 	 * M​a​p​ ​o​f​ ​C​a​f​e​s​ ​i​n​ ​D​K​I​ ​J​a​k​a​r​t​a
 	 */
@@ -576,6 +602,32 @@ type RootTranslation = {
 }
 
 export type TranslationFunctions = {
+	app: {
+		/**
+		 * Kopimap - Discover Jakarta's Best Cafes 🗺️☕️
+		 */
+		title: () => LocalizedString
+		/**
+		 * Explore Jakarta's vibrant cafe scene with Kopimap. Find the perfect spot for coffee, work, or relaxation with our interactive map and detailed reviews.
+		 */
+		description: () => LocalizedString
+		/**
+		 * Cafe terdekat di DKI Jakarta
+		 */
+		shortDescription: () => LocalizedString
+		/**
+		 * Jakarta cafes, coffee shops, workspace, kopimap, cafe finder
+		 */
+		keywords: () => LocalizedString
+		/**
+		 * Kopimap - Jakarta's Ultimate Cafe Guide
+		 */
+		ogTitle: () => LocalizedString
+		/**
+		 * Discover the best cafes in Jakarta for coffee, work, and relaxation. Interactive map and detailed reviews.
+		 */
+		ogDescription: () => LocalizedString
+	}
 	/**
 	 * Map of Cafes in DKI Jakarta
 	 */

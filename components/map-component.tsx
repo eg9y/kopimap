@@ -8,6 +8,7 @@ import { mapStyle } from "../config";
 import { useMapCafes } from "../hooks/use-map-cafes";
 import { useStore } from "../store";
 import Clusters, { ClustersRef } from "./clusters"; // Adjust the path as necessary
+import "maplibre-gl/dist/maplibre-gl.css";
 
 interface MapComponentProps {}
 

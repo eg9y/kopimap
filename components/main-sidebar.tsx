@@ -137,9 +137,7 @@ export default function MainSidebar({ children }: MainSidebarProps) {
 								<MagnifyingGlassIcon />
 							</NavbarItem>
 							<Dropdown>
-								<DropdownButton as={NavbarItem}>
-									<Avatar src="/profile-photo.jpg" square />
-								</DropdownButton>
+								<DropdownButton as={NavbarItem}>Dropdown</DropdownButton>
 								<DropdownMenu className="min-w-64" anchor="bottom end">
 									<DropdownItem href="/my-profile">
 										<UserIcon />
