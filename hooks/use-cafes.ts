@@ -1,16 +1,34 @@
-import { useQuery } from "@tanstack/react-query";
-import { useCallback } from "react";
+import { useInfiniteQuery, UseInfiniteQueryResult, QueryFunctionContext, InfiniteData } from "@tanstack/react-query";
+import { useCallback, useMemo } from "react";
 import { useStore } from "../store";
 import type { MeiliSearchCafe } from "../types";
 
-export const useCafes = (lat: number, lng: number, searchTerm: string) => {
+const SEARCH_RADIUS = 3000; // 3km radius
+const PAGE_SIZE = 20; // Number of cafes per page
+
+interface CafesResponse {
+  cafes: MeiliSearchCafe[];
+  nextPage: number | undefined;
+  totalHits: number;
+}
+
+type CafesQueryKey = [string, number, number, string, Record<string, any>];
+
+export const useCafes = (lat: number, lng: number, searchTerm: string): UseInfiniteQueryResult<InfiniteData<CafesResponse>, Error> => {
   const { searchFilters } = useStore();
 
-  const fetchCafes = useCallback(async () => {
+  const queryKey = useMemo((): CafesQueryKey => {
+    return ["cafes", lat, lng, searchTerm, searchFilters];
+  }, [lat, lng, searchTerm, searchFilters]);
+
+  const fetchCafes = useCallback(async ({ pageParam = 1 }: QueryFunctionContext<CafesQueryKey, number>): Promise<CafesResponse> => {
     const filterParams = new URLSearchParams();
 
     filterParams.append("lat", lat.toString());
     filterParams.append("lng", lng.toString());
+    filterParams.append("radius", SEARCH_RADIUS.toString());
+    filterParams.append("page", pageParam.toString());
+    filterParams.append("hitsPerPage", PAGE_SIZE.toString());
 
     if (searchTerm) {
       filterParams.append("q", searchTerm);
@@ -19,10 +37,8 @@ export const useCafes = (lat: number, lng: number, searchTerm: string) => {
     for (const [key, value] of Object.entries(searchFilters)) {
       if (value) {
         if (key === "gmaps_rating" || key === "gmaps_total_reviews") {
-          // For rating filters, don't add the _mode suffix
           filterParams.append(key, value);
         } else {
-          // For other filters, add the _mode suffix
           filterParams.append(`${key}_mode`, value);
         }
       }
@@ -36,21 +52,27 @@ export const useCafes = (lat: number, lng: number, searchTerm: string) => {
       throw new Error("Failed to fetch cafes");
     }
 
-    const data: { hits: any[] } = await response.json();
+    const data: { hits: any[]; totalHits: number } = await response.json();
 
-    return data.hits.map((cafe: MeiliSearchCafe) => ({
-      gmaps_ratings: cafe.gmaps_rating.toString(),
-      latitude: cafe._geo.lat,
-      longitude: cafe._geo.lng,
-      distance: cafe._geoDistance,
-      ...cafe,
-    }));
+    return {
+      cafes: data.hits.map((cafe: MeiliSearchCafe) => ({
+        gmaps_ratings: cafe.gmaps_rating.toString(),
+        latitude: cafe._geo.lat,
+        longitude: cafe._geo.lng,
+        distance: cafe._geoDistance,
+        ...cafe,
+      })),
+      nextPage: data.hits.length === PAGE_SIZE ? pageParam + 1 : undefined,
+      totalHits: data.totalHits,
+
+    };
   }, [lat, lng, searchTerm, searchFilters]);
 
-  return useQuery<MeiliSearchCafe[] | null, Error>({
-    queryKey: ["searchCafes", lat, lng, { searchTerm, ...searchFilters }],
+  return useInfiniteQuery<CafesResponse, Error, InfiniteData<CafesResponse>, CafesQueryKey, number>({
+    queryKey,
     queryFn: fetchCafes,
-    enabled: !!searchTerm || Object.keys(searchFilters).length > 0,
+    initialPageParam: 1, // Add this line
+    getNextPageParam: (lastPage) => lastPage.nextPage,
     staleTime: 1000 * 60 * 5, // 5 minutes
     refetchOnWindowFocus: false,
   });
