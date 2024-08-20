@@ -8,4 +8,5 @@ export default {
   Layout,
   Head,
   extends: vikeReact,
+  ssr: false,
 } satisfies Config;
