@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { lazy, Suspense, useState } from "react";
 import { siInstagram } from "simple-icons";
 
 import { Avatar } from "./catalyst/avatar";
@@ -26,10 +26,8 @@ import {
 import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import { createClient } from "@supabase/supabase-js";
 import useDebounce from "react-use/esm/useDebounce";
-import { useCafes } from "../hooks/use-cafes";
 import { useUser } from "../hooks/use-user";
 import { useStore } from "../store";
-import { CafeList } from "./cafe-list";
 import { Button } from "./catalyst/button";
 import {
   Dialog,
@@ -58,6 +56,9 @@ import { SidebarLayout } from "./catalyst/sidebar-layout";
 import { Text } from "./catalyst/text";
 import { LanguageSwitcher } from "./language-switcher";
 
+const CafeList = lazy(() => import("../components/cafe-list"));
+const CafeListSkeleton = lazy(() => import("../components/cafe-list-skeleton"));
+
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
   import.meta.env.VITE_SUPABASE_ANON_KEY,
@@ -74,23 +75,12 @@ export default function MainSidebar({ children }: MainSidebarProps) {
   const [searchInput, setSearchInput] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const {
-    mapCenter,
     setOpenFilters,
     openFilters,
     searchFilters,
     setSearchFilters,
   } = useStore();
   const { loggedInUser } = useUser();
-
-  const {
-    data: searchCafes,
-    isLoading: isSearchLoading,
-    error: searchError,
-  } = useCafes(mapCenter.lat, mapCenter.long, debouncedSearchTerm);
-
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchInput(e.target.value);
-  };
 
   useDebounce(
     () => {
@@ -280,8 +270,9 @@ export default function MainSidebar({ children }: MainSidebarProps) {
 										{JSON.stringify(searchError || mapCafesError)}
 									</Text>
 								)} */}
-                <CafeList searchInput={searchInput} />
-
+                <Suspense fallback={<CafeListSkeleton />}>
+                  <CafeList searchInput={debouncedSearchTerm} />
+                </Suspense>
               </SidebarSection>
               <SidebarSpacer />
             </SidebarBody>

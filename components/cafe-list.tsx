@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { Suspense, useEffect, useRef, useState } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useStore } from "../store";
 import type { MeiliSearchCafe } from "../types";
@@ -9,13 +9,15 @@ import {
   SidebarSection,
 } from "./catalyst/sidebar";
 import { useCafes } from "@/hooks/use-cafes";
+import CafeListSkeleton from "./cafe-list-skeleton";
 
 interface CafeListProps {
   searchInput: string;
 }
 
-export const CafeList: React.FC<CafeListProps> = ({ searchInput }) => {
+export default function CafeList({ searchInput }: CafeListProps) {
   const { selectCafe, mapRef, searchFilters, setSearchFilters, mapCenter } = useStore();
+  const [isStableLoading, setIsStableLoading] = useState(true);
 
   const {
     data,
@@ -33,9 +35,21 @@ export const CafeList: React.FC<CafeListProps> = ({ searchInput }) => {
   const rowVirtualizer = useVirtualizer({
     count: hasNextPage ? allCafes.length + 1 : allCafes.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 100, // Adjust this based on your actual row height
+    estimateSize: () => 100,
     overscan: 5,
   });
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (isLoading) {
+      setIsStableLoading(true);
+    } else {
+      timer = setTimeout(() => {
+        setIsStableLoading(false);
+      }, 1000);
+    }
+    return () => clearTimeout(timer);
+  }, [isLoading]);
 
   useEffect(() => {
     const [lastItem] = [...rowVirtualizer.getVirtualItems()].reverse();
@@ -80,6 +94,9 @@ export const CafeList: React.FC<CafeListProps> = ({ searchInput }) => {
     window.history.pushState({ triggeredBy: "user" }, "", url.toString());
   };
 
+  if (isStableLoading) {
+    return <CafeListSkeleton />;
+  }
 
   return (
     <SidebarSection className="max-lg:hidden h-full flex flex-col">
@@ -98,7 +115,6 @@ export const CafeList: React.FC<CafeListProps> = ({ searchInput }) => {
           </BadgeButton>
         ))}
       </div>
-      {isLoading && <p className="flex-shrink-0">Loading...</p>}
       {error && <p className="flex-shrink-0">Error: {(error as Error).message}</p>}
       <div ref={parentRef} className="flex-grow overflow-auto">
         <div
@@ -108,7 +124,6 @@ export const CafeList: React.FC<CafeListProps> = ({ searchInput }) => {
             position: 'relative',
           }}
         >
-
           {rowVirtualizer.getVirtualItems().map((virtualRow) => {
             const cafe = allCafes[virtualRow.index];
             const isLoaderRow = virtualRow.index > allCafes.length - 1;
@@ -165,4 +180,4 @@ export const CafeList: React.FC<CafeListProps> = ({ searchInput }) => {
       </div>
     </SidebarSection>
   );
-};
+}

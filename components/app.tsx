@@ -16,9 +16,9 @@ import { detectLocale } from "@/src/i18n/i18n-util";
 import { loadLocaleAsync } from "@/src/i18n/i18n-util.async";
 import type { MeiliSearchCafe } from "@/types";
 import { useStore } from "../store";
+import MainSidebar from "./main-sidebar";
 
 // Lazy load components
-const MainSidebar = lazy(() => import("./main-sidebar"));
 const MobileBar = lazy(() => import("./mobile-bar"));
 const MemoizedMapComponent = lazy(() => import("../components/map-component"));
 const SearchFilters = lazy(() => import("../components/search-filters"));
