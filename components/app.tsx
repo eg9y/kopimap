@@ -1,7 +1,7 @@
 import { Capacitor } from "@capacitor/core";
 import { StatusBar, Style } from "@capacitor/status-bar";
 import { AnimatePresence } from "framer-motion";
-import maplibregl from "maplibre-gl";
+import { addProtocol, removeProtocol } from "maplibre-gl";
 import * as pmtiles from "pmtiles";
 import { Suspense, lazy, useEffect, useState } from "react";
 import useMedia from "react-use/esm/useMedia";
@@ -65,10 +65,10 @@ export const App = () => {
 
   useEffect(() => {
     const protocol = new pmtiles.Protocol();
-    maplibregl.addProtocol("pmtiles", protocol.tile);
+    addProtocol("pmtiles", protocol.tile);
     setPmTilesReady(true);
     return () => {
-      maplibregl.removeProtocol("pmtiles");
+      removeProtocol("pmtiles");
     };
   }, []);
 

@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useStore } from "../store";
 import type { MeiliSearchCafe } from "../types";
@@ -17,11 +17,12 @@ interface CafeListProps {
 
 export default function CafeList({ searchInput }: CafeListProps) {
   const { selectCafe, mapRef, searchFilters, setSearchFilters, mapCenter } = useStore();
-  const [isStableLoading, setIsStableLoading] = useState(true);
+  const [showSkeleton, setShowSkeleton] = useState(false);
 
   const {
     data,
     isLoading,
+    isFetching,
     error,
     fetchNextPage,
     hasNextPage,
@@ -41,15 +42,15 @@ export default function CafeList({ searchInput }: CafeListProps) {
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
-    if (isLoading) {
-      setIsStableLoading(true);
-    } else {
+    if (isLoading && !data) {
       timer = setTimeout(() => {
-        setIsStableLoading(false);
-      }, 1000);
+        setShowSkeleton(true);
+      }, 2000);
+    } else {
+      setShowSkeleton(false);
     }
     return () => clearTimeout(timer);
-  }, [isLoading]);
+  }, [isLoading, data]);
 
   useEffect(() => {
     const [lastItem] = [...rowVirtualizer.getVirtualItems()].reverse();
@@ -94,7 +95,7 @@ export default function CafeList({ searchInput }: CafeListProps) {
     window.history.pushState({ triggeredBy: "user" }, "", url.toString());
   };
 
-  if (isStableLoading) {
+  if (showSkeleton && !data) {
     return <CafeListSkeleton />;
   }
 
@@ -178,6 +179,7 @@ export default function CafeList({ searchInput }: CafeListProps) {
           })}
         </div>
       </div>
+      {isFetching && <div className="flex-shrink-0 p-2 text-center">Updating...</div>}
     </SidebarSection>
   );
 }
