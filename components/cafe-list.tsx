@@ -80,7 +80,6 @@ export const CafeList: React.FC<CafeListProps> = ({ searchInput }) => {
     window.history.pushState({ triggeredBy: "user" }, "", url.toString());
   };
 
-  const totalCafes = data?.pages[0]?.totalHits || 0;
 
   return (
     <SidebarSection className="max-lg:hidden h-full flex flex-col">
@@ -89,7 +88,7 @@ export const CafeList: React.FC<CafeListProps> = ({ searchInput }) => {
           {searchInput || Object.keys(searchFilters).length > 0
             ? "Results"
             : "Cafe Terdekat"}{" "}
-          ({totalCafes})
+          ({allCafes.length})
         </p>
       </SidebarHeading>
       <div className="flex-shrink-0">

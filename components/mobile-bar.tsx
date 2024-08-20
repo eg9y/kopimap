@@ -63,7 +63,7 @@ export default function MobileBar() {
           <p>{t("loading")}</p>
         </div>
       )}
-      
+
       {(searchError || mapCafesError) && (
         <div className="absolute top-16 left-0 right-0 z-20 p-4 bg-white">
           <p className="text-red-500">{JSON.stringify(searchError || mapCafesError)}</p>
@@ -72,8 +72,6 @@ export default function MobileBar() {
 
       <MobileCafeList
         searchInput={searchInput}
-        mapCafes={mapCafesData}
-        searchCafes={searchCafes}
       />
     </>
   );
