@@ -272,7 +272,7 @@ export default function MainSidebar({ children }: MainSidebarProps) {
                 </Button>
               </div>
             </SidebarHeader>
-            <SidebarBody>
+            <SidebarBody className="overflow-y-hidden">
               <SidebarSection className="max-lg:hidden h-full">
                 {/* {(isSearchLoading || isMapCafesLoading) && <Text>Loading</Text>} */}
                 {/* {(searchError || mapCafesError) && (

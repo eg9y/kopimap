@@ -1,12 +1,8 @@
-
-// pages/index/+Head.tsx
-
 import type { MeiliSearchCafe } from "@/types";
 import { useData } from "vike-react/useData";
 import { usePageContext } from "vike-react/usePageContext";
 
 const SUPPORTED_LOCALES = ['en', 'id'];
-
 
 const translations = {
   en: {
@@ -71,6 +67,11 @@ export function Head() {
         addressLocality: "",
         postalCode: "",
         addressCountry: "",
+      },
+      aggregateRating: {
+        "@type": "AggregateRating",
+        ratingValue: getDataValue("gmaps_rating"),
+        ratingCount: getDataValue("gmaps_total_reviews"),
       },
     }
     : null;
