@@ -282,6 +282,7 @@ export default function MainSidebar({ children }: MainSidebarProps) {
                   color="red"
                   target="_blank"
                   href="https://www.instagram.com/kopimap/"
+                  arial-label="Instagram Link"
                 >
                   <svg viewBox="0 0 24 24" className="w-5 fill-fuchsia-200">
                     <path d={siInstagram.path} />
