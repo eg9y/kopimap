@@ -161,7 +161,7 @@ export function SubmitReviewDialog({
       <Dialog
         open={isOpen && !!cafeDetailedInfo}
         onClose={() => setIsOpen(false)}
-        className=""
+        className="z-50"
       >
         <DialogTitle>{LL.submitReview.createReview()}</DialogTitle>
         <DialogDescription>{LL.submitReview.pleaseLogin()}</DialogDescription>
@@ -329,30 +329,31 @@ export function SubmitReviewDialog({
                   const attrName = attribute.name as keyof typeof LL.attributes;
                   const options = LL.attributes[attrName].options as Record<string, () => LocalizedString>;
                   return (
-                  <Field key={attribute.name}>
-                    <Label>{LL.attributes[attrName].name()}</Label>
-                    <Controller
-                      name={attribute.name}
-                      control={control}
-                      render={({ field }) => (
-                        <div className="flex items-center gap-1 flex-wrap">
-                          {attribute.options.map((option) => (
-                            <Button
-                              key={option}
-                              color={
-                                field.value === option ? attr.color : "white"
-                              }
-                              className="cursor-pointer"
-                              onClick={() => field.onChange(option)}
-                            >
-                              {options[option]()}
-                            </Button>
-                          ))}
-                        </div>
-                      )}
-                    />
-                  </Field>
-                )})}
+                    <Field key={attribute.name}>
+                      <Label>{LL.attributes[attrName].name()}</Label>
+                      <Controller
+                        name={attribute.name}
+                        control={control}
+                        render={({ field }) => (
+                          <div className="flex items-center gap-1 flex-wrap">
+                            {attribute.options.map((option) => (
+                              <Button
+                                key={option}
+                                color={
+                                  field.value === option ? attr.color : "white"
+                                }
+                                className="cursor-pointer"
+                                onClick={() => field.onChange(option)}
+                              >
+                                {options[option]()}
+                              </Button>
+                            ))}
+                          </div>
+                        )}
+                      />
+                    </Field>
+                  )
+                })}
               </div>
             ))}
           </div>

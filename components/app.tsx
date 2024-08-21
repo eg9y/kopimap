@@ -129,15 +129,15 @@ const DesktopView = ({
               </Suspense>
             </div>
           )}
-          <AnimatePresence>
-            <Suspense fallback={<CafeDetailsLoader />}>
-              <CafeDetails />
-            </Suspense>
-          </AnimatePresence>
           {pmTilesReady && <MemoizedMapComponent />}
         </Suspense>
       </div>
     </MainSidebar>
+    <AnimatePresence>
+      <Suspense fallback={<CafeDetailsLoader />}>
+        <CafeDetails />
+      </Suspense>
+    </AnimatePresence>
   </Suspense>
 );
 
