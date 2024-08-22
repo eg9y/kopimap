@@ -6,14 +6,15 @@ import { Badge } from "./catalyst/badge";
 import { useCafes } from "@/hooks/use-cafes";
 import useMedia from "react-use/esm/useMedia";
 import { ChevronUp, ChevronDown, Map, List } from 'lucide-react';
+import { cn } from './lib/utils';
+import { PanInfo } from 'framer-motion';
 
 interface CafeListProps {
   searchInput: string;
 }
 
 export const MobileCafeList: React.FC<CafeListProps> = ({ searchInput }) => {
-  const { selectCafe, mapRef, searchFilters, setSearchFilters, mapCenter } = useStore();
-  const [isOpen, setIsOpen] = useState(true);
+  const { selectCafe, mapRef, mapCenter } = useStore();
   const isWide = useMedia("(min-width: 640px)");
   const sheetRef = useRef<SheetRef>();
   const [currentSnapIndex, setCurrentSnapIndex] = useState(1);
@@ -34,6 +35,10 @@ export const MobileCafeList: React.FC<CafeListProps> = ({ searchInput }) => {
   }, []);
 
   const snapTo = (i: number) => sheetRef.current?.snapTo(i);
+
+  mapRef?.current?.on?.("move", () => {
+    snapTo(2);
+  })
 
   // Dynamic snap points based on screen height
   const snapPoints = [
@@ -66,12 +71,13 @@ export const MobileCafeList: React.FC<CafeListProps> = ({ searchInput }) => {
   return (
     <Sheet
       ref={sheetRef}
-      isOpen={isOpen}
+      isOpen={true}
       onClose={() => snapTo(2)}
       snapPoints={snapPoints}
       initialSnap={1}
       onSnap={handleSnap}
       className="z-[100]"
+
     >
       <Sheet.Container>
         <Sheet.Header className="border-b border-gray-200">
@@ -133,7 +139,9 @@ export const MobileCafeList: React.FC<CafeListProps> = ({ searchInput }) => {
           </Sheet.Scroller>
         </Sheet.Content>
       </Sheet.Container>
-      <Sheet.Backdrop onTap={() => { snapTo(2) }} />
+      <Sheet.Backdrop
+        className="!pointer-events-none"
+      />
     </Sheet>
   );
 };
