@@ -6,8 +6,7 @@ import { Badge } from "./catalyst/badge";
 import { useCafes } from "@/hooks/use-cafes";
 import useMedia from "react-use/esm/useMedia";
 import { ChevronUp, ChevronDown, Map, List } from 'lucide-react';
-import { cn } from './lib/utils';
-import { PanInfo } from 'framer-motion';
+import { motion, PanInfo, useMotionValue, useTransform } from "framer-motion";
 
 interface CafeListProps {
   searchInput: string;
@@ -17,7 +16,9 @@ export const MobileCafeList: React.FC<CafeListProps> = ({ searchInput }) => {
   const { selectCafe, mapRef, mapCenter } = useStore();
   const isWide = useMedia("(min-width: 640px)");
   const sheetRef = useRef<SheetRef>();
+  const contentRef = useRef<HTMLDivElement>(null);
   const [currentSnapIndex, setCurrentSnapIndex] = useState(1);
+  const [isDragging, setIsDragging] = useState(false);
 
   const {
     data,
@@ -38,13 +39,13 @@ export const MobileCafeList: React.FC<CafeListProps> = ({ searchInput }) => {
 
   mapRef?.current?.on?.("move", () => {
     snapTo(2);
-  })
+  });
 
   // Dynamic snap points based on screen height
   const snapPoints = [
     window.innerHeight - 60, // Almost full screen, leaving space for status bar
     window.innerHeight / 2,  // Half screen
-    120                      // Minimal view showing just the header
+    60                      // Minimal view showing just the header
   ];
 
   useEffect(() => {
@@ -68,6 +69,49 @@ export const MobileCafeList: React.FC<CafeListProps> = ({ searchInput }) => {
     if (currentSnapIndex === 2) snapTo(1);  // Expand sheet if it's minimized
   };
 
+  const sheetY = useMotionValue(0);
+  const lastScrollTop = useRef(0);
+
+  const handleSheetDrag = useCallback((info: PanInfo) => {
+    const newSheetY = sheetY.get() + info.delta.y;
+    if (newSheetY <= 0) {
+      sheetY.set(0);
+      snapTo(0);
+    } else {
+      sheetY.set(newSheetY);
+    }
+  }, [sheetY]);
+
+  const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLDivElement;
+    const { scrollTop } = target;
+
+    if (currentSnapIndex === 0 && !isDragging) {
+      if (scrollTop === 0 && lastScrollTop.current > 0) {
+        // User is trying to scroll down when already at the top
+        snapTo(1); // Snap to the bottom point
+      }
+    }
+
+    lastScrollTop.current = scrollTop;
+
+    if (currentSnapIndex !== 0 && !isDragging) {
+      e.preventDefault();
+      const scrollDelta = scrollTop;
+      handleSheetDrag({ delta: { y: -scrollDelta, x: 0 } } as PanInfo);
+      target.scrollTop = 0;
+    }
+  }, [currentSnapIndex, isDragging, handleSheetDrag]);
+
+  useEffect(() => {
+    const unsubscribe = sheetY.onChange((latest) => {
+      if (latest <= -snapPoints[0] + snapPoints[2]) {
+        snapTo(0);
+      }
+    });
+    return () => unsubscribe();
+  }, [sheetY, snapPoints]);
+
   return (
     <Sheet
       ref={sheetRef}
@@ -76,8 +120,9 @@ export const MobileCafeList: React.FC<CafeListProps> = ({ searchInput }) => {
       snapPoints={snapPoints}
       initialSnap={1}
       onSnap={handleSnap}
+      onDragStart={() => setIsDragging(true)}
+      onDragEnd={() => setIsDragging(false)}
       className="z-[100]"
-
     >
       <Sheet.Container>
         <Sheet.Header className="border-b border-gray-200">
@@ -104,44 +149,55 @@ export const MobileCafeList: React.FC<CafeListProps> = ({ searchInput }) => {
           </div>
         </Sheet.Header>
         <Sheet.Content>
-          <Sheet.Scroller draggableAt="both">
-            {searchInput && (
-              <div className="p-4 bg-blue-50 border-b border-blue-100">
-                <p className="text-sm text-blue-700">Showing results for "{searchInput}"</p>
-              </div>
-            )}
-            {allCafes.map((cafe: MeiliSearchCafe) => (
-              <div
-                key={cafe.id}
-                onClick={() => handleCafeClick(cafe)}
-                className="p-4 border-b border-gray-200 hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer"
-              >
-                <div className="grow w-full">
-                  <p className="font-semibold text-nowrap text-ellipsis overflow-hidden">
-                    {cafe.name}
-                  </p>
-                  <div className="flex gap-2 my-1">
-                    <Badge color="red" className="text-xs">
-                      {cafe.gmaps_rating} ★ ({cafe.gmaps_total_reviews.toLocaleString("id-ID")})
-                    </Badge>
-                    {cafe.avg_rating && (
-                      <Badge color="red" className="text-xs">
-                        Our rating: {cafe.avg_rating} ({cafe.review_count})
-                      </Badge>
-                    )}
-                  </div>
-                  <p className="text-sm text-gray-500 text-ellipsis text-nowrap overflow-hidden">
-                    {cafe.address}
-                  </p>
+          <motion.div
+            ref={contentRef}
+            style={{
+              height: '100%',
+              overflowY: 'auto',
+              y: useTransform(
+                sheetY,
+                (sy) => Math.max(sy, -snapPoints[0] + snapPoints[2])
+              ),
+            }}
+            onScroll={handleScroll}
+          >
+            <div className="min-h-[calc(100%+1px)] bg-white">
+              {searchInput && (
+                <div className="p-4 bg-blue-50 border-b border-blue-100">
+                  <p className="text-sm text-blue-700">Showing results for "{searchInput}"</p>
                 </div>
-              </div>
-            ))}
-          </Sheet.Scroller>
+              )}
+              {allCafes.map((cafe: MeiliSearchCafe) => (
+                <div
+                  key={cafe.id}
+                  onClick={() => handleCafeClick(cafe)}
+                  className="p-4 border-b border-gray-200 hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer"
+                >
+                  <div className="grow w-full">
+                    <p className="font-semibold text-nowrap text-ellipsis overflow-hidden">
+                      {cafe.name}
+                    </p>
+                    <div className="flex gap-2 my-1">
+                      <Badge color="red" className="text-xs">
+                        {cafe.gmaps_rating} ★ ({cafe.gmaps_total_reviews.toLocaleString("id-ID")})
+                      </Badge>
+                      {cafe.avg_rating && (
+                        <Badge color="red" className="text-xs">
+                          Our rating: {cafe.avg_rating} ({cafe.review_count})
+                        </Badge>
+                      )}
+                    </div>
+                    <p className="text-sm text-gray-500 text-ellipsis text-nowrap overflow-hidden">
+                      {cafe.address}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
         </Sheet.Content>
       </Sheet.Container>
-      <Sheet.Backdrop
-        className="!pointer-events-none"
-      />
+      <Sheet.Backdrop className="!pointer-events-none" />
     </Sheet>
   );
 };
