@@ -18,7 +18,6 @@ export const MobileCafeList: React.FC<CafeListProps> = ({ searchInput }) => {
   const sheetRef = useRef<SheetRef>();
   const contentRef = useRef<HTMLDivElement>(null);
   const [currentSnapIndex, setCurrentSnapIndex] = useState(1);
-  const [isDragging, setIsDragging] = useState(false);
 
   const {
     data,
@@ -45,7 +44,7 @@ export const MobileCafeList: React.FC<CafeListProps> = ({ searchInput }) => {
   const snapPoints = [
     window.innerHeight - 60, // Almost full screen, leaving space for status bar
     window.innerHeight / 2,  // Half screen
-    60                      // Minimal view showing just the header
+    60                       // Minimal view showing just the header
   ];
 
   useEffect(() => {
@@ -71,46 +70,48 @@ export const MobileCafeList: React.FC<CafeListProps> = ({ searchInput }) => {
 
   const sheetY = useMotionValue(0);
   const lastScrollTop = useRef(0);
+  const dragStartY = useRef(0);
 
   const handleSheetDrag = useCallback((info: PanInfo) => {
+
     const newSheetY = sheetY.get() + info.delta.y;
+    console.log("JANGYAY", newSheetY)
     if (newSheetY <= 0) {
       sheetY.set(0);
       snapTo(0);
     } else {
       sheetY.set(newSheetY);
     }
-  }, [sheetY]);
+
+    // Check if dragging down at snap point 1
+    if (currentSnapIndex === 1 && info.delta.y > 0) {
+      const dragDistance = info.point.y - dragStartY.current;
+      if (dragDistance > 50) { // Threshold for snapping to bottom
+        snapTo(2);
+      }
+    }
+  }, [sheetY, currentSnapIndex]);
 
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     const target = e.target as HTMLDivElement;
     const { scrollTop } = target;
 
-    if (currentSnapIndex === 0 && !isDragging) {
+    if (currentSnapIndex === 0) {
       if (scrollTop === 0 && lastScrollTop.current > 0) {
         // User is trying to scroll down when already at the top
-        snapTo(1); // Snap to the bottom point
+        snapTo(1); // Snap to the middle point
       }
     }
 
     lastScrollTop.current = scrollTop;
 
-    if (currentSnapIndex !== 0 && !isDragging) {
+    if (currentSnapIndex !== 0) {
       e.preventDefault();
       const scrollDelta = scrollTop;
-      handleSheetDrag({ delta: { y: -scrollDelta, x: 0 } } as PanInfo);
+      handleSheetDrag({ delta: { y: -scrollDelta, x: 0 }, point: { y: 0, x: 0 } } as PanInfo);
       target.scrollTop = 0;
     }
-  }, [currentSnapIndex, isDragging, handleSheetDrag]);
-
-  useEffect(() => {
-    const unsubscribe = sheetY.onChange((latest) => {
-      if (latest <= -snapPoints[0] + snapPoints[2]) {
-        snapTo(0);
-      }
-    });
-    return () => unsubscribe();
-  }, [sheetY, snapPoints]);
+  }, [currentSnapIndex, handleSheetDrag]);
 
   return (
     <Sheet
@@ -120,8 +121,7 @@ export const MobileCafeList: React.FC<CafeListProps> = ({ searchInput }) => {
       snapPoints={snapPoints}
       initialSnap={1}
       onSnap={handleSnap}
-      onDragStart={() => setIsDragging(true)}
-      onDragEnd={() => setIsDragging(false)}
+      onDrag={handleSheetDrag as any}
       className="z-[100]"
     >
       <Sheet.Container>
