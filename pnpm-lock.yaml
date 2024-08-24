@@ -89,6 +89,9 @@ dependencies:
   framer-motion:
     specifier: ^11.2.12
     version: 11.2.12(react-dom@18.3.1)(react@18.3.1)
+  konsta:
+    specifier: ^3.1.4
+    version: 3.1.4
   ky:
     specifier: ^1.5.0
     version: 1.5.0
@@ -5542,6 +5545,11 @@ packages:
 
   /knitwork@1.1.0:
     resolution: {integrity: sha512-oHnmiBUVHz1V+URE77PNot2lv3QiYU2zQf1JjOVkMt3YDKGbu8NAFr+c4mcNOhdsGrB/VpVbRwPwhiXrPhxQbw==}
+    dev: false
+
+  /konsta@3.1.4:
+    resolution: {integrity: sha512-bVcy+BPRact12NYQjsozlZbljPQWy/dNRo1h+YILlShzQmeuo2MuEQascKc9SLY5glCRAD5xJ8BKg264oU7ZeQ==}
+    engines: {node: '>= 4.7.0'}
     dev: false
 
   /ky@1.5.0:

@@ -1,8 +1,7 @@
-import { create } from "zustand";
-import { devtools, persist } from "zustand/middleware";
-import type {} from "@redux-devtools/extension"; // required for devtools typing
 import { MutableRefObject, createRef } from "react";
 import { MapRef } from "react-map-gl";
+import { create } from "zustand";
+import { devtools, persist } from "zustand/middleware";
 import { Cafe, MeiliSearchCafe } from "./types";
 
 interface MapState {

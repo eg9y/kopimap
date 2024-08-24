@@ -1,5 +1,8 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+
+const konstaConfig = require('konsta/config');
+
+module.exports = konstaConfig({
   darkMode: ["class"],
   content: ["./{pages,layouts,components,src}/**/*.{html,js,jsx,ts,tsx,vue}"],
   prefix: "",
@@ -69,4 +72,4 @@ module.exports = {
     },
   },
   plugins: [require("tailwindcss-animate")],
-}
+})

@@ -75,7 +75,6 @@ export const MobileCafeList: React.FC<CafeListProps> = ({ searchInput }) => {
   const handleSheetDrag = useCallback((info: PanInfo) => {
 
     const newSheetY = sheetY.get() + info.delta.y;
-    console.log("JANGYAY", newSheetY)
     if (newSheetY <= 0) {
       sheetY.set(0);
       snapTo(0);
