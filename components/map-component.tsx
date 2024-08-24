@@ -7,7 +7,7 @@ import { GeolocateResultEvent } from "react-map-gl/dist/esm/types";
 import { mapStyle } from "../config";
 import { useMapCafes } from "../hooks/use-map-cafes";
 import { useStore } from "../store";
-import Clusters, { ClustersRef } from "./clusters"; // Adjust the path as necessary
+import Clusters, { ClustersRef } from "./clusters";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 interface MapComponentProps { }
@@ -26,6 +26,13 @@ export default function MapComponent({ }: MapComponentProps) {
     longitude: 106.789514505,
     zoom: 14,
   });
+
+  const maxBounds = [
+    106.626998 - 0.1,
+    -6.426709 - 0.1,
+    107.052031 + 0.1,
+    -6.121617 + 0.1,
+  ];
 
   const { data: mapCafesData, refetch: refetchMapCafes } = useMapCafes(
     mapCenter.lat,
@@ -78,11 +85,11 @@ export default function MapComponent({ }: MapComponentProps) {
             lon: lng - (isWide ? 0.0025 : -0.0025),
           },
           zoom: 16,
-          essential: true, // this animation is considered essential with respect to prefers-reduced-motion
+          essential: true,
         });
       }
     },
-    [mapRef],
+    [mapRef, isWide],
   );
 
   const handleMapMove = useCallback(() => {
@@ -98,7 +105,19 @@ export default function MapComponent({ }: MapComponentProps) {
         }));
       }
     }
-  }, [mapRef]);
+  }, [mapRef, setMapCenter]);
+
+  const handleOutOfMaxBounds = useCallback(() => {
+    if (mapRef && mapRef.current) {
+      const centerLat = (maxBounds[1] + maxBounds[3]) / 2;
+      const centerLng = (maxBounds[0] + maxBounds[2]) / 2;
+      mapRef.current.flyTo({
+        center: [centerLng, centerLat],
+        zoom: 10,
+        essential: true,
+      });
+    }
+  }, [mapRef, maxBounds]);
 
   return (
     <Mapgl
@@ -114,12 +133,7 @@ export default function MapComponent({ }: MapComponentProps) {
         geoControlRef.current?.trigger();
       }}
       onMoveEnd={handleMapMove}
-      maxBounds={[
-        106.626998 - 0.1,
-        -6.426709 - 0.1,
-        107.052031 + 0.1,
-        -6.121617 + 0.1,
-      ]}
+      maxBounds={maxBounds}
       maxZoom={24}
       minZoom={10}
       style={{ width: "100%", height: "100%" }}
@@ -177,6 +191,7 @@ export default function MapComponent({ }: MapComponentProps) {
           enableHighAccuracy: true,
         }}
         onGeolocate={handleGeolocate}
+        onOutOfMaxBounds={handleOutOfMaxBounds}
       />
     </Mapgl>
   );
