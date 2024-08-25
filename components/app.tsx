@@ -17,6 +17,7 @@ import { loadLocaleAsync } from "@/src/i18n/i18n-util.async";
 import type { MeiliSearchCafe } from "@/types";
 import { useStore } from "../store";
 import MainSidebar from "./main-sidebar";
+import MobileView from "./mobile-view";
 
 // Lazy load components
 const MobileBar = lazy(() => import("./mobile-bar"));
@@ -98,18 +99,18 @@ export const App = () => {
 
   return (
     <TypesafeI18n locale={locale}>
-      <div className="flex w-[100vw] h-[100dvh] overflow-hidden">
-        <Suspense fallback={<div>Loading...</div>}>
-          {isWide ? (
+      <Suspense fallback={<div>Loading...</div>}>
+        {isWide ? (
+          <div className="flex w-[100vw] h-[100dvh] overflow-hidden">
             <DesktopView
               openFilters={openFilters}
               pmTilesReady={pmTilesReady}
             />
-          ) : (
-            <MobileView pmTilesReady={pmTilesReady} />
-          )}
-        </Suspense>
-      </div>
+          </div>
+        ) : (
+          <MobileView pmTilesReady={pmTilesReady} />
+        )}
+      </Suspense>
       <Toaster />
     </TypesafeI18n>
   );
@@ -143,16 +144,4 @@ const DesktopView = ({
       </Suspense>
     </AnimatePresence>
   </Suspense>
-);
-
-const MobileView = ({ pmTilesReady }: { pmTilesReady: boolean }) => (
-  <KonstaProvider theme="ios">
-    <KonstaApp theme="ios" safeAreas>
-      <Suspense fallback={<MapComponentLoader />}>
-        <MobileBar />
-        {pmTilesReady && <MemoizedMapComponent />}
-        <MobileToolbar />
-      </Suspense>
-    </KonstaApp>
-  </KonstaProvider>
 );
