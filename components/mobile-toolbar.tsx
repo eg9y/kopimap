@@ -1,14 +1,28 @@
-import { Link, Toolbar } from "konsta/react";
+import { HomeIcon, UserIcon } from "@heroicons/react/20/solid";
+import { Tabbar, TabbarLink } from "konsta/react";
 
 
 export default function MobileToolbar() {
   return (
-    <Toolbar
-      className={`left-0 bottom-0 fixed  w-full`}
+    <Tabbar
+      className={`left-0 bottom-0 fixed w-full`}
     >
-      <Link toolbar>Link 1</Link>
-      <Link toolbar>Link 2</Link>
-      <Link toolbar>Link 3</Link>
-    </Toolbar>
+      <TabbarLink
+        active={false}
+        onClick={() => { }}
+        icon={
+          <HomeIcon />
+        }
+        label={'Home'}
+      />
+      <TabbarLink
+        active={false}
+        onClick={() => { }}
+        icon={
+          <UserIcon />
+        }
+        label={'Login'}
+      />
+    </Tabbar>
   )
 }

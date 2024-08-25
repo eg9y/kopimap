@@ -24,6 +24,7 @@ const MemoizedMapComponent = lazy(() => import("../components/map-component"));
 const SearchFilters = lazy(() => import("../components/search-filters"));
 const CafeDetails = lazy(() => import("../components/cafe-details"));
 const KonstaProvider = lazy(() => import('konsta/react').then((v) => { return { default: v.KonstaProvider } }))
+const KonstaApp = lazy(() => import('konsta/react').then((v) => { return { default: v.App } }))
 const MobileToolbar = lazy(() => import("../components/mobile-toolbar"));
 
 
@@ -146,10 +147,12 @@ const DesktopView = ({
 
 const MobileView = ({ pmTilesReady }: { pmTilesReady: boolean }) => (
   <KonstaProvider theme="ios">
-    <Suspense fallback={<MapComponentLoader />}>
-      <MobileBar />
-      {pmTilesReady && <MemoizedMapComponent />}
-      <MobileToolbar />
-    </Suspense>
+    <KonstaApp theme="ios" safeAreas>
+      <Suspense fallback={<MapComponentLoader />}>
+        <MobileBar />
+        {pmTilesReady && <MemoizedMapComponent />}
+        <MobileToolbar />
+      </Suspense>
+    </KonstaApp>
   </KonstaProvider>
 );

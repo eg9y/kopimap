@@ -9,6 +9,7 @@ import { useMapCafes } from "../hooks/use-map-cafes";
 import { useStore } from "../store";
 import Clusters, { ClustersRef } from "./clusters";
 import "maplibre-gl/dist/maplibre-gl.css";
+import type { LngLatBoundsLike } from "react-map-gl";
 
 interface MapComponentProps { }
 
@@ -27,7 +28,7 @@ export default function MapComponent({ }: MapComponentProps) {
     zoom: 14,
   });
 
-  const maxBounds = [
+  const maxBounds: LngLatBoundsLike = [
     106.626998 - 0.1,
     -6.426709 - 0.1,
     107.052031 + 0.1,
