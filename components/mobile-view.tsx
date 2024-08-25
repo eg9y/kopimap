@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, lazy } from "react";
+import React, { useState, useRef } from "react";
 import useDebounce from "react-use/esm/useDebounce";
 import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
 import { useCafes } from "../hooks/use-cafes";
@@ -10,9 +10,7 @@ import { MobileListTemp } from "./mobile-list-temp";
 import { HomeIcon, UserIcon } from "@heroicons/react/20/solid";
 import { Tabbar, TabbarLink } from "konsta/react";
 
-const MapComponent = lazy(() => import("../components/map-component"));
-
-export default function MobileView({ pmTilesReady }: { pmTilesReady: boolean }) {
+export default function MobileView() {
   const { LL } = useI18nContext();
   const { mapCenter } = useStore();
   const [searchInput, setSearchInput] = useState("");
@@ -40,31 +38,25 @@ export default function MobileView({ pmTilesReady }: { pmTilesReady: boolean }) 
 
   const handleSearchBarClick = () => {
     setIsListDialogOpen(true);
+    // Use a short delay to ensure the dialog is open before focusing
+    setTimeout(() => {
+      if (inputRef.current) {
+        inputRef.current.focus();
+        // Trick to force keyboard to show on iOS
+        inputRef.current.blur();
+        inputRef.current.focus();
+      }
+    }, 100);
   };
 
   const toggleListDialog = () => {
     setIsListDialogOpen((prevState) => !prevState);
   };
 
-  useEffect(() => {
-    const adjustViewport = () => {
-      const viewportMetaTag = document.querySelector('meta[name="viewport"]');
-      if (viewportMetaTag) {
-        viewportMetaTag.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0');
-      }
-    };
-    adjustViewport();
-    window.addEventListener('resize', adjustViewport);
-    return () => {
-      window.removeEventListener('resize', adjustViewport);
-    };
-  }, []);
-
   return (
     <div className="flex flex-col h-[100dvh] overflow-hidden">
       <div className="flex-grow relative">
-        {pmTilesReady && <MapComponent />}
-
+        {/* Map component would go here */}
         <div className="absolute top-0 left-0 right-0 z-40 p-4 w-full">
           <div
             className={`relative rounded-full shadow-md transition-all duration-300 ${isListDialogOpen ? 'bg-white ring-2 ring-blue-500' : 'bg-gray-100'}`}
@@ -81,6 +73,11 @@ export default function MobileView({ pmTilesReady }: { pmTilesReady: boolean }) 
               onChange={handleSearch}
               value={searchInput}
               className="w-full py-3 pl-12 pr-4 text-gray-900 placeholder-gray-500 bg-transparent rounded-full focus:outline-none"
+              onTouchStart={() => {
+                if (inputRef.current) {
+                  inputRef.current.focus();
+                }
+              }}
             />
             <MagnifyingGlassIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
           </div>

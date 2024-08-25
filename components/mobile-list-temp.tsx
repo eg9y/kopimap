@@ -37,7 +37,7 @@ export const MobileListTemp: React.FC<CafeListProps> = ({ searchInput, setIsOpen
     <Transition show={isOpen} as={React.Fragment} afterEnter={() => {
       inputRef.current?.focus();
     }}>
-      <Dialog onClose={() => setIsOpen(false)} className="relative z-45">
+      <Dialog onClose={() => setIsOpen(false)} className="relative z-45" >
         <Transition.Child
           as={React.Fragment}
           enter="ease-out duration-300"
