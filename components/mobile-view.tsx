@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, lazy } from "react";
 import useDebounce from "react-use/esm/useDebounce";
 import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
 import { useCafes } from "../hooks/use-cafes";
@@ -10,7 +10,9 @@ import { MobileListTemp } from "./mobile-list-temp";
 import { HomeIcon, UserIcon } from "@heroicons/react/20/solid";
 import { Tabbar, TabbarLink } from "konsta/react";
 
-export default function MobileView() {
+const MapComponent = lazy(() => import("../components/map-component"));
+
+export default function MobileView({ pmTilesReady }: { pmTilesReady: boolean }) {
   const { LL } = useI18nContext();
   const { mapCenter } = useStore();
   const [searchInput, setSearchInput] = useState("");
@@ -56,7 +58,7 @@ export default function MobileView() {
   return (
     <div className="flex flex-col h-[100dvh] overflow-hidden">
       <div className="flex-grow relative">
-        {/* Map component would go here */}
+        {pmTilesReady && <MapComponent />}
         <div className="absolute top-0 left-0 right-0 z-40 p-4 w-full">
           <div
             className={`relative rounded-full shadow-md transition-all duration-300 ${isListDialogOpen ? 'bg-white ring-2 ring-blue-500' : 'bg-gray-100'}`}
