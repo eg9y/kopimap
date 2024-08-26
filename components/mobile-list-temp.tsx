@@ -1,4 +1,4 @@
-import React, { useCallback, Dispatch, SetStateAction, RefObject } from "react";
+import React, { useCallback, Dispatch, SetStateAction, RefObject, useEffect } from "react";
 import { useStore } from "../store";
 import { MeiliSearchCafe } from "../types";
 import { Badge } from "./catalyst/badge";
@@ -33,11 +33,26 @@ export const MobileListTemp: React.FC<CafeListProps> = ({ searchInput, setIsOpen
     setIsOpen(false);
   }, [selectCafe, mapRef, isWide, setIsOpen]);
 
+  useEffect(() => {
+    if (isOpen) {
+      // Force blur and focus after a short delay to ensure iOS shows the keyboard
+      const timer = setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.blur();
+          inputRef.current.focus();
+        }
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, inputRef]);
+
   return (
-    <Transition show={isOpen} as={React.Fragment} afterEnter={() => {
-      inputRef.current?.focus();
-    }}>
-      <Dialog onClose={() => setIsOpen(false)} className="relative z-45" >
+    <Transition show={isOpen} as={React.Fragment}>
+      <Dialog
+        onClose={() => setIsOpen(false)}
+        className="relative z-45"
+        initialFocus={inputRef}
+      >
         <Transition.Child
           as={React.Fragment}
           enter="ease-out duration-300"
@@ -58,6 +73,11 @@ export const MobileListTemp: React.FC<CafeListProps> = ({ searchInput, setIsOpen
           leave="ease-in duration-200"
           leaveFrom="translate-y-0"
           leaveTo="translate-y-full"
+          afterEnter={() => {
+            if (inputRef.current) {
+              inputRef.current.focus();
+            }
+          }}
         >
           <div className="fixed inset-x-0 top-16 bottom-28 flex items-center justify-center p-4">
             <Dialog.Panel className="size-full max-w-md rounded-xl bg-white shadow-xl max-h-full flex flex-col">
