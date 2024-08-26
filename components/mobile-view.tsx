@@ -1,6 +1,6 @@
 import React, { useState, useRef, lazy } from "react";
 import useDebounce from "react-use/esm/useDebounce";
-import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
+import { MagnifyingGlassIcon, XCircleIcon } from "@heroicons/react/20/solid";
 import { useCafes } from "../hooks/use-cafes";
 import { useMapCafes } from "../hooks/use-map-cafes";
 import { useStore } from "../store";
@@ -19,6 +19,7 @@ export default function MobileView({ pmTilesReady }: { pmTilesReady: boolean }) 
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [isListDialogOpen, setIsListDialogOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+
   const {
     data: searchCafes,
   } = useCafes(mapCenter.lat, mapCenter.long, debouncedSearchTerm);
@@ -28,6 +29,11 @@ export default function MobileView({ pmTilesReady }: { pmTilesReady: boolean }) 
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchInput(e.target.value);
+  };
+
+  const handleClearSearch = () => {
+    setSearchInput("");
+    inputRef.current?.focus();
   };
 
   useDebounce(
@@ -44,7 +50,7 @@ export default function MobileView({ pmTilesReady }: { pmTilesReady: boolean }) 
         {pmTilesReady && <MapComponent />}
         <div className="absolute top-0 left-0 right-0 bottom-0 z-40 p-4 w-full h-[100dvh] flex flex-col pointer-events-none">
           <div
-            className={`relative z-50 rounded-full  pointer-events-auto shadow-md transition-all duration-300 ${isListDialogOpen ? 'bg-white ring-2 ring-blue-500' : 'bg-gray-100'}`}
+            className={`relative z-50 rounded-full pointer-events-auto shadow-md transition-all duration-300 ${isListDialogOpen ? 'bg-white ring-2 ring-blue-500' : 'bg-gray-100'}`}
           >
             <input
               ref={inputRef}
@@ -61,11 +67,18 @@ export default function MobileView({ pmTilesReady }: { pmTilesReady: boolean }) 
                 }
               }}
               value={searchInput}
-              className="w-full py-3 pl-12 pr-4 text-gray-900 placeholder-gray-500 bg-transparent rounded-full focus:outline-none"
+              className="w-full py-3 pl-12 pr-10 text-gray-900 placeholder-gray-500 bg-transparent rounded-full focus:outline-none"
             />
             <MagnifyingGlassIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+            {searchInput && (
+              <button
+                onClick={handleClearSearch}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2"
+              >
+                <XCircleIcon className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+              </button>
+            )}
           </div>
-
           <MobileListTemp
             searchInput={searchInput}
             setIsOpen={setIsListDialogOpen}
@@ -74,16 +87,17 @@ export default function MobileView({ pmTilesReady }: { pmTilesReady: boolean }) 
           />
         </div>
       </div>
-
       <div className="flex-shrink-0">
         <Button
-          onClick={() => setIsListDialogOpen(true)}
+          onClick={() => {
+            setIsListDialogOpen((isListOpen) => !isListOpen)
+            setSearchInput("")
+          }}
           className="w-full !h-12 flex justify-center items-center bg-blue-500 text-white font-semibold"
         >
           {isListDialogOpen ? 'Hide Cafes' : 'See Cafes'}
         </Button>
       </div>
-
       <Tabbar className="flex-shrink-0">
         <TabbarLink
           active={false}

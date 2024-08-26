@@ -4,7 +4,6 @@ import { MeiliSearchCafe } from "../types";
 import { Badge } from "./catalyst/badge";
 import { useCafes } from "@/hooks/use-cafes";
 import useMedia from "react-use/esm/useMedia";
-import { Dialog } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
 interface CafeListProps {
@@ -44,59 +43,59 @@ export const MobileListTemp: React.FC<CafeListProps> = ({
     }, 100)
   }
 
+  if (!isOpen) {
+    return null;
+  }
+
   return (
-    <Dialog open={isOpen} onClose={handleClose} className="relative z-45 pointer-events-auto" tabIndex={-1}>
-      <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+    <div className="z-45 pointer-events-auto absolute inset-x-0 top-16 bottom-28 flex items-center justify-center p-4">
+      <div className="size-full max-w-md rounded-xl bg-white shadow-xl max-h-full flex flex-col">
+        <div className="p-4 border-b border-gray-200 flex justify-between items-center">
+          <p className="text-lg font-semibold">
+            Places ({allCafes.length})
+          </p>
+          <button
+            onClick={handleClose}
+            className="text-gray-400 hover:text-gray-500"
+          >
+            <XMarkIcon className="h-6 w-6" />
+          </button>
+        </div>
 
-      <div className="fixed inset-x-0 top-16 bottom-28 flex items-center justify-center p-4">
-        <Dialog.Panel className="size-full max-w-md rounded-xl bg-white shadow-xl max-h-full flex flex-col">
-          <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-            <Dialog.Title className="text-lg font-semibold">
-              Places ({allCafes.length})
-            </Dialog.Title>
-            <button
-              onClick={handleClose}
-              className="text-gray-400 hover:text-gray-500"
+        <div className="flex-grow overflow-y-auto">
+          {searchInput && (
+            <div className="p-4 bg-blue-50 border-b border-blue-100">
+              <p className="text-sm text-blue-700">Showing results for "{searchInput}"</p>
+            </div>
+          )}
+          {allCafes.map((cafe: MeiliSearchCafe) => (
+            <div
+              key={cafe.id}
+              onClick={() => handleCafeClick(cafe)}
+              className="p-4 border-b border-gray-200 hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer"
             >
-              <XMarkIcon className="h-6 w-6" />
-            </button>
-          </div>
-
-          <div className="flex-grow overflow-y-auto">
-            {searchInput && (
-              <div className="p-4 bg-blue-50 border-b border-blue-100">
-                <p className="text-sm text-blue-700">Showing results for "{searchInput}"</p>
-              </div>
-            )}
-            {allCafes.map((cafe: MeiliSearchCafe) => (
-              <div
-                key={cafe.id}
-                onClick={() => handleCafeClick(cafe)}
-                className="p-4 border-b border-gray-200 hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer"
-              >
-                <div className="grow w-full">
-                  <p className="font-semibold text-nowrap text-ellipsis overflow-hidden">
-                    {cafe.name}
-                  </p>
-                  <div className="flex gap-2 my-1">
+              <div className="grow w-full">
+                <p className="font-semibold text-nowrap text-ellipsis overflow-hidden">
+                  {cafe.name}
+                </p>
+                <div className="flex gap-2 my-1">
+                  <Badge color="red" className="text-xs">
+                    {cafe.gmaps_rating} ★ ({cafe.gmaps_total_reviews.toLocaleString("id-ID")})
+                  </Badge>
+                  {cafe.avg_rating && (
                     <Badge color="red" className="text-xs">
-                      {cafe.gmaps_rating} ★ ({cafe.gmaps_total_reviews.toLocaleString("id-ID")})
+                      Our rating: {cafe.avg_rating} ({cafe.review_count})
                     </Badge>
-                    {cafe.avg_rating && (
-                      <Badge color="red" className="text-xs">
-                        Our rating: {cafe.avg_rating} ({cafe.review_count})
-                      </Badge>
-                    )}
-                  </div>
-                  <p className="text-sm text-gray-500 text-ellipsis text-nowrap overflow-hidden">
-                    {cafe.address}
-                  </p>
+                  )}
                 </div>
+                <p className="text-sm text-gray-500 text-ellipsis text-nowrap overflow-hidden">
+                  {cafe.address}
+                </p>
               </div>
-            ))}
-          </div>
-        </Dialog.Panel>
+            </div>
+          ))}
+        </div>
       </div>
-    </Dialog>
+    </div>
   );
 };
