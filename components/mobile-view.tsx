@@ -38,31 +38,13 @@ export default function MobileView({ pmTilesReady }: { pmTilesReady: boolean }) 
     [searchInput]
   );
 
-  const handleSearchBarClick = () => {
-    setIsListDialogOpen(true);
-    // Use a short delay to ensure the dialog is open before focusing
-    setTimeout(() => {
-      if (inputRef.current) {
-        inputRef.current.focus();
-        // Trick to force keyboard to show on iOS
-        inputRef.current.blur();
-        inputRef.current.focus();
-      }
-    }, 100);
-  };
-
-  const toggleListDialog = () => {
-    setIsListDialogOpen((prevState) => !prevState);
-  };
-
   return (
     <div className="flex flex-col h-[100dvh] overflow-hidden">
       <div className="flex-grow relative">
         {pmTilesReady && <MapComponent />}
-        <div className="absolute top-0 left-0 right-0 z-40 p-4 w-full">
+        <div className="absolute top-0 left-0 right-0 bottom-0 z-40 p-4 w-full h-[100dvh] flex flex-col pointer-events-none">
           <div
-            className={`relative rounded-full shadow-md transition-all duration-300 ${isListDialogOpen ? 'bg-white ring-2 ring-blue-500' : 'bg-gray-100'}`}
-            onClick={handleSearchBarClick}
+            className={`relative z-50 rounded-full  pointer-events-auto shadow-md transition-all duration-300 ${isListDialogOpen ? 'bg-white ring-2 ring-blue-500' : 'bg-gray-100'}`}
           >
             <input
               ref={inputRef}
@@ -73,22 +55,29 @@ export default function MobileView({ pmTilesReady }: { pmTilesReady: boolean }) 
               placeholder={LL.searchCafes()}
               aria-label={LL.searchCafes()}
               onChange={handleSearch}
-              value={searchInput}
-              className="w-full py-3 pl-12 pr-4 text-gray-900 placeholder-gray-500 bg-transparent rounded-full focus:outline-none"
-              onTouchStart={() => {
-                if (inputRef.current) {
-                  inputRef.current.focus();
+              onKeyUp={(e) => {
+                if (e.key === 'Enter' || e.keyCode === 13) {
+                  setIsListDialogOpen(true)
                 }
               }}
+              value={searchInput}
+              className="w-full py-3 pl-12 pr-4 text-gray-900 placeholder-gray-500 bg-transparent rounded-full focus:outline-none"
             />
             <MagnifyingGlassIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
           </div>
+
+          <MobileListTemp
+            searchInput={searchInput}
+            setIsOpen={setIsListDialogOpen}
+            isOpen={isListDialogOpen}
+            inputRef={inputRef}
+          />
         </div>
       </div>
 
       <div className="flex-shrink-0">
         <Button
-          onClick={toggleListDialog}
+          onClick={() => setIsListDialogOpen(true)}
           className="w-full !h-12 flex justify-center items-center bg-blue-500 text-white font-semibold"
         >
           {isListDialogOpen ? 'Hide Cafes' : 'See Cafes'}
@@ -109,13 +98,6 @@ export default function MobileView({ pmTilesReady }: { pmTilesReady: boolean }) 
           label="Login"
         />
       </Tabbar>
-
-      <MobileListTemp
-        searchInput={searchInput}
-        setIsOpen={setIsListDialogOpen}
-        isOpen={isListDialogOpen}
-        inputRef={inputRef}
-      />
     </div>
   );
 }

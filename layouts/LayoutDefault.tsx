@@ -1,5 +1,4 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 import React from "react";
 
@@ -14,8 +13,7 @@ export default function LayoutDefault({
 }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
-      <ReactQueryDevtools initialIsOpen={false} />
-      <div className="h-[100vh] overflow-hidden">{children}</div>
+      {children}
     </QueryClientProvider>
   );
 }
