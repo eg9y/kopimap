@@ -68,7 +68,7 @@ const responsive = {
   },
   desktop: {
     breakpoint: { max: 3000, min: 1024 },
-    items: 3
+    items: 1
   },
   tablet: {
     breakpoint: { max: 1024, min: 464 },
@@ -194,13 +194,13 @@ export default function CafeDetails() {
                 {cafeDetailedInfo.menu_link && (
                   <BadgeButton href={cafeDetailedInfo.menu_link}>Menu</BadgeButton>
                 )}
-              </div>
 
-              {/* Address */}
-              <div className="p-2 rounded-md bg-blue-100">
-                <p className="text-pretty text-xs">
-                  <MapPinIcon className="size-4 inline" /> {cafeDetailedInfo.address}
-                </p>
+                {/* Address */}
+                <div className="p-2 rounded-md bg-blue-100">
+                  <p className="text-pretty text-xs">
+                    <MapPinIcon className="size-4 inline" /> {cafeDetailedInfo.address}
+                  </p>
+                </div>
               </div>
 
               {/* Image and User Reviews Grid */}
