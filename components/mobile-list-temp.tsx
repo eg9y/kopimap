@@ -48,7 +48,7 @@ export const MobileListTemp: React.FC<CafeListProps> = ({
   }
 
   return (
-    <div className="z-45 pointer-events-auto absolute inset-x-0 top-16 bottom-28 flex items-center justify-center p-4">
+    <div className="z-30 pointer-events-auto absolute inset-x-0 top-16 bottom-28 flex items-center justify-center p-4">
       <div className="size-full max-w-md rounded-xl bg-white shadow-xl max-h-full flex flex-col">
         <div className="p-4 border-b border-gray-200 flex justify-between items-center">
           <p className="text-lg font-semibold">

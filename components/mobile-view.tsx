@@ -9,12 +9,13 @@ import { Button } from "konsta/react";
 import { MobileListTemp } from "./mobile-list-temp";
 import { HomeIcon, UserIcon } from "@heroicons/react/20/solid";
 import { Tabbar, TabbarLink } from "konsta/react";
+import CafeDetails from "./cafe-details";
 
 const MapComponent = lazy(() => import("../components/map-component"));
 
 export default function MobileView({ pmTilesReady }: { pmTilesReady: boolean }) {
   const { LL } = useI18nContext();
-  const { mapCenter } = useStore();
+  const { mapCenter, selectCafe } = useStore();
   const [searchInput, setSearchInput] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [isListDialogOpen, setIsListDialogOpen] = useState(false);
@@ -48,6 +49,7 @@ export default function MobileView({ pmTilesReady }: { pmTilesReady: boolean }) 
     <div className="flex flex-col h-[100dvh] overflow-hidden">
       <div className="flex-grow relative">
         {pmTilesReady && <MapComponent />}
+        <CafeDetails />
         <div className="absolute top-0 left-0 right-0 bottom-0 z-40 p-4 w-full h-[100dvh] flex flex-col pointer-events-none">
           <div
             className={`relative z-50 rounded-full pointer-events-auto shadow-md transition-all duration-300 ${isListDialogOpen ? 'bg-white ring-2 ring-blue-500' : 'bg-gray-100'}`}
@@ -90,6 +92,9 @@ export default function MobileView({ pmTilesReady }: { pmTilesReady: boolean }) 
       <div className="flex-shrink-0">
         <Button
           onClick={() => {
+            if (isListDialogOpen) {
+              selectCafe(null)
+            }
             setIsListDialogOpen((isListOpen) => !isListOpen)
             setSearchInput("")
           }}

@@ -101,9 +101,6 @@ dependencies:
   maplibre-gl:
     specifier: ^4.5.0
     version: 4.5.0
-  nuka-carousel:
-    specifier: ^8.0.1
-    version: 8.0.1(react-dom@18.3.1)(react@18.3.1)
   pmtiles:
     specifier: ^3.0.6
     version: 3.0.6
@@ -140,6 +137,9 @@ dependencies:
   react-modal-sheet:
     specifier: ^3.1.0
     version: 3.1.0(framer-motion@11.2.12)(react@18.3.1)
+  react-multi-carousel:
+    specifier: ^2.8.5
+    version: 2.8.5
   react-simple-star-rating:
     specifier: ^5.1.7
     version: 5.1.7(react-dom@18.3.1)(react@18.3.1)
@@ -6180,16 +6180,6 @@ packages:
       set-blocking: 2.0.0
     dev: false
 
-  /nuka-carousel@8.0.1(react-dom@18.3.1)(react@18.3.1):
-    resolution: {integrity: sha512-dnJBBU6psWT590GQwXApJlZQ5yReVwav4c+LImLaUwgzSZhDT6f1l/bGGOTzU9HqC70wZaHiZ/pWk0BJ+4VGZQ==}
-    peerDependencies:
-      react: '>=18.0.0'
-      react-dom: '>=18.0.0'
-    dependencies:
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-    dev: false
-
   /nypm@0.3.9:
     resolution: {integrity: sha512-BI2SdqqTHg2d4wJh8P9A1W+bslg33vOE9IZDY6eR2QC+Pu1iNBVZUqczrd43rJb+fMzHU7ltAYKsEFY/kHMFcw==}
     engines: {node: ^14.16.0 || >=16.10.0}
@@ -6773,6 +6763,11 @@ packages:
       '@react-aria/utils': 3.24.0(react@18.3.1)
       framer-motion: 11.2.12(react-dom@18.3.1)(react@18.3.1)
       react: 18.3.1
+    dev: false
+
+  /react-multi-carousel@2.8.5:
+    resolution: {integrity: sha512-C5DAvJkfzR2JK9YixZ3oyF9x6R4LW6nzTpIXrl9Oujxi4uqP9SzVVCjl+JLM3tSdqdjAx/oWZK3dTVBSR73Q+w==}
+    engines: {node: '>=8'}
     dev: false
 
   /react-refresh@0.14.2:
