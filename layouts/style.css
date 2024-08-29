@@ -40,7 +40,7 @@ body.page-is-transitioning #page-content {
 @media (max-width: 767px) {
     .maplibregl-ctrl-top-right {
         top: auto !important;
-        bottom: 134px !important;
+        bottom: 60px !important;
     }
 
     .maplibregl-ctrl-top-right .maplibregl-ctrl-group button {

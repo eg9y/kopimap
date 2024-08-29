@@ -1,6 +1,5 @@
 import { Capacitor } from "@capacitor/core";
 import { StatusBar, Style } from "@capacitor/status-bar";
-import { AnimatePresence } from "framer-motion";
 import { addProtocol, removeProtocol } from "maplibre-gl";
 import * as pmtiles from "pmtiles";
 import { Suspense, lazy, useEffect, useState } from "react";
@@ -16,28 +15,10 @@ import { detectLocale } from "@/src/i18n/i18n-util";
 import { loadLocaleAsync } from "@/src/i18n/i18n-util.async";
 import type { MeiliSearchCafe } from "@/types";
 import { useStore } from "../store";
-import MainSidebar from "./main-sidebar";
 
 // Lazy load components
-const MapComponent = lazy(() => import("../components/map-component"));
-const SearchFilters = lazy(() => import("../components/search-filters"));
-const CafeDetails = lazy(() => import("../components/cafe-details"));
+const DesktopView = lazy(() => import("./desktop-view"));
 const MobileView = lazy(() => import("./mobile-view"));
-
-// Loading components
-const MapComponentLoader = () => (
-  <div className="w-full h-full bg-gray-200 animate-pulse">Loading Map...</div>
-);
-const SearchFiltersLoader = () => (
-  <div className="w-[200px] h-full bg-gray-100 animate-pulse">
-    Loading Filters...
-  </div>
-);
-const CafeDetailsLoader = () => (
-  <div className="w-full h-full bg-white animate-pulse">
-    Loading Cafe Details...
-  </div>
-);
 
 export const App = () => {
   const { openFilters, selectCafe, selectedCafe } = useStore();
@@ -110,33 +91,3 @@ export const App = () => {
     </TypesafeI18n>
   );
 };
-
-const DesktopView = ({
-  openFilters,
-  pmTilesReady,
-}: {
-  openFilters: boolean;
-  pmTilesReady: boolean;
-}) => (
-  <Suspense fallback={<div>Loading desktop view...</div>}>
-    <MainSidebar>
-      <div className="rounded-lg overflow-hidden grow relative h-full">
-        <Suspense fallback={<MapComponentLoader />}>
-          {openFilters && (
-            <div className="z-[90] absolute w-[200px] h-full top-0 left-0 flex flex-col justify-end">
-              <Suspense fallback={<SearchFiltersLoader />}>
-                <SearchFilters />
-              </Suspense>
-            </div>
-          )}
-          {pmTilesReady && <MapComponent />}
-        </Suspense>
-      </div>
-    </MainSidebar>
-    <AnimatePresence>
-      <Suspense fallback={<CafeDetailsLoader />}>
-        <CafeDetails />
-      </Suspense>
-    </AnimatePresence>
-  </Suspense>
-);
