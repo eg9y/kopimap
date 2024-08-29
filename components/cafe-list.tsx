@@ -153,24 +153,26 @@ export default function CafeList({ searchInput }: CafeListProps) {
                     onClick={() => handleCafeSelect(cafe)}
                   >
                     <div className="grow w-full">
-                      <p className="text-nowrap text-ellipsis overflow-hidden">
-                        {cafe.name}
-                      </p>
-                      <div className="flex gap-2">
-                        <Badge className="grow">
-                          gmaps rating: {cafe.gmaps_rating} (
-                          {cafe.gmaps_total_reviews.toLocaleString("id-ID")})
-                        </Badge>
-                        <Badge className="grow">
-                          rating:{" "}
-                          {cafe.avg_rating
-                            ? `${cafe.avg_rating} (${cafe.review_count})`
-                            : "-"}
-                        </Badge>
+                      <div>
+                        <p className="text-nowrap text-ellipsis overflow-hidden">
+                          {cafe.name}
+                        </p>
+                        <div className="flex gap-2">
+                          <Badge className="grow">
+                            gmaps rating: {cafe.gmaps_rating} (
+                            {cafe.gmaps_total_reviews.toLocaleString("id-ID")})
+                          </Badge>
+                          <Badge className="grow">
+                            rating:{" "}
+                            {cafe.avg_rating
+                              ? `${cafe.avg_rating} (${cafe.review_count})`
+                              : "-"}
+                          </Badge>
+                        </div>
+                        <p className="font-light text-ellipsis text-nowrap text-slate-500 overflow-hidden">
+                          {cafe.address}
+                        </p>
                       </div>
-                      <p className="font-light text-ellipsis text-nowrap text-slate-500 overflow-hidden">
-                        {cafe.address}
-                      </p>
                     </div>
                   </SidebarItem>
                 )}

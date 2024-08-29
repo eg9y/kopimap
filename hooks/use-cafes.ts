@@ -71,8 +71,8 @@ export const useCafes = (
       latitude: cafe._geo.lat,
       longitude: cafe._geo.lng,
       distance: cafe._geoDistance,
-      images: [] as string[],
       ...cafe,
+      images: [] as string[],
     }));
 
     try {
