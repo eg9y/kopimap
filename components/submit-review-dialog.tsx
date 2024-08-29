@@ -189,7 +189,7 @@ export function SubmitReviewDialog({
     <Dialog
       open={isOpen && !!cafeDetailedInfo}
       onClose={() => setIsOpen(false)}
-      className="!max-w-[70vw] h-[90vh] flex flex-col overflow-y-auto"
+      className=" !max-w-[70vw] h-[90vh] flex flex-col overflow-y-auto jang  "
     >
       <DialogTitle>
         {isUpdating

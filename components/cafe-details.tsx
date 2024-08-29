@@ -120,7 +120,7 @@ export default function CafeDetails() {
   const carouselImages = [
     ...(cafeDetailedInfo?.all_image_urls ?? []),
     ...((cafeDetailedInfo?.hosted_gmaps_images as string[]) ?? [cafeDetailedInfo?.gmaps_featured_image]),
-    ...(cafeDetailedInfo?.gmaps_images ? JSON.parse(cafeDetailedInfo?.gmaps_images as string).map((gmapsImage: { link: string }) => gmapsImage.link) : []),
+    ...(cafeDetailedInfo?.gmaps_images ? JSON.parse(cafeDetailedInfo?.gmaps_images as string).slice(1).map((gmapsImage: { link: string }) => gmapsImage.link) : []),
   ];
 
   return (
@@ -286,12 +286,14 @@ export default function CafeDetails() {
         </div>
       </motion.div >
 
-      <SubmitReviewDialog
-        isOpen={openSubmitReviewDialog}
-        setIsOpen={setOpenSubmitReviewDialog}
-        cafeDetailedInfo={cafeDetailedInfo}
-        userReview={userReview}
-      />
+      {isWide && (
+        <SubmitReviewDialog
+          isOpen={openSubmitReviewDialog}
+          setIsOpen={setOpenSubmitReviewDialog}
+          cafeDetailedInfo={cafeDetailedInfo}
+          userReview={userReview}
+        />
+      )}
       <Confetti
         style={{
           pointerEvents: "none",

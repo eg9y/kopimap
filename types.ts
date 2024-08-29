@@ -8,25 +8,25 @@ type Attribute = {
 
 export type CategoryAttributes = {
   color:
-    | "orange"
-    | "blue"
-    | "emerald"
-    | "purple"
-    | "fuchsia"
-    | "zinc"
-    | "cyan"
-    | "green"
-    | "indigo"
-    | "lime"
-    | "pink"
-    | "red"
-    | "teal"
-    | "violet"
-    | "yellow"
-    | "amber"
-    | "sky"
-    | "rose"
-    | undefined;
+  | "orange"
+  | "blue"
+  | "emerald"
+  | "purple"
+  | "fuchsia"
+  | "zinc"
+  | "cyan"
+  | "green"
+  | "indigo"
+  | "lime"
+  | "pink"
+  | "red"
+  | "teal"
+  | "violet"
+  | "yellow"
+  | "amber"
+  | "sky"
+  | "rose"
+  | undefined;
   category: string;
   attributes: Attribute[];
 };
@@ -47,6 +47,7 @@ export type MeiliSearchCafe = {
   _geoDistance: number;
   avg_rating: number;
   review_count: number;
+  images: string[];
 } & CafeAttributes;
 
 export type Cafe = {

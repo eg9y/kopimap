@@ -2,6 +2,13 @@ import { useInfiniteQuery, UseInfiniteQueryResult, QueryFunctionContext, Infinit
 import { useCallback, useMemo } from "react";
 import { useStore } from "../store";
 import type { MeiliSearchCafe } from "../types";
+import { createClient } from "@supabase/supabase-js";
+import { Database } from "@/components/lib/database.types";
+
+const supabase = createClient<Database>(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_ANON_KEY,
+);
 
 const SEARCH_RADIUS = 3000; // 3km radius
 const PAGE_SIZE = 20; // Number of cafes per page
@@ -59,14 +66,46 @@ export const useCafes = (
 
     const data: { hits: any[]; totalHits: number } = await response.json();
 
+    const cafes = data.hits.map((cafe: MeiliSearchCafe) => ({
+      gmaps_ratings: cafe.gmaps_rating.toString(),
+      latitude: cafe._geo.lat,
+      longitude: cafe._geo.lng,
+      distance: cafe._geoDistance,
+      images: [] as string[],
+      ...cafe,
+    }));
+
+    try {
+      const { data: images, error } = await supabase
+        .from("cafe_location_view")
+        .select("all_image_urls, hosted_gmaps_images, gmaps_images,gmaps_featured_image, place_id")
+        .in("place_id", cafes.map((cafe) => cafe.id));
+
+      if (error) {
+        console.error("Error fetching images from Supabase:", error);
+      } else if (images) {
+        // Create a map of place_id to image data for efficient lookup
+        const imageMap = new Map(images.map(img => [img.place_id, img]));
+
+        // Connect images with cafes
+        cafes.forEach(cafe => {
+          const cafeImages = imageMap.get(cafe.id);
+          if (cafeImages) {
+            const images = [
+              ...(cafeImages?.all_image_urls ?? []),
+              ...((cafeImages?.hosted_gmaps_images as string[]) ?? [cafeImages?.gmaps_featured_image]),
+              ...(cafeImages?.gmaps_images ? JSON.parse(cafeImages?.gmaps_images as string).map((gmapsImage: { link: string }) => gmapsImage.link) : []),
+            ];
+            cafe.images = images;
+          }
+        });
+      }
+    } catch (error) {
+      console.error("Unexpected error while fetching images:", error);
+    }
+
     return {
-      cafes: data.hits.map((cafe: MeiliSearchCafe) => ({
-        gmaps_ratings: cafe.gmaps_rating.toString(),
-        latitude: cafe._geo.lat,
-        longitude: cafe._geo.lng,
-        distance: cafe._geoDistance,
-        ...cafe,
-      })),
+      cafes,
       nextPage: data.hits.length === PAGE_SIZE ? pageParam + 1 : undefined,
       totalHits: data.totalHits,
     };

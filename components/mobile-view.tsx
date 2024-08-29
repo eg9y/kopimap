@@ -6,7 +6,7 @@ import { useMapCafes } from "../hooks/use-map-cafes";
 import { useStore } from "../store";
 import { useI18nContext } from "@/src/i18n/i18n-react";
 import { Button } from "konsta/react";
-import { MobileListTemp } from "./mobile-list-temp";
+import { MobileCafeList } from "./mobile-cafe-list";
 import { HomeIcon, UserIcon } from "@heroicons/react/20/solid";
 import { Tabbar, TabbarLink } from "konsta/react";
 import CafeDetails from "./cafe-details";
@@ -81,7 +81,7 @@ export default function MobileView({ pmTilesReady }: { pmTilesReady: boolean }) 
               </button>
             )}
           </div>
-          <MobileListTemp
+          <MobileCafeList
             searchInput={searchInput}
             setIsOpen={setIsListDialogOpen}
             isOpen={isListDialogOpen}

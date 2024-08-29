@@ -17,12 +17,12 @@ import { loadLocaleAsync } from "@/src/i18n/i18n-util.async";
 import type { MeiliSearchCafe } from "@/types";
 import { useStore } from "../store";
 import MainSidebar from "./main-sidebar";
-import MobileView from "./mobile-view";
 
 // Lazy load components
 const MapComponent = lazy(() => import("../components/map-component"));
 const SearchFilters = lazy(() => import("../components/search-filters"));
 const CafeDetails = lazy(() => import("../components/cafe-details"));
+const MobileView = lazy(() => import("./mobile-view"));
 
 // Loading components
 const MapComponentLoader = () => (
