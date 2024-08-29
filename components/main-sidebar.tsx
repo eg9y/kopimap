@@ -328,15 +328,6 @@ export default function MainSidebar({ children }: MainSidebarProps) {
 
                   <ChevronUpIcon />
                 </DropdownButton>
-                {/* <div className="px-2">
-                  <Link
-                    href="https://github.com/eg9y"
-                    target="_blank"
-                    className="text-xs"
-                  >
-                    other apps{" "}
-                  </Link>
-                </div> */}
                 <DropdownMenu className="min-w-64" anchor="top start">
                   {loggedInUser && (
                     <>
