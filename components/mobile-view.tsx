@@ -13,7 +13,6 @@ import { createClient } from "@supabase/supabase-js";
 import { Avatar } from "./catalyst/avatar";
 import { useUserReview } from "@/hooks/use-user-review";
 import { useCafeDetailedInfo } from "@/hooks/use-cafe-detailed-info";
-import { PanInfo } from "framer-motion";
 import useWindowSize from "react-use/esm/useWindowSize";
 
 const MapComponent = lazy(() => import("../components/map-component"));
@@ -138,24 +137,31 @@ export default function MobileView({ pmTilesReady }: { pmTilesReady: boolean }) 
               sheetRef.current?.snapTo(2);
             }}
             detent="full-height"
-            snapPoints={[height - 80, 400, 100]}
+            snapPoints={[height - 80, height - 600, 100]}
             initialSnap={0}
             onSnap={handleSnap}
           >
             <Sheet.Container >
               <Sheet.Header />
               <Sheet.Content style={{ paddingBottom: sheetRef.current?.y }}>
-                {snapPoint === 2 ? renderCollapsedContent() : (
-                  <Sheet.Scroller draggableAt="both">
-                    <Suspense fallback={<CafeDetailsLoader />}>
-                      <CafeDetails
-                        cafeDetailedInfo={cafeDetailedInfo}
-                        setOpenSubmitReviewDialog={setOpenSubmitReviewDialog}
-                        userReview={userReview}
-                      />
-                    </Suspense>
-                  </Sheet.Scroller>
-                )}
+                {snapPoint === 2 && renderCollapsedContent()}
+                {snapPoint === 1 &&
+                  <Suspense fallback={<CafeDetailsLoader />}>
+                    <CafeDetails
+                      cafeDetailedInfo={cafeDetailedInfo}
+                      setOpenSubmitReviewDialog={setOpenSubmitReviewDialog}
+                      userReview={userReview}
+                    />
+                  </Suspense>}
+                {snapPoint === 0 && <Sheet.Scroller draggableAt="both">
+                  <Suspense fallback={<CafeDetailsLoader />}>
+                    <CafeDetails
+                      cafeDetailedInfo={cafeDetailedInfo}
+                      setOpenSubmitReviewDialog={setOpenSubmitReviewDialog}
+                      userReview={userReview}
+                    />
+                  </Suspense>
+                </Sheet.Scroller>}
               </Sheet.Content>
             </Sheet.Container>
           </Sheet>
