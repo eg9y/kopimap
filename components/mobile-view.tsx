@@ -94,24 +94,27 @@ export default function MobileView({ pmTilesReady }: { pmTilesReady: boolean }) 
 
   const handleSnap = (index: number) => {
     setSnapPoint(index);
-    if (index === 2) {
-      // Additional logic for map interaction when in small collapsed view
-    }
   };
 
   const handleMapMoveEnd = useCallback(() => {
     sheetRef.current?.snapTo(2);
   }, []);
 
+  useEffect(() => {
+    if (selectedCafe) {
+      setIsListDialogOpen(false)
+    }
+  }, [selectedCafe])
+
 
   useEffect(() => {
     const map = mapRef?.current;
     if (map?.on) {
-      map.on("moveend", handleMapMoveEnd);
+      map.on("movestart", handleMapMoveEnd);
 
       // Cleanup function
       return () => {
-        map.off("moveend", handleMapMoveEnd);
+        map.off("movestart", handleMapMoveEnd);
       };
     }
   }, [mapRef, handleMapMoveEnd]);
@@ -130,7 +133,10 @@ export default function MobileView({ pmTilesReady }: { pmTilesReady: boolean }) 
           <Sheet
             ref={sheetRef}
             isOpen={true}
-            onClose={() => { }}
+            onClose={() => {
+              console.log("CLOSED")
+              sheetRef.current?.snapTo(2);
+            }}
             detent="full-height"
             snapPoints={[height - 80, 400, 100]}
             initialSnap={0}
