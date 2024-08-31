@@ -14,6 +14,7 @@ import { Avatar } from "./catalyst/avatar";
 import { useUserReview } from "@/hooks/use-user-review";
 import { useCafeDetailedInfo } from "@/hooks/use-cafe-detailed-info";
 import useWindowSize from "react-use/esm/useWindowSize";
+import { MobileSubmitReview } from "./mobile-submit-review";
 
 const MapComponent = lazy(() => import("../components/map-component"));
 
@@ -128,7 +129,7 @@ export default function MobileView({ pmTilesReady }: { pmTilesReady: boolean }) 
     <div className="flex flex-col h-[100dvh] overflow-hidden">
       <div className="flex-grow relative">
         {pmTilesReady && <MapComponent />}
-        {selectedCafe && (
+        {selectedCafe && !openSubmitReviewDialog && (
           <Sheet
             ref={sheetRef}
             isOpen={true}
@@ -204,6 +205,13 @@ export default function MobileView({ pmTilesReady }: { pmTilesReady: boolean }) 
               setIsOpen={setIsListDialogOpen}
               isOpen={isListDialogOpen}
               inputRef={inputRef}
+            />
+          )}
+          {openSubmitReviewDialog && (
+            <MobileSubmitReview
+              cafeDetailedInfo={cafeDetailedInfo}
+              userReview={userReview}
+              onClose={() => { setOpenSubmitReviewDialog(false) }}
             />
           )}
         </div>
