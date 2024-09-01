@@ -1,4 +1,4 @@
-import React, { useRef, Suspense } from 'react';
+import React, { useRef, Suspense, useState, useCallback } from 'react';
 import { useI18nContext } from "@/src/i18n/i18n-react";
 import { StarIcon } from "@heroicons/react/20/solid";
 import { useImage } from 'react-image';
@@ -163,20 +163,7 @@ export default function CafeDetails({ cafeDetailedInfo, setOpenSubmitReviewDialo
           <div className="grid grid-cols-1 md:grid-cols-[250px_1fr] gap-4">
             {/* Cafe Image */}
             <div className="bg-white rounded-lg shadow-md overflow-hidden">
-              <Carousel responsive={responsive}>
-                {carouselImages.map((cafeImage, index) => (
-                  <ErrorBoundary fallback={<ImageError />} key={cafeImage}>
-                    <Suspense fallback={<ImageLoader />} >
-                      <ImageWithSuspense
-                        key={index}
-                        src={cafeImage}
-                        alt={`${cafeDetailedInfo.name} - Image ${index + 1}`}
-                        className="object-cover w-full h-[250px]"
-                      />
-                    </Suspense>
-                  </ErrorBoundary>
-                ))}
-              </Carousel>
+              <CustomCarousel images={carouselImages} />
             </div>
 
             {/* User Reviews Summary */}
@@ -258,3 +245,62 @@ export default function CafeDetails({ cafeDetailedInfo, setOpenSubmitReviewDialo
     </div>
   );
 }
+
+
+interface CustomCarouselProps {
+  images: string[];
+}
+
+const CustomCarousel: React.FC<CustomCarouselProps> = ({ images }) => {
+  const [isSwipingHorizontally, setIsSwipingHorizontally] = useState<boolean>(false);
+  const touchStartY = useRef<number>(0);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+    touchStartY.current = e.touches[0].clientY;
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+    if (isSwipingHorizontally) {
+      e.preventDefault();
+    } else {
+      const touchCurrentY = e.touches[0].clientY;
+      const deltaY = Math.abs(touchCurrentY - touchStartY.current);
+      if (deltaY > 10) {
+        setIsSwipingHorizontally(false);
+      } else {
+        setIsSwipingHorizontally(true);
+      }
+    }
+  }, [isSwipingHorizontally]);
+
+  const handleTouchEnd = useCallback(() => {
+    setIsSwipingHorizontally(false);
+  }, []);
+
+  return (
+    <div
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
+      <Carousel
+        responsive={responsive}
+        swipeable={true}
+        draggable={false}
+      >
+        {images.map((image, index) => (
+          <ErrorBoundary fallback={<ImageError />} key={image}>
+            <Suspense fallback={<ImageLoader />}>
+              <ImageWithSuspense
+                key={index}
+                src={image}
+                alt={`Cafe Image ${index + 1}`}
+                className="object-cover w-full h-[250px]"
+              />
+            </Suspense>
+          </ErrorBoundary>
+        ))}
+      </Carousel>
+    </div>
+  );
+};
