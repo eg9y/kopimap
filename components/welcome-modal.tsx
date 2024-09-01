@@ -24,10 +24,11 @@ export const WelcomeModal: React.FC = () => {
   const handleClose = () => setIsOpen(false);
 
   return (
-    <Dialog open={isOpen} onClose={setIsOpen} className='pb-20 md:pb-10'>
+
+    <Dialog open={isOpen} onClose={setIsOpen} className='md:pb-10'>
       <DialogTitle className="text-2xl font-bold text-center">{LL.welcomeModal.title()}</DialogTitle>
       <DialogDescription className="text-center">{LL.welcomeModal.description()}</DialogDescription>
-      <DialogBody>
+      <DialogBody className='overflow-y-scroll max-h-[55dvh]'>
         <ul className="list-disc pl-5 space-y-2 mb-4">
           {Object.keys(LL.welcomeModal.features).map((key) => (
             <li key={key}>{LL.welcomeModal.features[key as keyof typeof LL.welcomeModal.features]()}</li>
@@ -38,7 +39,7 @@ export const WelcomeModal: React.FC = () => {
         <p className="text-base font-medium text-center">{LL.welcomeModal.thankYou()}</p>
       </DialogBody>
       <DialogActions>
-        <Button onClick={handleClose} className="w-full">{LL.welcomeModal.closeButton()}</Button>
+        <Button color='orange' onClick={handleClose} className="w-full">{LL.welcomeModal.closeButton()}</Button>
       </DialogActions>
     </Dialog>
   );
