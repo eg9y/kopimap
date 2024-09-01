@@ -7,6 +7,7 @@ import { useWindowSize } from "react-use";
 import { MobileToolbar } from "@/components/mobile/mobile-toolbar";
 import { LocaleContext } from "@/components/locale-context";
 import { UsernamePrompt } from "@/components/username-prompt";
+import { WelcomeModal } from "@/components/welcome-modal";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ export default function LayoutDefault({
           <main className="grow overflow-scroll">{children}</main>
           {isMobile && <MobileToolbar />}
           <UsernamePrompt />
+          <WelcomeModal />
         </div>
       </LocaleContext>
     </QueryClientProvider>

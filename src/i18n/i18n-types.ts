@@ -607,6 +607,54 @@ type RootTranslation = {
 		 */
 		Excellent: string
 	}
+	welcomeModal: {
+		/**
+		 * W​e​l​c​o​m​e​ ​t​o​ ​K​o​p​i​m​a​p​!​ ​☕​️​�​�​️
+		 */
+		title: string
+		/**
+		 * Y​o​u​r​ ​g​a​t​e​w​a​y​ ​t​o​ ​J​a​k​a​r​t​a​'​s​ ​h​i​d​d​e​n​ ​c​o​f​f​e​e​ ​g​e​m​s​ ​a​n​d​ ​c​o​z​y​ ​w​o​r​k​s​p​a​c​e​s​.
+		 */
+		description: string
+		features: {
+			/**
+			 * E​x​p​l​o​r​e​ ​a​n​ ​i​n​t​e​r​a​c​t​i​v​e​ ​m​a​p​ ​o​f​ ​J​a​k​a​r​t​a​'​s​ ​v​i​b​r​a​n​t​ ​c​a​f​e​ ​s​c​e​n​e
+			 */
+			'0': string
+			/**
+			 * D​i​s​c​o​v​e​r​ ​c​a​f​e​s​ ​t​h​r​o​u​g​h​ ​h​o​n​e​s​t​,​ ​d​e​t​a​i​l​e​d​ ​c​o​m​m​u​n​i​t​y​ ​r​e​v​i​e​w​s
+			 */
+			'1': string
+			/**
+			 * F​i​n​d​ ​y​o​u​r​ ​p​e​r​f​e​c​t​ ​s​p​o​t​ ​w​i​t​h​ ​c​u​s​t​o​m​i​z​a​b​l​e​ ​f​i​l​t​e​r​s
+			 */
+			'2': string
+			/**
+			 * S​h​a​r​e​ ​y​o​u​r​ ​c​a​f​e​ ​e​x​p​e​r​i​e​n​c​e​s​ ​a​n​d​ ​h​e​l​p​ ​f​e​l​l​o​w​ ​c​o​f​f​e​e​ ​l​o​v​e​r​s
+			 */
+			'3': string
+			/**
+			 * U​n​c​o​v​e​r​ ​n​e​a​r​b​y​ ​'​c​a​f​e​ ​t​e​r​d​e​k​a​t​'​ ​f​o​r​ ​s​p​o​n​t​a​n​e​o​u​s​ ​c​o​f​f​e​e​ ​r​u​n​s
+			 */
+			'4': string
+		}
+		/**
+		 * K​o​p​i​m​a​p​ ​i​s​ ​a​ ​l​a​b​o​r​ ​o​f​ ​l​o​v​e​,​ ​c​r​a​f​t​e​d​ ​b​y​ ​a​ ​s​i​n​g​l​e​ ​d​e​v​e​l​o​p​e​r​ ​w​i​t​h​ ​a​ ​p​a​s​s​i​o​n​ ​f​o​r​ ​c​o​n​n​e​c​t​i​n​g​ ​p​e​o​p​l​e​ ​t​h​r​o​u​g​h​ ​g​r​e​a​t​ ​c​o​f​f​e​e​ ​e​x​p​e​r​i​e​n​c​e​s​.
+		 */
+		passionProject: string
+		/**
+		 * A​s​ ​t​h​e​ ​s​o​l​e​ ​c​r​e​a​t​o​r​ ​b​e​h​i​n​d​ ​K​o​p​i​m​a​p​,​ ​I​ ​p​o​u​r​ ​m​y​ ​h​e​a​r​t​ ​i​n​t​o​ ​t​h​i​s​ ​p​r​o​j​e​c​t​ ​e​v​e​r​y​ ​d​a​y​.​ ​Y​o​u​r​ ​s​u​p​p​o​r​t​ ​m​e​a​n​s​ ​t​h​e​ ​w​o​r​l​d​ ​t​o​ ​m​e​!
+		 */
+		personalNote: string
+		/**
+		 * T​h​a​n​k​ ​y​o​u​ ​f​o​r​ ​j​o​i​n​i​n​g​ ​m​e​ ​o​n​ ​t​h​i​s​ ​c​a​f​f​e​i​n​a​t​e​d​ ​j​o​u​r​n​e​y​ ​a​c​r​o​s​s​ ​J​a​k​a​r​t​a​!
+		 */
+		thankYou: string
+		/**
+		 * S​t​a​r​t​ ​Y​o​u​r​ ​C​o​f​f​e​e​ ​A​d​v​e​n​t​u​r​e
+		 */
+		closeButton: string
+	}
 }
 
 export type TranslationFunctions = {
@@ -1201,6 +1249,54 @@ export type TranslationFunctions = {
 		 * Excellent
 		 */
 		Excellent: () => LocalizedString
+	}
+	welcomeModal: {
+		/**
+		 * Welcome to Kopimap! ☕️🗺️
+		 */
+		title: () => LocalizedString
+		/**
+		 * Your gateway to Jakarta's hidden coffee gems and cozy workspaces.
+		 */
+		description: () => LocalizedString
+		features: {
+			/**
+			 * Explore an interactive map of Jakarta's vibrant cafe scene
+			 */
+			'0': () => LocalizedString
+			/**
+			 * Discover cafes through honest, detailed community reviews
+			 */
+			'1': () => LocalizedString
+			/**
+			 * Find your perfect spot with customizable filters
+			 */
+			'2': () => LocalizedString
+			/**
+			 * Share your cafe experiences and help fellow coffee lovers
+			 */
+			'3': () => LocalizedString
+			/**
+			 * Uncover nearby 'cafe terdekat' for spontaneous coffee runs
+			 */
+			'4': () => LocalizedString
+		}
+		/**
+		 * Kopimap is a labor of love, crafted by a single developer with a passion for connecting people through great coffee experiences.
+		 */
+		passionProject: () => LocalizedString
+		/**
+		 * As the sole creator behind Kopimap, I pour my heart into this project every day. Your support means the world to me!
+		 */
+		personalNote: () => LocalizedString
+		/**
+		 * Thank you for joining me on this caffeinated journey across Jakarta!
+		 */
+		thankYou: () => LocalizedString
+		/**
+		 * Start Your Coffee Adventure
+		 */
+		closeButton: () => LocalizedString
 	}
 }
 
