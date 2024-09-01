@@ -20,14 +20,14 @@ async function fetchLatestReviews(limit: number) {
     .from('reviews')
     .select(`
       id,
-      created_at,
+      updated_at,
       rating,
       image_urls,
       user_id,
       review_text,
       cafe:cafes(id, name, address)
     `)
-    .order('created_at', { ascending: false })
+    .order('updated_at', { ascending: false })
     .limit(limit);
 
   if (reviewsError) {

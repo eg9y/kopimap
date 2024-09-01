@@ -29,7 +29,7 @@ export default function Feed() {
             cafeAddress={review.cafe?.address!}
             rating={review.rating!}
             reviewText={review.review_text!}
-            createdAt={review.created_at as string}
+            createdAt={review.updated_at as string}
             imageUrls={review.image_urls!}
           />
         ))

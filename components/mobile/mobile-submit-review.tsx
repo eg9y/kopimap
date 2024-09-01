@@ -147,7 +147,7 @@ export function MobileSubmitReview({
 
   if (!loggedInUser) {
     return (
-      <div className="pointer-events-auto p-4 flex flex-col items-center rounded-xl bg-white shadow-xl top-[25%] absolute inset-x-0 max-w-md">
+      <div className="pointer-events-auto z-[10000] p-4 flex flex-col items-center rounded-xl bg-white shadow-xl top-[25%] absolute inset-x-0 max-w-md">
         <h2 className="text-xl font-bold mb-2">{LL.submitReview.createReview()}</h2>
         <p className="mb-4">{LL.submitReview.pleaseLogin()}</p>
         <Button
