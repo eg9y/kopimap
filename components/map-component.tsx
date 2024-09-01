@@ -123,6 +123,7 @@ export default function MapComponent({ }: MapComponentProps) {
   return (
     <Mapgl
       id="test"
+      reuseMaps
       {...viewport}
       onMove={(evt) => setViewport(evt.viewState)}
       onLoad={(evt) => {

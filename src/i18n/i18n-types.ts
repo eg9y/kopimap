@@ -539,10 +539,6 @@ type RootTranslation = {
 		 */
 		ratingRequired: string
 		/**
-		 * S​o​m​e​ ​f​i​e​l​d​s​ ​h​a​v​e​ ​v​a​l​i​d​a​t​i​o​n​ ​e​r​r​o​r​s
-		 */
-		validationErrors: string
-		/**
 		 * U​n​a​b​l​e​ ​t​o​ ​s​u​b​m​i​t​ ​r​e​v​i​e​w
 		 */
 		unableToSubmit: string
@@ -566,6 +562,18 @@ type RootTranslation = {
 		 * Y​o​u​r​ ​r​e​v​i​e​w​ ​h​a​s​ ​b​e​e​n​ ​s​u​c​c​e​s​s​f​u​l​l​y​ ​s​u​b​m​i​t​t​e​d​.
 		 */
 		submitSuccess: string
+		/**
+		 * R​e​v​i​e​w​ ​T​e​x​t
+		 */
+		reviewText: string
+		/**
+		 * S​h​a​r​e​ ​y​o​u​r​ ​t​h​o​u​g​h​t​s​ ​a​b​o​u​t​ ​t​h​i​s​ ​c​a​f​e​ ​(​o​p​t​i​o​n​a​l​)
+		 */
+		reviewTextPlaceholder: string
+		/**
+		 * R​e​v​i​e​w​ ​t​e​x​t​ ​m​u​s​t​ ​b​e​ ​2​8​0​ ​c​h​a​r​a​c​t​e​r​s​ ​o​r​ ​l​e​s​s
+		 */
+		reviewTextTooLong: string
 	}
 	cafeDetails: {
 		/**
@@ -1126,10 +1134,6 @@ export type TranslationFunctions = {
 		 */
 		ratingRequired: () => LocalizedString
 		/**
-		 * Some fields have validation errors
-		 */
-		validationErrors: () => LocalizedString
-		/**
 		 * Unable to submit review
 		 */
 		unableToSubmit: () => LocalizedString
@@ -1153,6 +1157,18 @@ export type TranslationFunctions = {
 		 * Your review has been successfully submitted.
 		 */
 		submitSuccess: () => LocalizedString
+		/**
+		 * Review Text
+		 */
+		reviewText: () => LocalizedString
+		/**
+		 * Share your thoughts about this cafe (optional)
+		 */
+		reviewTextPlaceholder: () => LocalizedString
+		/**
+		 * Review text must be 280 characters or less
+		 */
+		reviewTextTooLong: () => LocalizedString
 	}
 	cafeDetails: {
 		/**

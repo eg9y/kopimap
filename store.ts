@@ -24,6 +24,8 @@ interface MapState {
   setSearchFilters: (filters: Record<string, string>) => void;
   searchInput: string;
   setSearchInput: (input: string) => void;
+  isListDialogOpen: boolean;
+  setIsListDialogOpen: (isOpen: boolean) => void;
 }
 
 export const useStore = create<MapState>()(
@@ -60,6 +62,8 @@ export const useStore = create<MapState>()(
         setSearchFilters: (filters) => set({ searchFilters: filters }),
         searchInput: "",
         setSearchInput: (input: string) => set({ searchInput: input }),
+        isListDialogOpen: false,
+        setIsListDialogOpen: (isOpen: boolean) => set({ isListDialogOpen: isOpen }),
       }),
       {
         name: "map-storage",

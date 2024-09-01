@@ -1,22 +1,19 @@
 import React, { useState, useRef, lazy, Suspense, useEffect, useCallback } from "react";
-import { CircleXIcon, MapIcon, SearchIcon, UserIcon } from "lucide-react";
+import { CircleXIcon, SearchIcon } from "lucide-react";
 import { Sheet, SheetRef } from 'react-modal-sheet';
 import useDebounce from "react-use/esm/useDebounce";
-import { useStore } from "../store";
+import { useStore } from "../../store";
 import { useI18nContext } from "@/src/i18n/i18n-react";
-import { Button, Sheet as KonstaSheet, Toolbar, Link, Block } from "konsta/react";
 import { MobileCafeList } from "./mobile-cafe-list";
-import { Tabbar, TabbarLink } from "konsta/react";
-import CafeDetails from "./cafe-details";
-import { useUser } from "../hooks/use-user";
+import CafeDetails from "../cafe-details";
+import { useUser } from "../../hooks/use-user";
 import { createClient } from "@supabase/supabase-js";
-import { Avatar } from "./catalyst/avatar";
 import { useUserReview } from "@/hooks/use-user-review";
 import { useCafeDetailedInfo } from "@/hooks/use-cafe-detailed-info";
 import useWindowSize from "react-use/esm/useWindowSize";
 import { MobileSubmitReview } from "./mobile-submit-review";
 
-const MapComponent = lazy(() => import("../components/map-component"));
+const MapComponent = lazy(() => import("../map-component"));
 
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
@@ -31,17 +28,14 @@ const CafeDetailsLoader = () => (
 
 export default function MobileView({ pmTilesReady }: { pmTilesReady: boolean }) {
   const { LL } = useI18nContext();
-  const { mapRef, selectCafe, selectedCafe } = useStore();
-  const [searchInput, setSearchInput] = useState("");
+  const { mapRef, selectCafe, selectedCafe, searchInput, setSearchInput, isListDialogOpen, setIsListDialogOpen } = useStore();
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
-  const [isListDialogOpen, setIsListDialogOpen] = useState(false);
-  const [isUserSheetOpen, setIsUserSheetOpen] = useState(false);
   const [openSubmitReviewDialog, setOpenSubmitReviewDialog] = useState(false);
   const [snapPoint, setSnapPoint] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const sheetRef = useRef<SheetRef>();
   const { loggedInUser } = useUser();
-  const { height } = useWindowSize();
+  const { height } = useWindowSize()
 
 
   const { data: userReview } = useUserReview(
@@ -69,28 +63,6 @@ export default function MobileView({ pmTilesReady }: { pmTilesReady: boolean }) 
     300,
     [searchInput]
   );
-
-  const handleSignIn = async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: import.meta.env.VITE_URL,
-      },
-    });
-  };
-
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    window.location.reload();
-  };
-
-  const handleUserAction = () => {
-    if (loggedInUser) {
-      setIsUserSheetOpen(true);
-    } else {
-      handleSignIn();
-    }
-  };
 
   const handleSnap = (index: number) => {
     setSnapPoint(index);
@@ -126,7 +98,7 @@ export default function MobileView({ pmTilesReady }: { pmTilesReady: boolean }) 
   );
 
   return (
-    <div className="flex flex-col h-[100dvh] overflow-hidden">
+    <div className="flex flex-col overflow-hidden h-full">
       <div className="flex-grow relative">
         {pmTilesReady && <MapComponent />}
         {selectedCafe && !openSubmitReviewDialog && (
@@ -216,75 +188,7 @@ export default function MobileView({ pmTilesReady }: { pmTilesReady: boolean }) 
           )}
         </div>
       </div>
-      <Tabbar className="flex-shrink-0">
-        <TabbarLink
-          active={true}
-          onClick={() => {
-            if (isListDialogOpen) {
-              selectCafe(null)
-            }
-            setIsListDialogOpen((isListOpen) => !isListOpen)
-            setSearchInput("")
-          }}
-          icon={<MapIcon className="w-6 h-6" />}
-          label={isListDialogOpen ? 'Hide Cafes' : 'See Cafes'}
-        />
-        {
-          // <TabbarLink
-          //   active={false}
-          //   onClick={() => { }}
-          //   icon={<DicesIcon className="w-6 h-6" />}
-          //   label="Activity"
-          // />
-        }
-        <TabbarLink
-          active={false}
-          onClick={handleUserAction}
-          icon={loggedInUser ?
-            <Avatar
-              src={loggedInUser.user_metadata.avatar_url}
-              className="w-6 h-6"
-              square
-              alt=""
-            /> :
-            <UserIcon className="w-6 h-6" />
-          }
-          label={loggedInUser ? loggedInUser.user_metadata.name : LL.loginToReview()}
-        />
-      </Tabbar>
-      <KonstaSheet
-        className="pb-safe w-full"
-        opened={isUserSheetOpen}
-        onBackdropClick={() => setIsUserSheetOpen(false)}
-      >
-        <Toolbar top>
-          <div className="left" />
-          <div className="right">
-            <Link toolbar onClick={() => setIsUserSheetOpen(false)}>
-              Close
-            </Link>
-          </div>
-        </Toolbar>
-        <Block>
-          {loggedInUser && (
-            <>
-              <div className="flex items-center space-x-4 mb-4">
-                <Avatar
-                  src={loggedInUser.user_metadata.avatar_url}
-                  className="w-16 h-16"
-                  square
-                  alt=""
-                />
-                <div>
-                  <p className="font-semibold">{loggedInUser.user_metadata.name}</p>
-                  <p className="text-sm text-gray-500">{loggedInUser.email}</p>
-                </div>
-              </div>
-              <Button onClick={handleSignOut}>Sign Out</Button>
-            </>
-          )}
-        </Block>
-      </KonstaSheet>
+
     </div>
   );
 }

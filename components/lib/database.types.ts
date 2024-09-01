@@ -266,16 +266,19 @@ export type Database = {
           first_name: string | null
           id: string
           last_name: string | null
+          username: string | null
         }
         Insert: {
           first_name?: string | null
           id: string
           last_name?: string | null
+          username?: string | null
         }
         Update: {
           first_name?: string | null
           id?: string
           last_name?: string | null
+          username?: string | null
         }
         Relationships: [
           {
@@ -318,6 +321,7 @@ export type Database = {
           restroom_quality:
             | Database["public"]["Enums"]["restroom_quality"]
             | null
+          review_text: string | null
           seating_capacity:
             | Database["public"]["Enums"]["seating_capacity"]
             | null
@@ -362,6 +366,7 @@ export type Database = {
           restroom_quality?:
             | Database["public"]["Enums"]["restroom_quality"]
             | null
+          review_text?: string | null
           seating_capacity?:
             | Database["public"]["Enums"]["seating_capacity"]
             | null
@@ -406,6 +411,7 @@ export type Database = {
           restroom_quality?:
             | Database["public"]["Enums"]["restroom_quality"]
             | null
+          review_text?: string | null
           seating_capacity?:
             | Database["public"]["Enums"]["seating_capacity"]
             | null
@@ -436,6 +442,13 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_user_id_fkey1"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]

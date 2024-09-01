@@ -24,11 +24,11 @@ import { Button } from "./catalyst/button";
 import { Rate } from "./rate";
 import { AggregatedReviews } from "./aggregated-reviews";
 import { CafeDetailedInfo } from '@/types';
+import { UserReview } from './user-review';
 
 const isInstagramLink = (url: string) => {
   return url.includes("instagram.com") || url.includes("www.instagram.com");
 };
-
 
 const ImageWithSuspense = ({ src, alt, className }: { src: string, alt: string, className: string }) => {
   const { src: loadedSrc } = useImage({
@@ -50,10 +50,8 @@ const ImageLoader = () => (
   </div>
 );
 
-
 const responsive = {
   superLargeDesktop: {
-    // the naming can be any, depends on you.
     breakpoint: { max: 4000, min: 3000 },
     items: 5
   },
@@ -81,8 +79,7 @@ export default function CafeDetails({ cafeDetailedInfo, setOpenSubmitReviewDialo
 
   const buttonRef = useRef<HTMLButtonElement>(null);
 
-
-  const { data: aggregatedReview } = useCafeAggregatedReview(
+  const { data: reviewData } = useCafeAggregatedReview(
     selectedCafe ? selectedCafe.id : null,
   );
 
@@ -163,10 +160,8 @@ export default function CafeDetails({ cafeDetailedInfo, setOpenSubmitReviewDialo
           </div>
 
           {/* Image and User Reviews Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-[250px_1fr]  gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-[250px_1fr] gap-4">
             {/* Cafe Image */}
-
-
             <div className="bg-white rounded-lg shadow-md overflow-hidden">
               <Carousel responsive={responsive}>
                 {carouselImages.map((cafeImage, index) => (
@@ -184,20 +179,19 @@ export default function CafeDetails({ cafeDetailedInfo, setOpenSubmitReviewDialo
               </Carousel>
             </div>
 
-
-            {/* User Reviews */}
+            {/* User Reviews Summary */}
             <div className="bg-white p-4 rounded-lg shadow-md">
               <Heading className="text-xl mb-2">{LL.cafeDetails.userReviews()}</Heading>
-              <Rate rating={aggregatedReview?.avg_rating ?? 0} />
+              <Rate rating={reviewData?.aggregatedReview?.avg_rating ?? 0} />
               <p className="text-center mt-2 text-sm">
                 {LL.basedOnReviews({
-                  count: aggregatedReview?.review_count ?? 0,
+                  count: reviewData?.aggregatedReview?.review_count ?? 0,
                 })}
-                {aggregatedReview?.review_count && aggregatedReview?.review_count > 0 && (
+                {reviewData?.aggregatedReview?.review_count && reviewData.aggregatedReview.review_count > 0 && (
                   <>
                     <br />
                     Last review:{" "}
-                    {new Date(aggregatedReview?.last_updated!).toLocaleDateString("id-ID", {
+                    {new Date(reviewData.aggregatedReview.last_updated!).toLocaleDateString("id-ID", {
                       day: "numeric",
                       month: "short",
                       year: "2-digit",
@@ -235,6 +229,25 @@ export default function CafeDetails({ cafeDetailedInfo, setOpenSubmitReviewDialo
           <div className="bg-white p-4 rounded-lg shadow-md">
             <Heading className="mb-2 text-xl">{LL.ratingsBreakdown()}</Heading>
             <AggregatedReviews cafeDetailedInfo={cafeDetailedInfo} />
+          </div>
+
+          {/* Individual Reviews */}
+          <div className="bg-white p-4 rounded-lg shadow-md">
+            <Heading className="mb-4 text-xl">User Reviews</Heading>
+            <div className="space-y-4">
+              {reviewData?.reviews?.map((review) => (
+                <UserReview
+                  key={review.id}
+                  id={review.id}
+                  username={review.profiles?.username || 'Anonymous'}
+                  rating={review.rating!}
+                  reviewText={review.review_text!}
+                  createdAt={review.created_at as string}
+                  imageUrls={review.image_urls!}
+                  showCafeInfo={false}
+                />
+              ))}
+            </div>
           </div>
         </>
       ) : (

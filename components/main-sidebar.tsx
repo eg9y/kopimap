@@ -289,7 +289,7 @@ export default function MainSidebar({ children }: MainSidebarProps) {
                   </svg>
                 </Button>
                 <Button
-                  href="https://www. buatjajan.com/egan"
+                  href="https://www.nihbuatjajan.com/egan"
                   target="_blank"
                   rel="noreferrer"
                   className="h-full"

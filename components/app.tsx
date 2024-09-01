@@ -5,20 +5,17 @@ import * as pmtiles from "pmtiles";
 import { Suspense, lazy, useEffect, useState } from "react";
 import useMedia from "react-use/esm/useMedia";
 import { Toaster } from "sonner";
-import { navigatorDetector } from "typesafe-i18n/detectors";
 import { useData } from "vike-react/useData";
 
 import "@smastrom/react-rating/style.css";
 
-import TypesafeI18n from "@/src/i18n/i18n-react";
-import { detectLocale } from "@/src/i18n/i18n-util";
-import { loadLocaleAsync } from "@/src/i18n/i18n-util.async";
+
 import type { MeiliSearchCafe } from "@/types";
 import { useStore } from "../store";
 
 // Lazy load components
 const DesktopView = lazy(() => import("./desktop-view"));
-const MobileView = lazy(() => import("./mobile-view"));
+const MobileView = lazy(() => import("./mobile/mobile-view"));
 
 export const App = () => {
   const { openFilters, selectCafe, selectedCafe } = useStore();
@@ -60,21 +57,9 @@ export const App = () => {
     }
   }, []);
 
-  // Detect locale
-  const locale = detectLocale(navigatorDetector);
-
-  // Load locales
-  const [localesLoaded, setLocalesLoaded] = useState(false);
-  useEffect(() => {
-    loadLocaleAsync(locale).then(() => setLocalesLoaded(true));
-  }, [locale]);
-
-  if (!localesLoaded) {
-    return null;
-  }
 
   return (
-    <TypesafeI18n locale={locale}>
+    <>
       <Suspense fallback={<div>Loading...</div>}>
         {isWide ? (
           <div className="flex w-[100vw] h-[100dvh] overflow-hidden">
@@ -88,6 +73,6 @@ export const App = () => {
         )}
       </Suspense>
       <Toaster />
-    </TypesafeI18n>
+    </>
   );
 };

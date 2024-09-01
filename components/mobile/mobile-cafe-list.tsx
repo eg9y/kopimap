@@ -1,14 +1,14 @@
 import React, { useCallback, Dispatch, SetStateAction, RefObject } from "react";
-import { useStore } from "../store";
-import { MeiliSearchCafe } from "../types";
-import { Badge } from "./catalyst/badge";
+import { useStore } from "../../store";
+import { MeiliSearchCafe } from "../../types";
+import { Badge } from "../catalyst/badge";
 import { useCafes } from "@/hooks/use-cafes";
 import useMedia from "react-use/esm/useMedia";
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
 interface CafeListProps {
   searchInput: string;
-  setIsOpen: Dispatch<SetStateAction<boolean>>;
+  setIsOpen: (x: boolean) => void;
   isOpen: boolean;
   inputRef: RefObject<HTMLInputElement>;
 }

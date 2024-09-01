@@ -189,7 +189,6 @@ const en: BaseTranslation = {
     update: "Update Review",
     errorCorrection: "Please correct the following errors:",
     ratingRequired: "Overall rating is required",
-    validationErrors: "Some fields have validation errors",
     unableToSubmit: "Unable to submit review",
     ensureLoginAndCafe:
       "Please ensure you're logged in and a cafe is selected.",
@@ -197,6 +196,9 @@ const en: BaseTranslation = {
     reviewSubmitted: "Review Submitted",
     updateSuccess: "Your review has been successfully updated.",
     submitSuccess: "Your review has been successfully submitted.",
+    reviewText: "Review Text",
+    reviewTextPlaceholder: "Share your thoughts about this cafe (optional)",
+    reviewTextTooLong: "Review text must be 280 characters or less",
   },
   cafeDetails: {
     userReviews: "User Reviews",
