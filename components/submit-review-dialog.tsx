@@ -368,9 +368,6 @@ export function SubmitReviewDialog({
               </strong>
               <ul className="mt-2 list-disc list-inside">
                 {errors.rating && <li>{LL.submitReview.ratingRequired()}</li>}
-                {Object.keys(errors).length > 1 && (
-                  <li>{LL.submitReview.validationErrors()}</li>
-                )}
               </ul>
             </div>
           )}
