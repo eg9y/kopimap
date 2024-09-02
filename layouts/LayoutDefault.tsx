@@ -22,7 +22,7 @@ export default function LayoutDefault({
   return (
     <QueryClientProvider client={queryClient}>
       <LocaleContext>
-        <div className="flex flex-col h-[100dvh]">
+        <div className="flex flex-col h-[100dvh] relative">
           <main className="grow overflow-scroll">{children}</main>
           {isMobile && <MobileToolbar />}
           <UsernamePrompt />

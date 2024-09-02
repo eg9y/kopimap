@@ -19,8 +19,9 @@ export const MobileToolbar: React.FC = () => {
   const [isUserSheetOpen, setIsUserSheetOpen] = useState(false);
   const { loggedInUser } = useUser();
   const { LL } = useI18nContext();
-  const { isListDialogOpen, setIsListDialogOpen, selectCafe, setSearchInput } = useStore();
+  const { isListDialogOpen, setIsListDialogOpen, selectCafe, setSearchInput, openSubmitReviewDialog } = useStore();
   const pageContext = usePageContext();
+
 
   const handleSignIn = async () => {
     await supabase.auth.signInWithOAuth({
@@ -81,53 +82,55 @@ export const MobileToolbar: React.FC = () => {
           )}
         </Block>
       </Sheet>
-      <Tabbar className="flex-shrink-0">
-        <TabbarLink
-          active={isActive('/feed')}
-          linkProps={{
-            href: "/feed"
-          }}
-          onClick={() => {
-            setIsListDialogOpen(false)
-          }}
-          icon={<NewspaperIcon className="w-6 h-6" />}
-          label={'Feed'}
-        />
-        <TabbarLink
-          active={isActive('/')}
-          onClick={async () => {
-            if (isActive('/')) {
-              if (isListDialogOpen) {
-                selectCafe(null);
+      {!openSubmitReviewDialog && (
+        <Tabbar className="flex-shrink-0">
+          <TabbarLink
+            active={isActive('/feed')}
+            linkProps={{
+              href: "/feed"
+            }}
+            onClick={() => {
+              setIsListDialogOpen(false)
+            }}
+            icon={<NewspaperIcon className="w-6 h-6" />}
+            label={'Feed'}
+          />
+          <TabbarLink
+            active={isActive('/')}
+            onClick={async () => {
+              if (isActive('/')) {
+                if (isListDialogOpen) {
+                  selectCafe(null);
+                }
+                setIsListDialogOpen(!isListDialogOpen);
+                setSearchInput("");
+              } else {
+                const navigationPromise = navigate('/')
+                console.log("The URL changed but the new page hasn't rendered yet.")
+                await navigationPromise
+                console.log('The new page has finished rendering.')
               }
-              setIsListDialogOpen(!isListDialogOpen);
-              setSearchInput("");
-            } else {
-              const navigationPromise = navigate('/')
-              console.log("The URL changed but the new page hasn't rendered yet.")
-              await navigationPromise
-              console.log('The new page has finished rendering.')
-            }
 
-          }}
-          icon={<MapIcon className="w-6 h-6" />}
-          label={isListDialogOpen ? 'Hide Cafes' : 'See Cafes'}
-        />
-        <TabbarLink
-          active={isActive('/profile')}  // Assuming there's a profile page
-          onClick={handleUserAction}
-          icon={loggedInUser ?
-            <Avatar
-              src={loggedInUser.user_metadata.avatar_url}
-              className="w-6 h-6"
-              square
-              alt=""
-            /> :
-            <UserIcon className="w-6 h-6" />
-          }
-          label={loggedInUser ? loggedInUser.user_metadata.name : LL.loginToReview()}
-        />
-      </Tabbar>
+            }}
+            icon={<MapIcon className="w-6 h-6" />}
+            label={isListDialogOpen ? 'Hide Cafes' : 'See Cafes'}
+          />
+          <TabbarLink
+            active={isActive('/profile')}  // Assuming there's a profile page
+            onClick={handleUserAction}
+            icon={loggedInUser ?
+              <Avatar
+                src={loggedInUser.user_metadata.avatar_url}
+                className="w-6 h-6"
+                square
+                alt=""
+              /> :
+              <UserIcon className="w-6 h-6" />
+            }
+            label={loggedInUser ? loggedInUser.user_metadata.name : LL.loginToReview()}
+          />
+        </Tabbar>
+      )}
     </>
   );
 };

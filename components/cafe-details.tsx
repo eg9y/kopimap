@@ -71,7 +71,7 @@ const responsive = {
 
 export default function CafeDetails({ cafeDetailedInfo, setOpenSubmitReviewDialog, userReview }: {
   cafeDetailedInfo?: CafeDetailedInfo;
-  setOpenSubmitReviewDialog: React.Dispatch<React.SetStateAction<boolean>>;
+  setOpenSubmitReviewDialog: (isOpen: boolean) => void;
   userReview: any;
 }) {
   const { LL } = useI18nContext();

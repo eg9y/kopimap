@@ -26,6 +26,8 @@ interface MapState {
   setSearchInput: (input: string) => void;
   isListDialogOpen: boolean;
   setIsListDialogOpen: (isOpen: boolean) => void;
+  openSubmitReviewDialog: boolean;
+  setOpenSubmitReviewDialog: (isOpen: boolean) => void;
 }
 
 export const useStore = create<MapState>()(
@@ -64,6 +66,8 @@ export const useStore = create<MapState>()(
         setSearchInput: (input: string) => set({ searchInput: input }),
         isListDialogOpen: false,
         setIsListDialogOpen: (isOpen: boolean) => set({ isListDialogOpen: isOpen }),
+        openSubmitReviewDialog: false,
+        setOpenSubmitReviewDialog: (isOpen: boolean) => set({ openSubmitReviewDialog: isOpen }),
       }),
       {
         name: "map-storage",

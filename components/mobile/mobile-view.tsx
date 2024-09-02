@@ -28,9 +28,8 @@ const CafeDetailsLoader = () => (
 
 export default function MobileView({ pmTilesReady }: { pmTilesReady: boolean }) {
   const { LL } = useI18nContext();
-  const { mapRef, selectCafe, selectedCafe, searchInput, setSearchInput, isListDialogOpen, setIsListDialogOpen } = useStore();
+  const { mapRef, selectCafe, selectedCafe, searchInput, setSearchInput, isListDialogOpen, setIsListDialogOpen, openSubmitReviewDialog, setOpenSubmitReviewDialog } = useStore();
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
-  const [openSubmitReviewDialog, setOpenSubmitReviewDialog] = useState(false);
   const [snapPoint, setSnapPoint] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const sheetRef = useRef<SheetRef>();
@@ -139,9 +138,9 @@ export default function MobileView({ pmTilesReady }: { pmTilesReady: boolean }) 
             </Sheet.Container>
           </Sheet>
         )}
-        <div className="absolute top-0 left-0 right-0 bottom-0 z-40 p-4 w-full h-[100dvh] flex flex-col pointer-events-none">
+        <div className="absolute top-0 left-0 right-0 bottom-0 z-[1000] p-4 w-full h-[100dvh] flex flex-col pointer-events-none">
           <div
-            className={`relative z-50 rounded-full pointer-events-auto shadow-md transition-all duration-300 ${isListDialogOpen ? 'bg-white ring-2 ring-blue-500' : 'bg-gray-100'}`}
+            className={`relative z-[1000] rounded-full pointer-events-auto shadow-md transition-all duration-300 ${isListDialogOpen ? 'bg-white ring-2 ring-blue-500' : 'bg-gray-100'}`}
           >
             <input
               ref={inputRef}

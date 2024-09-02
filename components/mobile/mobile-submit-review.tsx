@@ -174,7 +174,7 @@ export function MobileSubmitReview({
   return (
     <form onSubmit={handleSubmit(onSubmit, () => {
       setShowErrorMessage(true)
-    })} className="z-[100] pointer-events-auto fixed inset-0 flex flex-col bg-white">
+    })} className="z-[100000] pointer-events-auto absolute inset-0 flex flex-col bg-white">
       <div className="p-4 border-b">
         <h2 className="text-xl font-bold">
           {isUpdating
@@ -408,7 +408,7 @@ export function MobileSubmitReview({
             </button>
           </div>
         )}
-        <div className="flex">
+        <div className="flex z-[10000]">
           <Button plain onClick={onClose} className="grow">
             {LL.submitReview.cancel()}
           </Button>
