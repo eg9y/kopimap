@@ -67,13 +67,18 @@ export const reviewAttributes: CategoryAttributes[] = [
       },
       {
         name: "non_coffee_options",
-        options: ["Very Limited", "Some Options", "Wide Variety"],
+        options: ["Subpar", "Average", "Good", "Excellent"],
         icon: CupSodaIcon,
       },
       {
         name: "food_options",
-        options: ["No Food", "Snacks Only", "Light Meals", "Full Menu"],
+        options: ["Subpar", "Average", "Good", "Excellent"],
         icon: UtensilsIcon,
+      },
+      {
+        name: "price_quality_ratio",
+        options: ["Overpriced", "Fair", "Good Value", "Excellent Value"],
+        icon: ScaleIcon,
       },
     ],
   },
@@ -116,17 +121,6 @@ export const reviewAttributes: CategoryAttributes[] = [
         name: "accessibility",
         options: ["Not Accessible", "Partially Accessible", "Fully Accessible"],
         icon: AccessibilityIcon,
-      },
-    ],
-  },
-  {
-    color: "purple",
-    category: "Value",
-    attributes: [
-      {
-        name: "price_quality_ratio",
-        options: ["Overpriced", "Fair", "Good Value", "Excellent Value"],
-        icon: ScaleIcon,
       },
     ],
   },

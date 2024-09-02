@@ -263,17 +263,21 @@ type RootTranslation = {
 			name: string
 			options: {
 				/**
-				 * V​e​r​y​ ​L​i​m​i​t​e​d
+				 * S​u​b​p​a​r
 				 */
-				'Very Limited': string
+				Subpar: string
 				/**
-				 * S​o​m​e​ ​O​p​t​i​o​n​s
+				 * A​v​e​r​a​g​e
 				 */
-				'Some Options': string
+				Average: string
 				/**
-				 * W​i​d​e​ ​V​a​r​i​e​t​y
+				 * G​o​o​d
 				 */
-				'Wide Variety': string
+				Good: string
+				/**
+				 * E​x​c​e​l​l​e​n​t
+				 */
+				Excellent: string
 			}
 		}
 		food_options: {
@@ -283,21 +287,21 @@ type RootTranslation = {
 			name: string
 			options: {
 				/**
-				 * N​o​ ​F​o​o​d
+				 * S​u​b​p​a​r
 				 */
-				'No Food': string
+				Subpar: string
 				/**
-				 * S​n​a​c​k​s​ ​O​n​l​y
+				 * A​v​e​r​a​g​e
 				 */
-				'Snacks Only': string
+				Average: string
 				/**
-				 * L​i​g​h​t​ ​M​e​a​l​s
+				 * G​o​o​d
 				 */
-				'Light Meals': string
+				Good: string
 				/**
-				 * F​u​l​l​ ​M​e​n​u
+				 * E​x​c​e​l​l​e​n​t
 				 */
-				'Full Menu': string
+				Excellent: string
 			}
 		}
 		price_quality_ratio: {
@@ -922,17 +926,21 @@ export type TranslationFunctions = {
 			name: () => LocalizedString
 			options: {
 				/**
-				 * Very Limited
+				 * Subpar
 				 */
-				'Very Limited': () => LocalizedString
+				Subpar: () => LocalizedString
 				/**
-				 * Some Options
+				 * Average
 				 */
-				'Some Options': () => LocalizedString
+				Average: () => LocalizedString
 				/**
-				 * Wide Variety
+				 * Good
 				 */
-				'Wide Variety': () => LocalizedString
+				Good: () => LocalizedString
+				/**
+				 * Excellent
+				 */
+				Excellent: () => LocalizedString
 			}
 		}
 		food_options: {
@@ -942,21 +950,21 @@ export type TranslationFunctions = {
 			name: () => LocalizedString
 			options: {
 				/**
-				 * No Food
+				 * Subpar
 				 */
-				'No Food': () => LocalizedString
+				Subpar: () => LocalizedString
 				/**
-				 * Snacks Only
+				 * Average
 				 */
-				'Snacks Only': () => LocalizedString
+				Average: () => LocalizedString
 				/**
-				 * Light Meals
+				 * Good
 				 */
-				'Light Meals': () => LocalizedString
+				Good: () => LocalizedString
 				/**
-				 * Full Menu
+				 * Excellent
 				 */
-				'Full Menu': () => LocalizedString
+				Excellent: () => LocalizedString
 			}
 		}
 		price_quality_ratio: {

@@ -363,7 +363,13 @@ export function MobileSubmitReview({
                                   field.value === option ? attr.color : "white"
                                 }
                                 className="cursor-pointer text-xs py-1 px-2"
-                                onClick={() => field.onChange(option)}
+                                onClick={() => {
+                                  if (field.value === option) {
+                                    field.onChange(null); // Remove the value if it's already selected
+                                  } else {
+                                    field.onChange(option); // Set the new value
+                                  }
+                                }}
                               >
                                 {options[option]()}
                               </Button>

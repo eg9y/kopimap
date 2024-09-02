@@ -91,18 +91,19 @@ const en: BaseTranslation = {
     non_coffee_options: {
       name: "Non-Coffee Options",
       options: {
-        "Very Limited": "Very Limited",
-        "Some Options": "Some Options",
-        "Wide Variety": "Wide Variety",
+        Subpar: "Subpar",
+        Average: "Average",
+        Good: "Good",
+        Excellent: "Excellent",
       },
     },
     food_options: {
       name: "Food Options",
       options: {
-        "No Food": "No Food",
-        "Snacks Only": "Snacks Only",
-        "Light Meals": "Light Meals",
-        "Full Menu": "Full Menu",
+        Subpar: "Subpar",
+        Average: "Average",
+        Good: "Good",
+        Excellent: "Excellent",
       },
     },
     price_quality_ratio: {

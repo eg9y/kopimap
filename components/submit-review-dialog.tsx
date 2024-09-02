@@ -345,7 +345,13 @@ export function SubmitReviewDialog({
                                   field.value === option ? attr.color : "white"
                                 }
                                 className="cursor-pointer"
-                                onClick={() => field.onChange(option)}
+                                onClick={() => {
+                                  if (field.value === option) {
+                                    field.onChange(null); // Remove the value if it's already selected
+                                  } else {
+                                    field.onChange(option); // Set the new value
+                                  }
+                                }}
                               >
                                 {options[option]()}
                               </Button>

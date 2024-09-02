@@ -16,7 +16,7 @@ export const AggregatedReviews: React.FC<AggregatedReviewsProps> = ({ cafeDetail
 
   return (
     <div className="grid grid-cols-2 gap-2">
-      {reviewAttributes.map((category) => (
+      {reviewAttributes.map((category, index) => (
         <div
           key={category.category}
           className={cn(
@@ -28,8 +28,10 @@ export const AggregatedReviews: React.FC<AggregatedReviewsProps> = ({ cafeDetail
             category.color === "yellow" && "bg-yellow-100",
             category.color === "fuchsia" && "bg-fuchsia-100",
             category.color === "lime" && "bg-lime-100",
+            index === reviewAttributes.length - 1 && reviewAttributes.length % 2 !== 0 && "col-span-2"
           )}
         >
+          {/* Rest of the component remains the same */}
           <p
             className={cn(
               "text-base font-bold letter leading-4 text-nowrap",

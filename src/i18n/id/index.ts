@@ -92,18 +92,19 @@ const id: Translation = {
     non_coffee_options: {
       name: "Pilihan Non-Kopi",
       options: {
-        "Very Limited": "Sangat Terbatas",
-        "Some Options": "Beberapa Pilihan",
-        "Wide Variety": "Banyak Pilihan",
+        Subpar: "Subpar",
+        Average: "Average",
+        Good: "Good",
+        Excellent: "Excellent",
       },
     },
     food_options: {
       name: "Pilihan Makanan",
       options: {
-        "No Food": "Tidak Ada Makanan",
-        "Snacks Only": "Hanya Cemilan",
-        "Light Meals": "Makanan Ringan",
-        "Full Menu": "Menu Lengkap",
+        Subpar: "Subpar",
+        Average: "Average",
+        Good: "Good",
+        Excellent: "Excellent",
       },
     },
     price_quality_ratio: {
