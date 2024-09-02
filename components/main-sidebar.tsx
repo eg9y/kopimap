@@ -166,7 +166,7 @@ export default function MainSidebar({ children }: MainSidebarProps) {
               </div>
               <div className="flex flex-col gap-1">
                 <div className="flex gap-2 w-full">
-                  <InputGroup className="">
+                  <InputGroup className="w-full">
                     <MagnifyingGlassIcon />
                     <Input
                       name="search"
@@ -283,6 +283,7 @@ export default function MainSidebar({ children }: MainSidebarProps) {
                   target="_blank"
                   href="https://www.instagram.com/kopimap/"
                   arial-label="Instagram Link"
+                  className="grow"
                 >
                   <svg viewBox="0 0 24 24" className="w-5 fill-fuchsia-200">
                     <path d={siInstagram.path} />
@@ -292,7 +293,7 @@ export default function MainSidebar({ children }: MainSidebarProps) {
                   href="https://www.nihbuatjajan.com/egan"
                   target="_blank"
                   rel="noreferrer"
-                  className="h-full"
+                  className="h-full grow"
                   color="yellow"
                 >
                   <p className="text-xs text-orange-900">Nih Buat Jajan</p>
