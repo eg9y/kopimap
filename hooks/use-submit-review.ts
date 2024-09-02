@@ -17,7 +17,7 @@ const submitReview = async (
   const { data, error } = await supabase
     .from("reviews")
     .upsert(reviewData, { onConflict: "user_id,cafe_id" });
-  
+
   if (error) {
     throw new Error(error.message);
   }

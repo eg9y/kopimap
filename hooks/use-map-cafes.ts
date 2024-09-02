@@ -30,14 +30,15 @@ export const useMapCafes = (lat: number, lng: number) => {
     for (const [key, value] of Object.entries(searchFilters)) {
       if (value) {
         if (key === "gmaps_rating" || key === "gmaps_total_reviews") {
-          // For rating filters, don't add the _mode suffix
           filterParams.append(key, value);
         } else {
-          // For other filters, add the _mode suffix
           filterParams.append(`${key}_mode`, value);
         }
       }
     }
+
+
+
     const response = await fetch(
       `${import.meta.env.VITE_MEILISEARCH_URL!}/api/search?${filterParams.toString()}`
     );

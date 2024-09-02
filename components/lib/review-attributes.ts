@@ -15,6 +15,7 @@ import {
   SunIcon,
   CameraIcon,
   CatIcon,
+  BadgeIcon,
 } from "lucide-react";
 
 export const reviewAttributes: CategoryAttributes[] = [
@@ -77,20 +78,14 @@ export const reviewAttributes: CategoryAttributes[] = [
     ],
   },
   {
-    color: "purple",
-    category: "Value",
-    attributes: [
-      {
-        name: "price_quality_ratio",
-        options: ["Overpriced", "Fair", "Good Value", "Excellent Value"],
-        icon: ScaleIcon,
-      },
-    ],
-  },
-  {
     color: "fuchsia",
     category: "Facilities",
     attributes: [
+      {
+        name: "has_musholla",
+        options: ["Yes", "No"],
+        icon: BadgeIcon,
+      },
       {
         name: "parking_options",
         options: [
@@ -121,6 +116,17 @@ export const reviewAttributes: CategoryAttributes[] = [
         name: "accessibility",
         options: ["Not Accessible", "Partially Accessible", "Fully Accessible"],
         icon: AccessibilityIcon,
+      },
+    ],
+  },
+  {
+    color: "purple",
+    category: "Value",
+    attributes: [
+      {
+        name: "price_quality_ratio",
+        options: ["Overpriced", "Fair", "Good Value", "Excellent Value"],
+        icon: ScaleIcon,
       },
     ],
   },

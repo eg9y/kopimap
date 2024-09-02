@@ -61,7 +61,13 @@ export const AggregatedReviews: React.FC<AggregatedReviewsProps> = ({ cafeDetail
                   () => string
                 >;
                 Object.entries(options).forEach(([key, translationFn]) => {
-                  if (key.toLowerCase() === value.toLowerCase()) {
+                  if (modeKey === 'has_musholla_mode') {
+                    if (key.toLowerCase() === "yes" && !!value) {
+                      translation = "Yes"
+                    } else if (key.toLowerCase() === "no" && !value) {
+                      translation = "No"
+                    }
+                  } else if (key.toLowerCase() === value.toLowerCase()) {
                     translation = translationFn();
                   }
                 });

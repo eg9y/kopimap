@@ -29,6 +29,13 @@ const id: Translation = {
     "Special Features": "Fitur Khusus",
   },
   attributes: {
+    has_musholla: {
+      name: "Ada Musholla",
+      options: {
+        Yes: "Iya",
+        No: "Tidak",
+      },
+    },
     comfort_level: {
       name: "Tingkat Kenyamanan",
       options: {

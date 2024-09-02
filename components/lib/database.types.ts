@@ -26,6 +26,7 @@ export type Database = {
             | Database["public"]["Enums"]["comfort_level"]
             | null
           food_options_mode: Database["public"]["Enums"]["food_options"] | null
+          has_musholla_mode: boolean | null
           instagram_worthiness_mode:
             | Database["public"]["Enums"]["instagram_worthiness"]
             | null
@@ -74,6 +75,7 @@ export type Database = {
             | Database["public"]["Enums"]["comfort_level"]
             | null
           food_options_mode?: Database["public"]["Enums"]["food_options"] | null
+          has_musholla_mode?: boolean | null
           instagram_worthiness_mode?:
             | Database["public"]["Enums"]["instagram_worthiness"]
             | null
@@ -122,6 +124,7 @@ export type Database = {
             | Database["public"]["Enums"]["comfort_level"]
             | null
           food_options_mode?: Database["public"]["Enums"]["food_options"] | null
+          has_musholla_mode?: boolean | null
           instagram_worthiness_mode?:
             | Database["public"]["Enums"]["instagram_worthiness"]
             | null
@@ -300,6 +303,7 @@ export type Database = {
           comfort_level: Database["public"]["Enums"]["comfort_level"] | null
           created_at: string | null
           food_options: Database["public"]["Enums"]["food_options"] | null
+          has_musholla: boolean | null
           id: string
           image_urls: string[] | null
           instagram_worthiness:
@@ -341,6 +345,7 @@ export type Database = {
           comfort_level?: Database["public"]["Enums"]["comfort_level"] | null
           created_at?: string | null
           food_options?: Database["public"]["Enums"]["food_options"] | null
+          has_musholla?: boolean | null
           id?: string
           image_urls?: string[] | null
           instagram_worthiness?:
@@ -386,6 +391,7 @@ export type Database = {
           comfort_level?: Database["public"]["Enums"]["comfort_level"] | null
           created_at?: string | null
           food_options?: Database["public"]["Enums"]["food_options"] | null
+          has_musholla?: boolean | null
           id?: string
           image_urls?: string[] | null
           instagram_worthiness?:
@@ -484,6 +490,7 @@ export type Database = {
           gmaps_reviews_link: string | null
           gmaps_reviews_per_rating: Json | null
           gmaps_total_reviews: number | null
+          has_musholla_mode: boolean | null
           hosted_gmaps_images: Json | null
           hours: Json | null
           id: number | null

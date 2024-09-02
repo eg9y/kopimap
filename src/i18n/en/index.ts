@@ -28,6 +28,13 @@ const en: BaseTranslation = {
     "Special Features": "Special Features",
   },
   attributes: {
+    has_musholla: {
+      name: "Has Musholla",
+      options: {
+        Yes: "Yes",
+        No: "No",
+      },
+    },
     comfort_level: {
       name: "Comfort Level",
       options: {

@@ -56,6 +56,8 @@ export const useCafes = (
       }
     }
 
+    console.log("filterParams", Array.from(filterParams.entries()))
+
     const response = await fetch(
       `${import.meta.env.VITE_MEILISEARCH_URL}/api/search?${filterParams.toString()}`
     );

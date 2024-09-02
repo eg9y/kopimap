@@ -142,12 +142,14 @@ export function SubmitReviewDialog({
 
     setIsUploading(false);
 
+    const payload = { ...data };
+
     const reviewData: ReviewInsert = {
-      ...data,
+      ...payload,
       cafe_id: cafeDetailedInfo.id,
       cafe_place_id: cafeDetailedInfo.place_id,
       user_id: loggedInUser.id,
-      rating: typeof data.rating === "number" ? data.rating : parseFloat(data.rating),
+      rating: typeof payload.rating === "number" ? payload.rating : parseFloat(payload.rating),
       image_urls: [...existingImageUrls, ...newUploadedUrls],
     };
 
@@ -189,7 +191,7 @@ export function SubmitReviewDialog({
     <Dialog
       open={isOpen && !!cafeDetailedInfo}
       onClose={() => setIsOpen(false)}
-      className=" !max-w-[70vw] h-[90vh] flex flex-col overflow-y-auto jang  "
+      className=" !max-w-[70vw] flex flex-col overflow-y-auto jang  "
     >
       <DialogTitle>
         {isUpdating
@@ -203,7 +205,7 @@ export function SubmitReviewDialog({
           : LL.submitReview.fillOptions()}
       </DialogDescription>
       <form onSubmit={handleSubmit(onSubmit)} className="grow">
-        <DialogBody className="flex flex-col gap-2 h-[70vh] overflow-scroll">
+        <DialogBody className="flex flex-col gap-2 h-[60vh] overflow-scroll">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {/* Overall Rating */}
             <div className="p-2 rounded-md bg-slate-100 w-full flex flex-col">

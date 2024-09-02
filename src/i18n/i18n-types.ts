@@ -100,6 +100,22 @@ type RootTranslation = {
 		'Special Features': string
 	}
 	attributes: {
+		has_musholla: {
+			/**
+			 * H​a​s​ ​M​u​s​h​o​l​l​a
+			 */
+			name: string
+			options: {
+				/**
+				 * Y​e​s
+				 */
+				Yes: string
+				/**
+				 * N​o
+				 */
+				No: string
+			}
+		}
 		comfort_level: {
 			/**
 			 * C​o​m​f​o​r​t​ ​L​e​v​e​l
@@ -743,6 +759,22 @@ export type TranslationFunctions = {
 		'Special Features': () => LocalizedString
 	}
 	attributes: {
+		has_musholla: {
+			/**
+			 * Has Musholla
+			 */
+			name: () => LocalizedString
+			options: {
+				/**
+				 * Yes
+				 */
+				Yes: () => LocalizedString
+				/**
+				 * No
+				 */
+				No: () => LocalizedString
+			}
+		}
 		comfort_level: {
 			/**
 			 * Comfort Level

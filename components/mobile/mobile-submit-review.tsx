@@ -132,15 +132,18 @@ export function MobileSubmitReview({
 
     setIsUploading(false);
 
+    const payload = { ...data };
+
     const reviewData: ReviewInsert = {
-      ...data,
+      ...payload,
       cafe_id: cafeDetailedInfo.id,
       cafe_place_id: cafeDetailedInfo.place_id,
       user_id: loggedInUser.id,
-      rating: typeof data.rating === "number" ? data.rating : parseFloat(data.rating),
+      rating: typeof payload.rating === "number" ? payload.rating : parseFloat(payload.rating),
       image_urls: [...existingImageUrls, ...newUploadedUrls],
-      review_text: data.review_text,
+      review_text: payload.review_text,
     };
+
 
     mutate(reviewData);
   };
