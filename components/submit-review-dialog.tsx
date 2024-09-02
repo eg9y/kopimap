@@ -16,7 +16,7 @@ import { reviewAttributes } from "./lib/review-attributes";
 import { useSubmitReview } from "../hooks/use-submit-review";
 import { createClient, Session } from "@supabase/supabase-js";
 import { Database } from "./lib/database.types";
-import { CafeDetailedInfo } from "../types";
+import { CafeDetailedInfo, ReviewWithStringMusholla } from "../types";
 import { cn } from "./lib/utils";
 import { useUser } from "../hooks/use-user";
 import { useI18nContext } from "@/src/i18n/i18n-react";
@@ -45,7 +45,7 @@ export function SubmitReviewDialog({
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   cafeDetailedInfo?: CafeDetailedInfo;
-  userReview?: ReviewInsert | null;
+  userReview?: ReviewWithStringMusholla | null;
 }) {
   const { LL } = useI18nContext();
   const {

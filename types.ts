@@ -82,3 +82,8 @@ export type SearchFilters = {
   minRating: number;
   query: string;
 } & CafeAttributes;
+
+// Define a new interface that extends the original one but with has_musholla as string
+export interface ReviewWithStringMusholla extends Omit<Database["public"]["Tables"]["reviews"]["Row"], "has_musholla"> {
+  has_musholla: string | null;
+}

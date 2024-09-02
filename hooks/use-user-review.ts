@@ -1,16 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { createClient } from "@supabase/supabase-js";
 import { Database } from "../components/lib/database.types";
+import { ReviewWithStringMusholla } from "@/types";
 
 const supabase = createClient<Database>(
   import.meta.env.VITE_SUPABASE_URL!,
   import.meta.env.VITE_SUPABASE_ANON_KEY!
 );
 
-// Define a new interface that extends the original one but with has_musholla as string
-interface ReviewWithStringMusholla extends Omit<Database["public"]["Tables"]["reviews"]["Row"], "has_musholla"> {
-  has_musholla: string | null;
-}
 
 const fetchUserReview = async (userId: string, cafeId: string): Promise<ReviewWithStringMusholla | null> => {
   const { data, error } = await supabase
