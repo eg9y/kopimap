@@ -1,11 +1,6 @@
-import { Star, MapPin, User } from 'lucide-react';
-import { useLatestReviews } from '@/hooks/use-latest-reviews';
-import { UserReview } from '@/components/user-review';
-
-const trimAddress = (address: string) => {
-  const parts = address.split(',');
-  return parts.length > 2 ? `${parts[0]}, ${parts[1]}...` : address;
-};
+import { Star, MapPin, User } from "lucide-react";
+import { useLatestReviews } from "@/hooks/use-latest-reviews";
+import { UserReview } from "@/components/user-review";
 
 export default function Feed() {
   const { data: reviews, isLoading, error } = useLatestReviews();
@@ -24,16 +19,29 @@ export default function Feed() {
           <UserReview
             key={review.id}
             id={review.id}
-            username={review.user?.username || 'Anonymous'}
+            username={review.user?.username || "Anonymous"}
             cafeName={review.cafe?.name}
             cafeAddress={review.cafe?.address!}
             rating={review.rating!}
             reviewText={review.review_text!}
             createdAt={review.updated_at as string}
             imageUrls={review.image_urls!}
+            metadata={{
+              coffee_quality: review.coffee_quality,
+              cleanliness: review.cleanliness,
+              comfort_level: review.comfort_level,
+              food_options: review.food_options,
+              wifi_quality: review.wifi_quality,
+              work_suitability: review.work_suitability,
+              has_musholla: review.has_musholla,
+            }}
+            cafeGmapsRating={review.cafe?.gmaps_rating ?? undefined}
+            cafeGmapsTotalReviews={
+              review.cafe?.gmaps_total_reviews ?? undefined
+            }
+            cafePriceRange={review.cafe?.price_range ?? undefined}
           />
-        ))
-        }
+        ))}
       </div>
     </div>
   );
