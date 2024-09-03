@@ -77,9 +77,9 @@ export function Head() {
     : null;
 
   // Construct the current URL
-  const currentPath = pageContext.urlOriginal || '';
   const baseUrl = 'https://www.kopimap.com';
-  const currentUrl = `${baseUrl}${currentPath}`;
+  const currentPath = pageContext.urlOriginal || '';
+  const currentUrl = new URL(currentPath, baseUrl).toString();
 
   return (
     <>
@@ -95,32 +95,14 @@ export function Head() {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(ldJson) }}
         />
       )}
-      <meta
-        name="description"
-        content={t.description}
-      />
-      <meta
-        name="description"
-        content={t.shortDescription}
-      />
-      <meta
-        name="keywords"
-        content={t.keywords}
-      />
+      <meta name="description" content={t.description} />
+      <meta name="description" content={t.shortDescription} />
+      <meta name="keywords" content={t.keywords} />
       <meta name="robots" content="index, follow" />
       <link rel="canonical" href={currentUrl} />
-      <meta
-        property="og:title"
-        content={t.ogTitle}
-      />
-      <meta
-        property="og:description"
-        content={t.ogDescription}
-      />
-      <meta
-        property="og:image"
-        content="https://www.kopimap.com/og-image.jpg"
-      />
+      <meta property="og:title" content={t.ogTitle} />
+      <meta property="og:description" content={t.ogDescription} />
+      <meta property="og:image" content={`${baseUrl}/og-image.jpg`} />
       <meta property="og:url" content={currentUrl} />
       <meta name="twitter:card" content="summary_large_image" />
 
@@ -130,13 +112,13 @@ export function Head() {
           key={lang}
           rel="alternate"
           hrefLang={lang}
-          href={`${baseUrl}/${lang}${currentPath.replace(/^\/[a-z]{2}/, '')}`}
+          href={new URL(`/${lang}${currentPath.replace(/^\/[a-z]{2}/, '')}`, baseUrl).toString()}
         />
       ))}
       <link
         rel="alternate"
         hrefLang="x-default"
-        href={`${baseUrl}${currentPath.replace(/^\/[a-z]{2}/, '')}`}
+        href={new URL(currentPath.replace(/^\/[a-z]{2}/, ''), baseUrl).toString()}
       />
     </>
   );
