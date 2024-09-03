@@ -38,7 +38,8 @@ async function fetchLatestReviews(limit: number) {
         address,
         gmaps_rating,
         gmaps_total_reviews,
-        price_range
+        price_range,
+        place_id
       )
     `)
     .order("updated_at", { ascending: false })

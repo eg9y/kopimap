@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 
 const supabase = createClient<Database>(
   import.meta.env.VITE_SUPABASE_URL!,
-  import.meta.env.VITE_SUPABASE_ANON_KEY!
+  import.meta.env.VITE_SUPABASE_ANON_KEY!,
 );
 
 export const useCafeAggregatedReview = (placeId: string | null) => {
@@ -29,16 +29,23 @@ const fetchCafeAggregatedReviewAndReviews = async (placeId: string | null) => {
     supabase
       .from("reviews")
       .select(`
-        id,
-        created_at,
+         id,
+        updated_at,
         rating,
-        review_text,
         image_urls,
         user_id,
+        review_text,
+        coffee_quality,
+        cleanliness,
+        comfort_level,
+        food_options,
+        wifi_quality,
+        work_suitability,
+        has_musholla,
        profiles(username)
       `)
       .eq("cafe_place_id", placeId)
-      .order("created_at", { ascending: false })
+      .order("created_at", { ascending: false }),
   ]);
 
   if (aggregatedReview.error && aggregatedReview.error.code !== "PGRST116") {
@@ -50,6 +57,6 @@ const fetchCafeAggregatedReviewAndReviews = async (placeId: string | null) => {
 
   return {
     aggregatedReview: aggregatedReview.data,
-    reviews: reviews.data
+    reviews: reviews.data,
   };
 };

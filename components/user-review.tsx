@@ -11,6 +11,7 @@ import {
   ChevronUp,
 } from "lucide-react";
 import { Database } from "@/components/lib/database.types";
+import { Badge } from "./catalyst/badge";
 
 type ReviewMetadata = {
   coffee_quality: Database["public"]["Enums"]["quality_rating"] | null;
@@ -38,11 +39,6 @@ interface UserReviewProps {
   cafePriceRange?: string;
 }
 
-const trimAddress = (address: string) => {
-  const parts = address.split(",");
-  return parts.length > 2 ? `${parts[0]}, ${parts[1]}...` : address;
-};
-
 export const UserReview: React.FC<UserReviewProps> = ({
   username,
   cafeName,
@@ -53,9 +49,6 @@ export const UserReview: React.FC<UserReviewProps> = ({
   imageUrls,
   showCafeInfo = true,
   metadata,
-  cafeGmapsRating,
-  cafeGmapsTotalReviews,
-  cafePriceRange,
 }) => {
   const [expanded, setExpanded] = useState(false);
 
@@ -68,100 +61,114 @@ export const UserReview: React.FC<UserReviewProps> = ({
   ) => {
     if (value === null || value === undefined) return null;
     return (
-      <div className="flex items-center">
+      <Badge className="flex items-center gap-1">
         {icon}
-        <span className="ml-1">
-          {label}: {value === true ? "Yes" : value === false ? "No" : value}
-        </span>
-      </div>
+        <p>{label}:</p>
+        <p>{value === true ? "Yes" : value === false ? "No" : value}</p>
+      </Badge>
     );
   };
 
+  const metadataItems = [
+    {
+      icon: <Coffee className="inline" size={14} />,
+      label: "Coffee",
+      value: metadata.coffee_quality,
+    },
+    {
+      icon: <Wifi className="inline" size={14} />,
+      label: "WiFi",
+      value: metadata.wifi_quality,
+    },
+    {
+      icon: <Briefcase className="inline" size={14} />,
+      label: "Work",
+      value: metadata.work_suitability,
+    },
+    {
+      icon: <Utensils className="inline" size={14} />,
+      label: "Food",
+      value: metadata.food_options,
+    },
+    {
+      icon: <Star className="inline" size={14} />,
+      label: "Cleanliness",
+      value: metadata.cleanliness,
+    },
+    {
+      icon: <Star className="inline" size={14} />,
+      label: "Comfort",
+      value: metadata.comfort_level,
+    },
+    {
+      icon: <Star className="inline" size={14} />,
+      label: "Musholla",
+      value: metadata.has_musholla,
+    },
+  ];
+
+  const visibleItems = expanded ? metadataItems : metadataItems.slice(0, 4);
+
   return (
     <div className="bg-white shadow-md rounded-lg p-4 mb-4 border border-gray-200">
-      <div className="flex items-center mb-2">
-        <User size={20} className="mr-2 text-gray-600" />
-        <span className="font-semibold text-base">
-          {username || "Anonymous"}
-        </span>
+      <div className="flex justify-between items-baseline">
+        <div className="flex items-center mb-2">
+          <User size={20} className="mr-1 mt-1 text-gray-600" />
+          <span className="font-semibold text-base">
+            {username || "Anonymous"}
+          </span>
+        </div>
+        <p className="text-xs text-gray-500 mt-2">
+          {new Date(createdAt).toLocaleDateString("id", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          })}
+        </p>
       </div>
       {showCafeInfo && cafeName && (
         <div className="text-sm text-gray-600 mb-2 pb-2 border-b border-gray-200">
           <p className="flex items-center">
             <MapPin size={14} className="mr-1" />
-            <span>
-              {cafeName} - {trimAddress(cafeAddress || "")}
-            </span>
-          </p>
-          <p className="mt-1 flex items-center">
-            <Star size={14} className="mr-1 text-yellow-400" />
-            <span>
-              {cafeGmapsRating} ({cafeGmapsTotalReviews} reviews) •{" "}
-              {cafePriceRange}
-            </span>
+            <span>{cafeName}</span>
           </p>
         </div>
       )}
-      <div className="flex items-center mb-2">
-        <Star className="text-yellow-400 mr-1" size={18} />
-        <span className="text-base font-medium">{rating.toFixed(1)}</span>
-      </div>
       {reviewText && <p className="text-sm text-gray-800 mb-2">{reviewText}</p>}
-      <div className="grid grid-cols-2 gap-2 mb-2 text-xs">
-        {renderMetadataItem(
-          <Coffee className="inline mr-1" size={14} />,
-          "Coffee",
-          metadata.coffee_quality
-        )}
-        {renderMetadataItem(
-          <Wifi className="inline mr-1" size={14} />,
-          "WiFi",
-          metadata.wifi_quality
+      <div className="flex flex-wrap items-baseline gap-2 pb-2 text-xs">
+        <Badge color="yellow" className="flex items-center">
+          <Star
+            className="text-orange-400 mr-1"
+            fill="rgb(251 146 60)"
+            size={18}
+          />
+          <span className="text-base font-medium">{rating.toFixed(1)}</span>
+        </Badge>
+        {visibleItems.map((item, index) =>
+          renderMetadataItem(item.icon, item.label, item.value)
         )}
       </div>
-      {expanded && (
-        <div className="grid grid-cols-2 gap-2 mb-2 text-xs">
-          {renderMetadataItem(
-            <Briefcase className="inline mr-1" size={14} />,
-            "Work",
-            metadata.work_suitability
-          )}
-          {renderMetadataItem(
-            <Utensils className="inline mr-1" size={14} />,
-            "Food",
-            metadata.food_options
-          )}
-          {renderMetadataItem(
-            <Star className="inline mr-1" size={14} />,
-            "Cleanliness",
-            metadata.cleanliness
-          )}
-          {renderMetadataItem(
-            <Star className="inline mr-1" size={14} />,
-            "Comfort",
-            metadata.comfort_level
-          )}
-          {renderMetadataItem(
-            <Star className="inline mr-1" size={14} />,
-            "Musholla",
-            metadata.has_musholla
-          )}
-        </div>
+      {expanded && showCafeInfo && (
+        <p className="text-sm text-slate-500 overflow-hidden whitespace-nowrap text-ellipsis tracking-tight mb-2">
+          @{cafeAddress}
+        </p>
       )}
-      <button
-        onClick={toggleExpanded}
-        className="text-xs text-blue-500 flex items-center mt-2 hover:underline focus:outline-none"
-      >
-        {expanded ? (
-          <>
-            <ChevronUp size={14} className="mr-1" /> Show less
-          </>
-        ) : (
-          <>
-            <ChevronDown size={14} className="mr-1" /> Show more
-          </>
-        )}
-      </button>
+      {metadataItems.length > 4 && (
+        <button
+          onClick={toggleExpanded}
+          className="text-xs text-blue-500 flex items-center mt-2 hover:underline focus:outline-none"
+        >
+          {expanded ? (
+            <>
+              <ChevronUp size={14} className="mr-1" /> Show less
+            </>
+          ) : (
+            <>
+              <ChevronDown size={14} className="mr-1" /> Show more
+            </>
+          )}
+        </button>
+      )}
       {imageUrls && imageUrls.length > 0 && (
         <div className="flex flex-wrap gap-1 mt-2">
           {imageUrls.map((url, index) => (
@@ -174,9 +181,6 @@ export const UserReview: React.FC<UserReviewProps> = ({
           ))}
         </div>
       )}
-      <p className="text-xs text-gray-500 mt-2">
-        {new Date(createdAt).toLocaleDateString()}
-      </p>
     </div>
   );
 };

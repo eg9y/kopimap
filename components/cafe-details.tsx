@@ -1,11 +1,11 @@
-import React, { useRef, Suspense, useState, useCallback } from 'react';
+import React, { useRef, Suspense, useState, useCallback } from "react";
 import { useI18nContext } from "@/src/i18n/i18n-react";
 import { StarIcon } from "@heroicons/react/20/solid";
-import { useImage } from 'react-image';
+import { useImage } from "react-image";
 import { ErrorBoundary } from "react-error-boundary";
-import Carousel from 'react-multi-carousel';
+import Carousel from "react-multi-carousel";
 
-import 'react-multi-carousel/lib/styles.css';
+import "react-multi-carousel/lib/styles.css";
 
 import { useStore } from "../store";
 import { Badge, BadgeButton } from "./catalyst/badge";
@@ -23,14 +23,22 @@ import { useCafeAggregatedReview } from "../hooks/use-cafe-aggregated-review";
 import { Button } from "./catalyst/button";
 import { Rate } from "./rate";
 import { AggregatedReviews } from "./aggregated-reviews";
-import { CafeDetailedInfo } from '@/types';
-import { UserReview } from './user-review';
+import { CafeDetailedInfo } from "@/types";
+import { UserReview } from "./user-review";
 
 const isInstagramLink = (url: string) => {
   return url.includes("instagram.com") || url.includes("www.instagram.com");
 };
 
-const ImageWithSuspense = ({ src, alt, className }: { src: string, alt: string, className: string }) => {
+const ImageWithSuspense = ({
+  src,
+  alt,
+  className,
+}: {
+  src: string;
+  alt: string;
+  className: string;
+}) => {
   const { src: loadedSrc } = useImage({
     srcList: Array(5).fill(src),
   });
@@ -53,23 +61,27 @@ const ImageLoader = () => (
 const responsive = {
   superLargeDesktop: {
     breakpoint: { max: 4000, min: 3000 },
-    items: 5
+    items: 5,
   },
   desktop: {
     breakpoint: { max: 3000, min: 1024 },
-    items: 1
+    items: 1,
   },
   tablet: {
     breakpoint: { max: 1024, min: 464 },
-    items: 2
+    items: 2,
   },
   mobile: {
     breakpoint: { max: 464, min: 0 },
-    items: 1
-  }
+    items: 1,
+  },
 };
 
-export default function CafeDetails({ cafeDetailedInfo, setOpenSubmitReviewDialog, userReview }: {
+export default function CafeDetails({
+  cafeDetailedInfo,
+  setOpenSubmitReviewDialog,
+  userReview,
+}: {
   cafeDetailedInfo?: CafeDetailedInfo;
   setOpenSubmitReviewDialog: (isOpen: boolean) => void;
   userReview: any;
@@ -80,7 +92,7 @@ export default function CafeDetails({ cafeDetailedInfo, setOpenSubmitReviewDialo
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   const { data: reviewData } = useCafeAggregatedReview(
-    selectedCafe ? selectedCafe.id : null,
+    selectedCafe ? selectedCafe.id : null
   );
 
   if (!selectedCafe) return null;
@@ -91,8 +103,14 @@ export default function CafeDetails({ cafeDetailedInfo, setOpenSubmitReviewDialo
 
   const carouselImages = [
     ...(cafeDetailedInfo?.all_image_urls ?? []),
-    ...((cafeDetailedInfo?.hosted_gmaps_images as string[]) ?? [cafeDetailedInfo?.gmaps_featured_image]),
-    ...(cafeDetailedInfo?.gmaps_images ? JSON.parse(cafeDetailedInfo?.gmaps_images as string).slice(1).map((gmapsImage: { link: string }) => gmapsImage.link) : []),
+    ...((cafeDetailedInfo?.hosted_gmaps_images as string[]) ?? [
+      cafeDetailedInfo?.gmaps_featured_image,
+    ]),
+    ...(cafeDetailedInfo?.gmaps_images
+      ? JSON.parse(cafeDetailedInfo?.gmaps_images as string)
+          .slice(1)
+          .map((gmapsImage: { link: string }) => gmapsImage.link)
+      : []),
   ];
 
   return (
@@ -101,10 +119,7 @@ export default function CafeDetails({ cafeDetailedInfo, setOpenSubmitReviewDialo
         <>
           <div className="flex items-center justify-between">
             <Heading className="text-2xl">{cafeDetailedInfo.name}</Heading>
-            <BadgeButton
-              color="zinc"
-              onClick={() => selectCafe(null)}
-            >
+            <BadgeButton color="zinc" onClick={() => selectCafe(null)}>
               <XIcon />
             </BadgeButton>
           </div>
@@ -154,7 +169,8 @@ export default function CafeDetails({ cafeDetailedInfo, setOpenSubmitReviewDialo
             {/* Address */}
             <div className="p-2 rounded-md bg-blue-100">
               <p className="text-pretty text-xs">
-                <MapPinIcon className="size-4 inline" /> {cafeDetailedInfo.address}
+                <MapPinIcon className="size-4 inline" />{" "}
+                {cafeDetailedInfo.address}
               </p>
             </div>
           </div>
@@ -168,23 +184,28 @@ export default function CafeDetails({ cafeDetailedInfo, setOpenSubmitReviewDialo
 
             {/* User Reviews Summary */}
             <div className="bg-white p-4 rounded-lg shadow-md">
-              <Heading className="text-xl mb-2">{LL.cafeDetails.userReviews()}</Heading>
+              <Heading className="text-xl mb-2">
+                {LL.cafeDetails.userReviews()}
+              </Heading>
               <Rate rating={reviewData?.aggregatedReview?.avg_rating ?? 0} />
               <p className="text-center mt-2 text-sm">
                 {LL.basedOnReviews({
                   count: reviewData?.aggregatedReview?.review_count ?? 0,
                 })}
-                {reviewData?.aggregatedReview?.review_count && reviewData.aggregatedReview.review_count > 0 && (
-                  <>
-                    <br />
-                    Last review:{" "}
-                    {new Date(reviewData.aggregatedReview.last_updated!).toLocaleDateString("id-ID", {
-                      day: "numeric",
-                      month: "short",
-                      year: "2-digit",
-                    })}
-                  </>
-                )}
+                {reviewData?.aggregatedReview?.review_count &&
+                  reviewData.aggregatedReview.review_count > 0 && (
+                    <>
+                      <br />
+                      Last review:{" "}
+                      {new Date(
+                        reviewData.aggregatedReview.last_updated!
+                      ).toLocaleDateString("id-ID", {
+                        day: "numeric",
+                        month: "short",
+                        year: "2-digit",
+                      })}
+                    </>
+                  )}
               </p>
               <Button
                 color={userReview ? "blue" : "emerald"}
@@ -226,12 +247,21 @@ export default function CafeDetails({ cafeDetailedInfo, setOpenSubmitReviewDialo
                 <UserReview
                   key={review.id}
                   id={review.id}
-                  username={review.profiles?.username || 'Anonymous'}
+                  username={review.profiles?.username || "Anonymous"}
                   rating={review.rating!}
                   reviewText={review.review_text!}
-                  createdAt={review.created_at as string}
+                  createdAt={review.updated_at as string}
                   imageUrls={review.image_urls!}
                   showCafeInfo={false}
+                  metadata={{
+                    coffee_quality: review.coffee_quality,
+                    cleanliness: review.cleanliness,
+                    comfort_level: review.comfort_level,
+                    food_options: review.food_options,
+                    wifi_quality: review.wifi_quality,
+                    work_suitability: review.work_suitability,
+                    has_musholla: review.has_musholla,
+                  }}
                 />
               ))}
             </div>
@@ -246,36 +276,52 @@ export default function CafeDetails({ cafeDetailedInfo, setOpenSubmitReviewDialo
   );
 }
 
-
 interface CustomCarouselProps {
   images: string[];
 }
 
 const CustomCarousel: React.FC<CustomCarouselProps> = ({ images }) => {
-  const [isSwipingHorizontally, setIsSwipingHorizontally] = useState<boolean>(false);
+  const [isSwipingHorizontally, setIsSwipingHorizontally] =
+    useState<boolean>(false);
   const touchStartY = useRef<number>(0);
 
-  const handleTouchStart = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
-    touchStartY.current = e.touches[0].clientY;
-  }, []);
+  const handleTouchStart = useCallback(
+    (e: React.TouchEvent<HTMLDivElement>) => {
+      touchStartY.current = e.touches[0].clientY;
+    },
+    []
+  );
 
-  const handleTouchMove = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
-    if (isSwipingHorizontally) {
-      e.preventDefault();
-    } else {
-      const touchCurrentY = e.touches[0].clientY;
-      const deltaY = Math.abs(touchCurrentY - touchStartY.current);
-      if (deltaY > 10) {
-        setIsSwipingHorizontally(false);
+  const handleTouchMove = useCallback(
+    (e: React.TouchEvent<HTMLDivElement>) => {
+      if (isSwipingHorizontally) {
+        e.preventDefault();
       } else {
-        setIsSwipingHorizontally(true);
+        const touchCurrentY = e.touches[0].clientY;
+        const deltaY = Math.abs(touchCurrentY - touchStartY.current);
+        if (deltaY > 10) {
+          setIsSwipingHorizontally(false);
+        } else {
+          setIsSwipingHorizontally(true);
+        }
       }
-    }
-  }, [isSwipingHorizontally]);
+    },
+    [isSwipingHorizontally]
+  );
 
   const handleTouchEnd = useCallback(() => {
     setIsSwipingHorizontally(false);
   }, []);
+
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+  const openModal = (image: string) => {
+    setSelectedImage(image);
+  };
+
+  const closeModal = () => {
+    setSelectedImage(null);
+  };
 
   return (
     <div
@@ -283,24 +329,43 @@ const CustomCarousel: React.FC<CustomCarouselProps> = ({ images }) => {
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      <Carousel
-        responsive={responsive}
-        swipeable={true}
-        draggable={false}
-      >
+      <Carousel responsive={responsive} swipeable={true} draggable={false}>
         {images.map((image, index) => (
           <ErrorBoundary fallback={<ImageError />} key={image}>
             <Suspense fallback={<ImageLoader />}>
-              <ImageWithSuspense
-                key={index}
-                src={image}
-                alt={`Cafe Image ${index + 1}`}
-                className="object-cover w-full h-[250px]"
-              />
+              <a onClick={() => openModal(image)}>
+                <ImageWithSuspense
+                  key={index}
+                  src={image}
+                  alt={`Cafe Image ${index + 1}`}
+                  className="object-cover w-full h-[250px] cursor-pointer"
+                />
+              </a>
             </Suspense>
           </ErrorBoundary>
         ))}
       </Carousel>
+
+      {selectedImage && (
+        <div
+          className="fixed z-[1000] inset-0 bg-black bg-opacity-75 flex items-center justify-center"
+          onClick={closeModal}
+        >
+          <div className="max-w-4xl max-h-[90vh] relative">
+            <img
+              src={selectedImage}
+              alt="Expanded view"
+              className="max-w-full max-h-full object-contain"
+            />
+            <button
+              className="absolute top-4 right-4 text-white bg-black bg-opacity-50 rounded-full p-2"
+              onClick={closeModal}
+            >
+              <XIcon size={24} />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
