@@ -221,19 +221,23 @@ const en: BaseTranslation = {
   },
   welcomeModal: {
     title: "Welcome to Kopimap! ☕️🗺️",
-    description: "Your gateway to Jakarta's hidden coffee gems and cozy workspaces.",
+    description:
+      "Your gateway to Jakarta's hidden coffee gems and cozy workspaces.",
     features: [
       "Explore an interactive map of Jakarta's vibrant cafe scene",
       "Discover cafes through honest, detailed community reviews",
       "Find your perfect spot with customizable filters",
       "Share your cafe experiences and help fellow coffee lovers",
-      "Uncover nearby 'cafe terdekat' for spontaneous coffee runs"
+      "Uncover nearby cafes for spontaneous coffee runs",
     ],
-    passionProject: "Kopimap is a labor of love, crafted by a single developer with a passion for connecting people through great coffee experiences.",
-    personalNote: "As the sole creator behind Kopimap, I pour my heart into this project every day. Your support means the world to me!",
-    thankYou: "Thank you for joining me on this caffeinated journey across Jakarta!",
-    closeButton: "Start Your Coffee Adventure"
-  }
+    passionProject:
+      "Kopimap is a labor of love, crafted by a single developer with a passion for connecting people through great coffee experiences.",
+    personalNote:
+      "As the sole creator behind Kopimap, I pour my heart into this project every day. Your support means the world to me!",
+    thankYou:
+      "Thank you for joining me on this caffeinated journey across Jakarta!",
+    closeButton: "Start Your Coffee Adventure",
+  },
 };
 
 export default en;
