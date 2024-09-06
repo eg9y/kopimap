@@ -103,15 +103,16 @@ export default function CafeDetails({
 
   const carouselImages = [
     ...(cafeDetailedInfo?.all_image_urls ?? []),
-    ...((cafeDetailedInfo?.hosted_gmaps_images as string[]) ?? [
-      cafeDetailedInfo?.gmaps_featured_image,
-    ]),
-    ...(cafeDetailedInfo?.gmaps_images
-      ? JSON.parse(cafeDetailedInfo?.gmaps_images as string)
-          .slice(1)
-          .map((gmapsImage: { link: string }) => gmapsImage.link)
-      : []),
+    ...((cafeDetailedInfo?.hosted_gmaps_images as string[]) ?? []),
+    // ...(cafeDetailedInfo?.gmaps_images
+    //   ? JSON.parse(cafeDetailedInfo?.gmaps_images as string)
+    //       .slice(1)
+    //       .map((gmapsImage: { link: string }) => gmapsImage.link)
+    //   : []),
   ];
+
+  // Remove duplicates from carouselImages
+  const uniqueCarouselImages = Array.from(new Set(carouselImages));
 
   return (
     <div className="flex flex-col gap-4 p-4">
@@ -179,7 +180,7 @@ export default function CafeDetails({
           <div className="grid grid-cols-1 md:grid-cols-[250px_1fr] gap-4">
             {/* Cafe Image */}
             <div className="bg-white rounded-lg shadow-md overflow-hidden">
-              <CustomCarousel images={carouselImages} />
+              <CustomCarousel images={uniqueCarouselImages} />
             </div>
 
             {/* User Reviews Summary */}

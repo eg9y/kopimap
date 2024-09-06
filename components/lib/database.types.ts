@@ -9,6 +9,38 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      achievements: {
+        Row: {
+          created_account: boolean | null
+          created_at: string
+          first_review: boolean | null
+          id: number
+          user_profile_id: string | null
+        }
+        Insert: {
+          created_account?: boolean | null
+          created_at?: string
+          first_review?: boolean | null
+          id?: number
+          user_profile_id?: string | null
+        }
+        Update: {
+          created_account?: boolean | null
+          created_at?: string
+          first_review?: boolean | null
+          id?: number
+          user_profile_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "achievements_user_profile_id_fkey"
+            columns: ["user_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cafe_aggregated_reviews: {
         Row: {
           accessibility_mode:
@@ -582,12 +614,12 @@ export type Database = {
       cleanliness: "Needs Improvement" | "Acceptable" | "Clean" | "Spotless"
       coffee_quality: "Subpar" | "Average" | "Good" | "Excellent"
       comfort_level: "Minimal" | "Adequate" | "Comfortable" | "Luxurious"
-      food_options: "No Food" | "Snacks Only" | "Light Meals" | "Full Menu"
+      food_options: "Subpar" | "Average" | "Good" | "Excellent"
       instagram_worthiness:
         | "Not Particularly"
         | "Somewhat Photogenic"
         | "Very Instagrammable"
-      non_coffee_options: "Very Limited" | "Some Options" | "Wide Variety"
+      non_coffee_options: "Subpar" | "Average" | "Good" | "Excellent"
       outdoor_seating: "None" | "Limited" | "Ample"
       outlet_availability: "None Visible" | "Scarce" | "Adequate" | "Plentiful"
       parking_options:
