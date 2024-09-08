@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useForm, Controller, FieldValues } from "react-hook-form";
 import { toast } from "sonner";
-import { Rating } from 'react-simple-star-rating';
+import { Rating } from "react-simple-star-rating";
 import { Button } from "../catalyst/button";
 import { Field, Label } from "../catalyst/fieldset";
 import { reviewAttributes } from "../lib/review-attributes";
@@ -57,7 +57,9 @@ export function MobileSubmitReview({
 
   useEffect(() => {
     (async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       setSessionInfo(session);
     })();
   }, []);
@@ -123,7 +125,7 @@ export function MobileSubmitReview({
       try {
         newUploadedUrls = await imageUploadRef.current.triggerUpload();
       } catch (error) {
-        console.error('Error uploading images:', error);
+        console.error("Error uploading images:", error);
         toast.error(LL.submitReview.imageUploadError());
         setIsUploading(false);
         return;
@@ -139,11 +141,13 @@ export function MobileSubmitReview({
       cafe_id: cafeDetailedInfo.id,
       cafe_place_id: cafeDetailedInfo.place_id,
       user_id: loggedInUser.id,
-      rating: typeof payload.rating === "number" ? payload.rating : parseFloat(payload.rating),
+      rating:
+        typeof payload.rating === "number"
+          ? payload.rating
+          : parseFloat(payload.rating),
       image_urls: [...existingImageUrls, ...newUploadedUrls],
       review_text: payload.review_text,
     };
-
 
     mutate(reviewData);
   };
@@ -151,7 +155,9 @@ export function MobileSubmitReview({
   if (!loggedInUser) {
     return (
       <div className="pointer-events-auto z-[10000] p-4 flex flex-col items-center rounded-xl bg-white shadow-xl top-[25%] absolute inset-x-0 max-w-md">
-        <h2 className="text-xl font-bold mb-2">{LL.submitReview.createReview()}</h2>
+        <h2 className="text-xl font-bold mb-2">
+          {LL.submitReview.createReview()}
+        </h2>
         <p className="mb-4">{LL.submitReview.pleaseLogin()}</p>
         <Button
           onClick={async () => {
@@ -172,9 +178,12 @@ export function MobileSubmitReview({
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit, () => {
-      setShowErrorMessage(true)
-    })} className="z-[100000] pointer-events-auto absolute inset-0 flex flex-col bg-white">
+    <form
+      onSubmit={handleSubmit(onSubmit, () => {
+        setShowErrorMessage(true);
+      })}
+      className="z-[100000] pointer-events-auto absolute inset-0 flex flex-col bg-white"
+    >
       <div className="p-4 border-b">
         <h2 className="text-xl font-bold">
           {isUpdating
@@ -216,13 +225,17 @@ export function MobileSubmitReview({
                             "#f16c45",
                             "#f18845",
                             "#f1b345",
-                            "#f1d045"
+                            "#f1d045",
                           ]}
                           SVGclassName="inline-block"
                         />
                         <p className="font-bold text-base mt-1">
                           {value
-                            ? LL.ratingLabels[CUSTOM_ITEM_LABELS[Math.floor(value) - 1] as keyof typeof LL.ratingLabels]()
+                            ? LL.ratingLabels[
+                                CUSTOM_ITEM_LABELS[
+                                  Math.floor(value) - 1
+                                ] as keyof typeof LL.ratingLabels
+                              ]()
                             : LL.submitReview.selectRating()}
                         </p>
                       </div>
@@ -249,8 +262,8 @@ export function MobileSubmitReview({
                   rules={{
                     maxLength: {
                       value: 280,
-                      message: LL.submitReview.reviewTextTooLong()
-                    }
+                      message: LL.submitReview.reviewTextTooLong(),
+                    },
                   }}
                   render={({ field }) => (
                     <div>
@@ -284,6 +297,7 @@ export function MobileSubmitReview({
                   ref={imageUploadRef}
                   onFilesSelected={handleFilesSelected}
                   sessionInfo={sessionInfo}
+                  placeId={cafeDetailedInfo?.place_id!}
                 />
               )}
               {existingImageUrls.length > 0 && (
@@ -347,10 +361,15 @@ export function MobileSubmitReview({
                 </p>
                 {attr.attributes.map((attribute) => {
                   const attrName = attribute.name as keyof typeof LL.attributes;
-                  const options = LL.attributes[attrName].options as Record<string, () => LocalizedString>;
+                  const options = LL.attributes[attrName].options as Record<
+                    string,
+                    () => LocalizedString
+                  >;
                   return (
                     <Field key={attribute.name}>
-                      <Label className="text-sm">{LL.attributes[attrName].name()}</Label>
+                      <Label className="text-sm">
+                        {LL.attributes[attrName].name()}
+                      </Label>
                       <Controller
                         name={attribute.name}
                         control={control}
@@ -378,14 +397,12 @@ export function MobileSubmitReview({
                         )}
                       />
                     </Field>
-                  )
+                  );
                 })}
               </div>
             ))}
           </div>
-
         </div>
-
       </div>
       {/* Fixed footer with Submit and Cancel buttons */}
       <div className="border-t bg-white p-4 justify-end gap-2 flex flex-col">
@@ -397,7 +414,9 @@ export function MobileSubmitReview({
             </strong>
             <ul className="mt-2 list-disc list-inside">
               {errors.rating && <li>{LL.submitReview.ratingRequired()}</li>}
-              {errors.review_text && <li>{errors.review_text.message as string}</li>}
+              {errors.review_text && (
+                <li>{errors.review_text.message as string}</li>
+              )}
             </ul>
             <button
               onClick={() => setShowErrorMessage(false)}
@@ -412,7 +431,12 @@ export function MobileSubmitReview({
           <Button plain onClick={onClose} className="grow">
             {LL.submitReview.cancel()}
           </Button>
-          <Button type="submit" color="emerald" className="cursor-pointer grow" disabled={isUploading}>
+          <Button
+            type="submit"
+            color="emerald"
+            className="cursor-pointer grow"
+            disabled={isUploading}
+          >
             {isUpdating ? LL.submitReview.update() : LL.submitReview.submit()}
           </Button>
         </div>
