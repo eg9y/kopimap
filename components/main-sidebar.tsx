@@ -61,7 +61,7 @@ const CafeListSkeleton = lazy(() => import("../components/cafe-list-skeleton"));
 
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY,
+  import.meta.env.VITE_SUPABASE_ANON_KEY
 );
 
 interface MainSidebarProps {
@@ -74,12 +74,8 @@ export default function MainSidebar({ children }: MainSidebarProps) {
   const [isFeatureRoadmapOpen, setIsFeatureRoadmapOpen] = useState(false);
   const [searchInput, setSearchInput] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
-  const {
-    setOpenFilters,
-    openFilters,
-    searchFilters,
-    setSearchFilters,
-  } = useStore();
+  const { setOpenFilters, openFilters, searchFilters, setSearchFilters } =
+    useStore();
   const { loggedInUser } = useUser();
 
   useDebounce(
@@ -87,7 +83,7 @@ export default function MainSidebar({ children }: MainSidebarProps) {
       setDebouncedSearchTerm(searchInput);
     },
     300,
-    [searchInput],
+    [searchInput]
   );
 
   const handleRatingChange = (value: string) => {
@@ -157,7 +153,7 @@ export default function MainSidebar({ children }: MainSidebarProps) {
                 <div className="flex flex-col">
                   <div>
                     <div className="flex items-center space-x-4">
-                      <Heading>KopiMap</Heading>
+                      <Heading>☕️KopiMap</Heading>
                       <LanguageSwitcher />
                     </div>
                     <Text>{LL.appDescription()}</Text>
@@ -195,7 +191,11 @@ export default function MainSidebar({ children }: MainSidebarProps) {
                 <div className="flex items-baseline gap-2">
                   <Dropdown>
                     <DropdownButton outline className="grow">
-                      <p className="text-xs">{searchFilters.gmaps_rating ? `>=${searchFilters.gmaps_rating}⭐️` : 'Rating'}</p>
+                      <p className="text-xs">
+                        {searchFilters.gmaps_rating
+                          ? `>=${searchFilters.gmaps_rating}⭐️`
+                          : "Rating"}
+                      </p>
                       <ChevronDownIcon />
                     </DropdownButton>
                     <DropdownMenu>
@@ -221,7 +221,11 @@ export default function MainSidebar({ children }: MainSidebarProps) {
                   </Dropdown>
                   <Dropdown>
                     <DropdownButton outline className="grow">
-                      <p className="text-xs">{searchFilters.gmaps_total_reviews ? `>=${searchFilters.gmaps_total_reviews} reviews` : 'Total Reviews'}</p>
+                      <p className="text-xs">
+                        {searchFilters.gmaps_total_reviews
+                          ? `>=${searchFilters.gmaps_total_reviews} reviews`
+                          : "Total Reviews"}
+                      </p>
                       <ChevronDownIcon />
                     </DropdownButton>
                     <DropdownMenu>

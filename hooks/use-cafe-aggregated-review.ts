@@ -20,7 +20,7 @@ const fetchCafeAggregatedReviewAndReviews = async (placeId: string | null) => {
     return null;
   }
 
-  const [aggregatedReview, reviews] = await Promise.all([
+  const [aggregatedReview, reviews, cafeDetails] = await Promise.all([
     supabase
       .from("cafe_aggregated_reviews")
       .select("*")
@@ -46,6 +46,17 @@ const fetchCafeAggregatedReviewAndReviews = async (placeId: string | null) => {
       `)
       .eq("cafe_place_id", placeId)
       .order("created_at", { ascending: false }),
+    supabase
+      .from("cafes")
+      .select(`
+        popular_times,
+        gmaps_reviews_per_rating,
+        phone,
+        hours,
+        workday_timings
+      `)
+      .eq("place_id", placeId)
+      .single(),
   ]);
 
   if (aggregatedReview.error && aggregatedReview.error.code !== "PGRST116") {
@@ -58,5 +69,6 @@ const fetchCafeAggregatedReviewAndReviews = async (placeId: string | null) => {
   return {
     aggregatedReview: aggregatedReview.data,
     reviews: reviews.data,
+    cafeDetails: cafeDetails.data,
   };
 };

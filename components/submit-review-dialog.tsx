@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useForm, Controller, FieldValues } from "react-hook-form";
 import { toast } from "sonner";
-import { Rating } from 'react-simple-star-rating';
+import { Rating } from "react-simple-star-rating";
 
 import {
   Dialog,
@@ -65,7 +65,9 @@ export function SubmitReviewDialog({
 
   useEffect(() => {
     (async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       setSessionInfo(session);
     })();
   }, []);
@@ -133,7 +135,7 @@ export function SubmitReviewDialog({
       try {
         newUploadedUrls = await imageUploadRef.current.triggerUpload();
       } catch (error) {
-        console.error('Error uploading images:', error);
+        console.error("Error uploading images:", error);
         toast.error(LL.submitReview.imageUploadError());
         setIsUploading(false);
         return;
@@ -149,11 +151,14 @@ export function SubmitReviewDialog({
       cafe_id: cafeDetailedInfo.id,
       cafe_place_id: cafeDetailedInfo.place_id,
       user_id: loggedInUser.id,
-      rating: typeof payload.rating === "number" ? payload.rating : parseFloat(payload.rating),
+      rating:
+        typeof payload.rating === "number"
+          ? payload.rating
+          : parseFloat(payload.rating),
       image_urls: [...existingImageUrls, ...newUploadedUrls],
     };
 
-    console.log('reviewData', reviewData);
+    console.log("reviewData", reviewData);
 
     mutate(reviewData);
   };
@@ -232,17 +237,21 @@ export function SubmitReviewDialog({
                               "#f16c45",
                               "#f18845",
                               "#f1b345",
-                              "#f1d045"
+                              "#f1d045",
                             ]}
-                            onPointerEnter={() => console.log('Enter')}
-                            onPointerLeave={() => console.log('Leave')}
+                            onPointerEnter={() => console.log("Enter")}
+                            onPointerLeave={() => console.log("Leave")}
                             SVGclassName={`inline-block`}
                           />
                         </div>
                         <div>
                           <p className="font-bold text-lg">
                             {value
-                              ? LL.ratingLabels[CUSTOM_ITEM_LABELS[Math.floor(value) - 1] as keyof typeof LL.ratingLabels]()
+                              ? LL.ratingLabels[
+                                  CUSTOM_ITEM_LABELS[
+                                    Math.floor(value) - 1
+                                  ] as keyof typeof LL.ratingLabels
+                                ]()
                               : LL.submitReview.selectRating()}
                           </p>
                         </div>
@@ -262,11 +271,12 @@ export function SubmitReviewDialog({
               <p className="text-base font-semibold">
                 {LL.submitReview.images()}
               </p>
-              {sessionInfo && (
+              {sessionInfo && cafeDetailedInfo && (
                 <ImageUpload
                   ref={imageUploadRef}
                   onFilesSelected={handleFilesSelected}
                   sessionInfo={sessionInfo}
+                  placeId={cafeDetailedInfo.place_id!}
                 />
               )}
               {existingImageUrls.length > 0 && (
@@ -329,7 +339,10 @@ export function SubmitReviewDialog({
                 </p>
                 {attr.attributes.map((attribute) => {
                   const attrName = attribute.name as keyof typeof LL.attributes;
-                  const options = LL.attributes[attrName].options as Record<string, () => LocalizedString>;
+                  const options = LL.attributes[attrName].options as Record<
+                    string,
+                    () => LocalizedString
+                  >;
                   return (
                     <Field key={attribute.name}>
                       <Label>{LL.attributes[attrName].name()}</Label>
@@ -360,7 +373,7 @@ export function SubmitReviewDialog({
                         )}
                       />
                     </Field>
-                  )
+                  );
                 })}
               </div>
             ))}
@@ -384,7 +397,12 @@ export function SubmitReviewDialog({
           <Button plain onClick={() => setIsOpen(false)}>
             {LL.submitReview.cancel()}
           </Button>
-          <Button type="submit" color="emerald" className="cursor-pointer" disabled={isUploading}>
+          <Button
+            type="submit"
+            color="emerald"
+            className="cursor-pointer"
+            disabled={isUploading}
+          >
             {isUpdating ? LL.submitReview.update() : LL.submitReview.submit()}
           </Button>
         </DialogActions>

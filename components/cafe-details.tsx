@@ -1,6 +1,6 @@
 import React, { useRef, Suspense, useState, useCallback } from "react";
 import { useI18nContext } from "@/src/i18n/i18n-react";
-import { StarIcon } from "@heroicons/react/20/solid";
+import { StarIcon, PhoneIcon, ClockIcon } from "@heroicons/react/20/solid";
 import { useImage } from "react-image";
 import { ErrorBoundary } from "react-error-boundary";
 import Carousel from "react-multi-carousel";
@@ -126,53 +126,116 @@ export default function CafeDetails({
           </div>
 
           {/* Cafe Details */}
-          <div className="flex flex-wrap gap-2">
-            <BadgeButton
-              color="red"
-              href={cafeDetailedInfo.gmaps_link || ""}
-              disabled={!cafeDetailedInfo.gmaps_link}
-              target="_blank"
-            >
-              GMaps
-            </BadgeButton>
-            <Badge className="text-nowrap">
-              <p>GMaps Rating</p>
-              <StarIcon className="size-4" />
-              <p>{cafeDetailedInfo.gmaps_rating}</p>
-              <p>({cafeDetailedInfo.gmaps_total_reviews})</p>
-            </Badge>
-            {cafeDetailedInfo.website && (
+          <div className="grid grid-cols-2 gap-2 ">
+            <div className="flex flex-wrap gap-2">
               <BadgeButton
-                color="fuchsia"
-                href={cafeDetailedInfo.website}
+                color="red"
+                href={cafeDetailedInfo.gmaps_link || ""}
+                disabled={!cafeDetailedInfo.gmaps_link}
                 target="_blank"
-                className="flex items-center justify-center"
               >
-                {isInstagramLink(cafeDetailedInfo.website) ? (
-                  <svg viewBox="0 0 24 24" className="w-5 fill-pink-700">
-                    <path d={siInstagram.path} />
-                  </svg>
-                ) : (
-                  "Website"
-                )}
+                GMaps
               </BadgeButton>
-            )}
-            {cafeDetailedInfo.price_range && (
-              <Badge>{cafeDetailedInfo.price_range}</Badge>
-            )}
-            <Badge className="text-nowrap">
-              Open {cafeDetailedInfo.workday_timings}
-            </Badge>
-            {cafeDetailedInfo.menu_link && (
-              <BadgeButton href={cafeDetailedInfo.menu_link}>Menu</BadgeButton>
-            )}
+              {cafeDetailedInfo.website && (
+                <BadgeButton
+                  color="fuchsia"
+                  href={cafeDetailedInfo.website}
+                  target="_blank"
+                  className="flex items-center justify-center"
+                >
+                  {isInstagramLink(cafeDetailedInfo.website) ? (
+                    <svg viewBox="0 0 24 24" className="w-5 fill-pink-700">
+                      <path d={siInstagram.path} />
+                    </svg>
+                  ) : (
+                    "Website"
+                  )}
+                </BadgeButton>
+              )}
+              {cafeDetailedInfo.price_range && (
+                <Badge>{cafeDetailedInfo.price_range}</Badge>
+              )}
 
-            {/* Address */}
-            <div className="p-2 rounded-md bg-blue-100">
-              <p className="text-pretty text-xs">
-                <MapPinIcon className="size-4 inline" />{" "}
-                {cafeDetailedInfo.address}
-              </p>
+              {/* Opening Hours */}
+              {reviewData?.cafeDetails?.workday_timings && (
+                <Badge className="text-nowrap">
+                  <ClockIcon className="h-5 w-5 text-gray-500" />
+                  <p>Open {cafeDetailedInfo.workday_timings}</p>
+                </Badge>
+              )}
+              {reviewData?.cafeDetails?.phone && (
+                <Badge color="green" className="text-nowrap">
+                  <p>
+                    <div className="flex items-center gap-2">
+                      {/* <svg viewBox="0 0 24 24" className="w-5 fill-green-700">
+                        <path d={siWhatsapp.path} />
+                      </svg> */}
+                      <PhoneIcon className="size-4" />
+                      <a
+                        href={`te:${reviewData.cafeDetails.phone}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:underline"
+                      >
+                        {reviewData.cafeDetails.phone}
+                      </a>
+                    </div>
+                  </p>
+                </Badge>
+              )}
+
+              {cafeDetailedInfo.menu_link && (
+                <BadgeButton href={cafeDetailedInfo.menu_link}>
+                  Menu
+                </BadgeButton>
+              )}
+
+              {/* Address */}
+              <div className="p-2 rounded-md bg-blue-100">
+                <p className="text-pretty text-xs">
+                  <MapPinIcon className="size-4 inline" />{" "}
+                  {cafeDetailedInfo.address}
+                </p>
+              </div>
+            </div>
+            <div className="flex text-nowrap flex-col bg-white p-4 rounded-lg shadow-md">
+              <div className="flex gap-1">
+                <p className="text-sm">GMaps Rating</p>
+                <div className="flex">
+                  <StarIcon className="size-4" />
+                  <p className="text-nowrap text-sm flex items-center">
+                    {cafeDetailedInfo.gmaps_rating} (
+                    {cafeDetailedInfo.gmaps_total_reviews})
+                  </p>
+                </div>
+              </div>
+              {cafeDetailedInfo.gmaps_reviews_per_rating && (
+                <div className="mt-2 w-full max-w-[200px]">
+                  {[5, 4, 3, 2, 1].map((rating) => {
+                    const reviewCount = JSON.parse(
+                      cafeDetailedInfo.gmaps_reviews_per_rating as string
+                    )[rating.toString()];
+                    const percentage =
+                      (reviewCount / cafeDetailedInfo.gmaps_total_reviews!) *
+                      100;
+                    return (
+                      <div
+                        key={rating}
+                        className="flex items-center text-xs mb-1"
+                      >
+                        <span className="w-3">{rating}</span>
+                        <div className="flex-grow mx-2 bg-gray-200 rounded-full h-2">
+                          <div
+                            className="bg-yellow-400 h-2 rounded-full"
+                            style={{ width: `${percentage}%` }}
+                          ></div>
+                        </div>
+                        <span className="w-8 text-right">{reviewCount}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </div>
 
