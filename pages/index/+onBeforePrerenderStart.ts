@@ -76,7 +76,7 @@ export const onBeforePrerenderStart: OnBeforePrerenderStartAsync =
       for (const cafe of allCafes) {
         const cafeSlug = createSlug(cafe.name!);
         urls.push({
-          url: `/${locale}/cafe/${cafeSlug}?place_id=${cafe.place_id}`,
+          url: `/${locale}?cafe=${cafeSlug}&place_id=${cafe.place_id}`,
           pageContext: {
             locale,
             data: {
