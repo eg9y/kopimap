@@ -2,7 +2,7 @@ import type { MeiliSearchCafe } from "@/types";
 import { useData } from "vike-react/useData";
 import { usePageContext } from "vike-react/usePageContext";
 
-const SUPPORTED_LOCALES = ['en', 'id'];
+const SUPPORTED_LOCALES = ["en", "id"];
 
 const translations = {
   en: {
@@ -29,13 +29,13 @@ const translations = {
       ogDescription:
         "Temukan cafe terdekat terbaik di Jakarta untuk ngopi, kerja, atau bersantai. Peta interaktif dan ulasan detail.",
     },
-  }
+  },
 };
 
 export function Head() {
   const data = useData<undefined | { cafeToSelect?: MeiliSearchCafe }>();
   const pageContext: any = usePageContext();
-  const locale: 'en' | 'id' = pageContext.locale || "en";
+  const locale: "en" | "id" = pageContext.locale || "en";
   const t = translations[locale].app;
 
   const getDataValue = (key: string, defaultValue?: string) => {
@@ -51,35 +51,39 @@ export function Head() {
 
   const ldJson = pageContext.data
     ? {
-      "@context": "https://schema.org",
-      "@type": "CafeOrCoffeeShop",
-      name: getDataValue("name", ""),
-      image: getDataValue("image"),
-      "@id": "",
-      url: getDataValue("website"),
-      telephone: getDataValue("phone"),
-      menu: "",
-      servesCuisine: "Cafe",
-      acceptsReservations: "false",
-      address: {
-        "@type": "PostalAddress",
-        streetAddress: "",
-        addressLocality: "",
-        postalCode: "",
-        addressCountry: "",
-      },
-      aggregateRating: {
-        "@type": "AggregateRating",
-        ratingValue: getDataValue("gmaps_rating"),
-        ratingCount: getDataValue("gmaps_total_reviews"),
-      },
-    }
+        "@context": "https://schema.org",
+        "@type": "CafeOrCoffeeShop",
+        name: getDataValue("name", ""),
+        image: getDataValue("image"),
+        "@id": "",
+        url: getDataValue("website"),
+        telephone: getDataValue("phone"),
+        menu: "",
+        servesCuisine: "Cafe",
+        acceptsReservations: "false",
+        address: {
+          "@type": "PostalAddress",
+          streetAddress: "",
+          addressLocality: "",
+          postalCode: "",
+          addressCountry: "",
+        },
+        aggregateRating: {
+          "@type": "AggregateRating",
+          ratingValue: getDataValue("gmaps_rating"),
+          ratingCount: getDataValue("gmaps_total_reviews"),
+        },
+      }
     : null;
 
   // Construct the current URL
-  const baseUrl = 'https://www.kopimap.com';
-  const currentPath = pageContext.urlOriginal || '';
+  const baseUrl = "https://www.kopimap.com";
+  const currentPath = pageContext.urlOriginal || "";
   const currentUrl = new URL(currentPath, baseUrl).toString();
+
+  // Extract the path and query parameters
+  const url = new URL(currentUrl);
+  const pathWithParams = `${url.pathname}${url.search}`;
 
   return (
     <>
@@ -112,13 +116,13 @@ export function Head() {
           key={lang}
           rel="alternate"
           hrefLang={lang}
-          href={new URL(`/${lang}${currentPath.replace(/^\/[a-z]{2}/, '')}`, baseUrl).toString()}
+          href={`${baseUrl}/${lang}${pathWithParams.replace(/^\/[a-z]{2}/, "")}`}
         />
       ))}
       <link
         rel="alternate"
         hrefLang="x-default"
-        href={new URL(currentPath.replace(/^\/[a-z]{2}/, ''), baseUrl).toString()}
+        href={`${baseUrl}${pathWithParams.replace(/^\/[a-z]{2}/, "")}`}
       />
     </>
   );
