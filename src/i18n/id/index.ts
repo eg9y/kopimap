@@ -22,7 +22,7 @@ const id: Translation = {
   searchCafes: "Cari...",
   categories: {
     Ambiance: "Suasana",
-    "Work-Friendly": "Ramah untuk Bekerja",
+    "Work-Friendly": "WFC",
     "Food & Drinks": "Makanan & Minuman",
     Value: "Harga",
     Facilities: "Fasilitas",
@@ -221,19 +221,23 @@ const id: Translation = {
   },
   welcomeModal: {
     title: "Selamat Datang di Kopimap! ☕️🗺️",
-    description: "Gerbang Anda menuju tempat-tempat kopi tersembunyi dan ruang kerja nyaman di Jakarta.",
+    description:
+      "Gerbang Anda menuju tempat-tempat kopi tersembunyi dan ruang kerja nyaman di Jakarta.",
     features: [
       "Jelajahi peta interaktif dunia kafe Jakarta yang hidup",
       "Temukan kafe melalui ulasan jujur dan detail dari komunitas",
       "Temukan tempat sempurna dengan filter yang dapat disesuaikan",
       "Bagikan pengalaman kafe Anda dan bantu sesama pecinta kopi",
-      "Temukan 'cafe terdekat' untuk perjalanan kopi spontan"
+      "Temukan 'cafe terdekat' untuk perjalanan kopi spontan",
     ],
-    passionProject: "Kopimap adalah proyek yang dibuat dengan sepenuh hati, dirancang oleh seorang pengembang tunggal dengan hasrat menghubungkan orang melalui pengalaman kopi yang luar biasa.",
-    personalNote: "Sebagai satu-satunya kreator di balik Kopimap, saya mencurahkan hati saya ke dalam proyek ini setiap hari. Dukungan Anda sangat berarti bagi saya!",
-    thankYou: "Terima kasih telah bergabung dengan saya dalam perjalanan berkafein ini di seluruh Jakarta!",
-    closeButton: "Mulai Petualangan Kopi Anda"
-  }
+    passionProject:
+      "Kopimap adalah proyek yang dibuat dengan sepenuh hati, dirancang oleh seorang pengembang tunggal dengan hasrat menghubungkan orang melalui pengalaman kopi yang luar biasa.",
+    personalNote:
+      "Sebagai satu-satunya kreator di balik Kopimap, saya mencurahkan hati saya ke dalam proyek ini setiap hari. Dukungan Anda sangat berarti bagi saya!",
+    thankYou:
+      "Terima kasih telah bergabung dengan saya dalam perjalanan berkafein ini di seluruh Jakarta!",
+    closeButton: "Mulai Petualangan Kopi Anda",
+  },
 };
 
 export default id;
