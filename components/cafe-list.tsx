@@ -16,7 +16,8 @@ interface CafeListProps {
 }
 
 export default function CafeList({ searchInput }: CafeListProps) {
-  const { selectCafe, mapRef, searchFilters, setSearchFilters, mapCenter } = useStore();
+  const { selectCafe, mapRef, searchFilters, setSearchFilters, mapCenter } =
+    useStore();
   const [showSkeleton, setShowSkeleton] = useState(false);
 
   const {
@@ -26,12 +27,12 @@ export default function CafeList({ searchInput }: CafeListProps) {
     error,
     fetchNextPage,
     hasNextPage,
-    isFetchingNextPage
+    isFetchingNextPage,
   } = useCafes(mapCenter.lat, mapCenter.long, searchInput);
 
   const parentRef = useRef<HTMLDivElement>(null);
 
-  const allCafes = data?.pages.flatMap(page => page.cafes) ?? [];
+  const allCafes = data?.pages.flatMap((page) => page.cafes) ?? [];
 
   const rowVirtualizer = useVirtualizer({
     count: hasNextPage ? allCafes.length + 1 : allCafes.length,
@@ -80,6 +81,14 @@ export default function CafeList({ searchInput }: CafeListProps) {
     setSearchFilters(temp);
   };
 
+  // Add this function to create a URL-friendly slug
+  function createSlug(name: string): string {
+    return name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
+  }
+
   const handleCafeSelect = (cafe: MeiliSearchCafe) => {
     selectCafe(cafe);
     mapRef?.current?.flyTo({
@@ -90,7 +99,7 @@ export default function CafeList({ searchInput }: CafeListProps) {
       zoom: 14,
     });
     const url = new URL(window.location.href);
-    url.searchParams.set("cafe", cafe.name);
+    url.searchParams.set("cafe", createSlug(cafe.name));
     url.searchParams.set("place_id", cafe.id);
     window.history.pushState({ triggeredBy: "user" }, "", url.toString());
   };
@@ -116,13 +125,15 @@ export default function CafeList({ searchInput }: CafeListProps) {
           </BadgeButton>
         ))}
       </div>
-      {error && <p className="flex-shrink-0">Error: {(error as Error).message}</p>}
+      {error && (
+        <p className="flex-shrink-0">Error: {(error as Error).message}</p>
+      )}
       <div ref={parentRef} className="flex-grow overflow-auto">
         <div
           style={{
             height: `${rowVirtualizer.getTotalSize()}px`,
-            width: '100%',
-            position: 'relative',
+            width: "100%",
+            position: "relative",
           }}
         >
           {rowVirtualizer.getVirtualItems().map((virtualRow) => {
@@ -134,24 +145,22 @@ export default function CafeList({ searchInput }: CafeListProps) {
                 data-index={virtualRow.index}
                 ref={rowVirtualizer.measureElement}
                 style={{
-                  position: 'absolute',
+                  position: "absolute",
                   top: 0,
                   left: 0,
-                  width: '100%',
+                  width: "100%",
                   height: `${virtualRow.size}px`,
                   transform: `translateY(${virtualRow.start}px)`,
                 }}
               >
                 {isLoaderRow ? (
                   hasNextPage ? (
-                    'Loading more...'
+                    "Loading more..."
                   ) : (
-                    'No more cafes to load'
+                    "No more cafes to load"
                   )
                 ) : (
-                  <SidebarItem
-                    onClick={() => handleCafeSelect(cafe)}
-                  >
+                  <SidebarItem onClick={() => handleCafeSelect(cafe)}>
                     <div className="grow w-full">
                       <div>
                         <p className="text-nowrap text-ellipsis overflow-hidden">
@@ -181,7 +190,9 @@ export default function CafeList({ searchInput }: CafeListProps) {
           })}
         </div>
       </div>
-      {isFetching && <div className="flex-shrink-0 p-2 text-center">Updating...</div>}
+      {isFetching && (
+        <div className="flex-shrink-0 p-2 text-center">Updating...</div>
+      )}
     </SidebarSection>
   );
 }
