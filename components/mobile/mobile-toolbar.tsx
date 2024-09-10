@@ -1,27 +1,40 @@
-import React, { useState } from 'react';
-import { MapIcon, NewspaperIcon, UserIcon } from "lucide-react";
-import { Button, Sheet, Toolbar, Link, Block, Tabbar, TabbarLink } from "konsta/react";
+import React, { useState } from "react";
+import { MapIcon, NewspaperIcon, TrophyIcon, UserIcon } from "lucide-react";
+import {
+  Button,
+  Sheet,
+  Toolbar,
+  Link,
+  Block,
+  Tabbar,
+  TabbarLink,
+} from "konsta/react";
 import { Avatar } from "../catalyst/avatar";
 import { useUser } from "../../hooks/use-user";
 import { useI18nContext } from "@/src/i18n/i18n-react";
 import { useStore } from "../../store";
-import { createClient } from '@supabase/supabase-js';
-import { usePageContext } from 'vike-react/usePageContext';
-import { navigate } from 'vike/client/router'
-
+import { createClient } from "@supabase/supabase-js";
+import { usePageContext } from "vike-react/usePageContext";
+import { navigate } from "vike/client/router";
+import { LanguageSwitcher } from "../language-switcher";
 
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY,
+  import.meta.env.VITE_SUPABASE_ANON_KEY
 );
 
 export const MobileToolbar: React.FC = () => {
   const [isUserSheetOpen, setIsUserSheetOpen] = useState(false);
   const { loggedInUser } = useUser();
   const { LL } = useI18nContext();
-  const { isListDialogOpen, setIsListDialogOpen, selectCafe, setSearchInput, openSubmitReviewDialog } = useStore();
+  const {
+    isListDialogOpen,
+    setIsListDialogOpen,
+    selectCafe,
+    setSearchInput,
+    openSubmitReviewDialog,
+  } = useStore();
   const pageContext = usePageContext();
-
 
   const handleSignIn = async () => {
     await supabase.auth.signInWithOAuth({
@@ -40,6 +53,7 @@ export const MobileToolbar: React.FC = () => {
   const handleUserAction = () => {
     if (loggedInUser) {
       setIsUserSheetOpen(true);
+      setIsListDialogOpen(false);
     } else {
       handleSignIn();
     }
@@ -73,61 +87,85 @@ export const MobileToolbar: React.FC = () => {
                   alt=""
                 />
                 <div>
-                  <p className="font-semibold">{loggedInUser.user_metadata.name}</p>
+                  <p className="font-semibold">
+                    {loggedInUser.user_metadata.name}
+                  </p>
                   <p className="text-sm text-gray-500">{loggedInUser.email}</p>
                 </div>
               </div>
-              <Button onClick={handleSignOut}>Sign Out</Button>
+              <Button onClick={handleSignOut} className="mb-4">
+                Sign Out
+              </Button>
             </>
           )}
+          <div className="mt-6">
+            <p className="text-sm font-medium text-gray-700 mb-2">Language</p>
+            <LanguageSwitcher />
+          </div>
         </Block>
       </Sheet>
       {!openSubmitReviewDialog && (
         <Tabbar className="flex-shrink-0">
           <TabbarLink
-            active={isActive('/feed')}
+            active={isActive("/feed")}
             linkProps={{
-              href: "/feed"
+              href: "/feed",
             }}
             onClick={() => {
-              setIsListDialogOpen(false)
+              setIsListDialogOpen(false);
             }}
             icon={<NewspaperIcon className="w-6 h-6" />}
-            label={'Feed'}
+            label={"Feed"}
           />
           <TabbarLink
-            active={isActive('/')}
+            active={isActive("/")}
             onClick={async () => {
-              if (isActive('/')) {
+              if (isActive("/")) {
                 if (isListDialogOpen) {
                   selectCafe(null);
                 }
                 setIsListDialogOpen(!isListDialogOpen);
                 setSearchInput("");
               } else {
-                const navigationPromise = navigate('/')
-                console.log("The URL changed but the new page hasn't rendered yet.")
-                await navigationPromise
-                console.log('The new page has finished rendering.')
+                const navigationPromise = navigate("/");
+                console.log(
+                  "The URL changed but the new page hasn't rendered yet."
+                );
+                await navigationPromise;
+                console.log("The new page has finished rendering.");
               }
-
             }}
             icon={<MapIcon className="w-6 h-6" />}
-            label={isListDialogOpen ? 'Hide Cafes' : 'See Cafes'}
+            label={isListDialogOpen ? "Hide Cafes" : "See Cafes"}
           />
           <TabbarLink
-            active={isActive('/profile')}  // Assuming there's a profile page
+            active={isActive("/achievements")}
+            onClick={() => {
+              navigate("/achievements");
+            }}
+            icon={<TrophyIcon className="w-6 h-6" />}
+            label="Achievements"
+          />
+          <TabbarLink
+            active={isActive("/profile")} // Assuming there's a profile page
             onClick={handleUserAction}
-            icon={loggedInUser ?
-              <Avatar
-                src={loggedInUser.user_metadata.avatar_url}
-                className="w-6 h-6"
-                square
-                alt=""
-              /> :
-              <UserIcon className="w-6 h-6" />
+            icon={
+              loggedInUser ? (
+                <Avatar
+                  src={loggedInUser.user_metadata.avatar_url}
+                  className="w-6 h-6"
+                  square
+                  alt=""
+                />
+              ) : (
+                <UserIcon className="w-6 h-6" />
+              )
             }
-            label={loggedInUser ? loggedInUser.user_metadata.name : LL.loginToReview()}
+            label={
+              loggedInUser
+                ? loggedInUser.user_metadata.name
+                : LL.loginToReview()
+            }
           />
         </Tabbar>
       )}

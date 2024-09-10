@@ -9,6 +9,35 @@ const supabase = createClient<Database>(
   import.meta.env.VITE_SUPABASE_ANON_KEY!,
 );
 
+const checkAchievement = async (userId: string) => {
+  // Check if this is the user's first review
+  const { count: reviewCount, error: countError } = await supabase
+    .from("reviews")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", userId);
+
+  if (countError) {
+    throw new Error(countError.message);
+  }
+
+  if (reviewCount && reviewCount === 1) {
+    // This is the user's first review, update achievements
+    const { error: achievementError } = await supabase
+      .from("achievements")
+      .upsert(
+        {
+          user_profile_id: userId,
+          first_review: true,
+        },
+        { onConflict: "user_profile_id" },
+      );
+
+    if (achievementError) {
+      throw new Error(achievementError.message);
+    }
+  }
+};
+
 const submitReview = async (
   reviewData: Omit<
     Database["public"]["Tables"]["reviews"]["Insert"],
@@ -23,32 +52,7 @@ const submitReview = async (
     throw new Error(reviewError.message);
   }
 
-  // Check if this is the user's first review
-  const { count: reviewCount, error: countError } = await supabase
-    .from("reviews")
-    .select("id", { count: "exact", head: true })
-    .eq("user_id", reviewData.user_id!);
-
-  if (countError) {
-    throw new Error(countError.message);
-  }
-
-  if (reviewCount === 1) {
-    // This is the user's first review, update achievements
-    const { error: achievementError } = await supabase
-      .from("achievements")
-      .upsert(
-        {
-          user_profile_id: reviewData.user_id,
-          first_review: true,
-        },
-        { onConflict: "user_profile_id" },
-      );
-
-    if (achievementError) {
-      throw new Error(achievementError.message);
-    }
-  }
+  await checkAchievement(reviewData.user_id!);
 
   return reviewData;
 };

@@ -37,7 +37,7 @@ export default function CafeList({ searchInput }: CafeListProps) {
   const rowVirtualizer = useVirtualizer({
     count: hasNextPage ? allCafes.length + 1 : allCafes.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 100,
+    estimateSize: () => 80,
     overscan: 5,
   });
 
@@ -109,7 +109,7 @@ export default function CafeList({ searchInput }: CafeListProps) {
   }
 
   return (
-    <SidebarSection className="max-lg:hidden h-full flex flex-col">
+    <SidebarSection className="h-full flex flex-col">
       <SidebarHeading className="flex-shrink-0">
         <p className="text-base">
           {searchInput || Object.keys(searchFilters).length > 0

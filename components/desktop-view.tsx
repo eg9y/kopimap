@@ -29,7 +29,6 @@ const CafeDetailsLoader = () => (
   </div>
 );
 
-
 export default function DesktopView({
   openFilters,
   pmTilesReady,
@@ -43,17 +42,17 @@ export default function DesktopView({
 
   const { data: userReview } = useUserReview(
     loggedInUser?.id || null,
-    selectedCafe?.id || null,
+    selectedCafe?.id || null
   );
 
   const { data: cafeDetailedInfo } = useCafeDetailedInfo(
-    selectedCafe?.id || null,
+    selectedCafe?.id || null
   );
 
   return (
     <Suspense fallback={<div>Loading desktop view...</div>}>
       <MainSidebar>
-        <div className="rounded-lg overflow-hidden grow relative h-full">
+        <div className="overflow-hidden grow relative h-full">
           <Suspense fallback={<MapComponentLoader />}>
             {openFilters && (
               <div className="z-[90] absolute w-[200px] h-full top-0 left-0 flex flex-col justify-end">
@@ -66,15 +65,17 @@ export default function DesktopView({
           </Suspense>
         </div>
       </MainSidebar>
-      {selectedCafe &&
+      {selectedCafe && (
         <AnimatePresence>
           <Suspense fallback={<CafeDetailsLoader />}>
             <>
               <motion.div
-                className={"ml-[300px] h-[calc(100%_-_1rem)] min-w-[400px] w-[30vw] top-2 overflow-y-scroll pointer-events-auto bg-slate-50 rounded-l-md absolute ring-1 ring-slate-300 shadow-md flex flex-col gap-2"}
+                className={
+                  "ml-[300px] h-[calc(100%_-_56px_-0.5rem)] min-w-[400px] w-[30vw] overflow-y-scroll pointer-events-auto bg-slate-50 absolute ring-1 ring-slate-300 shadow-md flex flex-col gap-2"
+                }
                 animate={{
                   width: "30vw",
-                  minWidth: "500px"
+                  minWidth: "500px",
                 }}
                 transition={{
                   type: "spring",
@@ -98,6 +99,7 @@ export default function DesktopView({
             </>
           </Suspense>
         </AnimatePresence>
-      }
-    </Suspense>)
-};
+      )}
+    </Suspense>
+  );
+}

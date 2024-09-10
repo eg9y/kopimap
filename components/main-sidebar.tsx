@@ -1,32 +1,19 @@
 import React, { lazy, Suspense, useState } from "react";
-import { siInstagram } from "simple-icons";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 
-import { Avatar } from "./catalyst/avatar";
 import {
   Dropdown,
   DropdownButton,
-  DropdownDivider,
   DropdownItem,
-  DropdownLabel,
   DropdownMenu,
 } from "./catalyst/dropdown";
-import { Heading } from "./catalyst/heading";
 import { Input, InputGroup } from "./catalyst/input";
 
 import { useI18nContext } from "@/src/i18n/i18n-react";
-import {
-  ArrowRightStartOnRectangleIcon,
-  ChevronDownIcon,
-  ChevronUpIcon,
-  Cog8ToothIcon,
-  LightBulbIcon,
-  ShieldCheckIcon,
-  UserIcon,
-} from "@heroicons/react/16/solid";
-import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/20/solid";
-import { createClient } from "@supabase/supabase-js";
+import { ChevronDownIcon } from "@heroicons/react/16/solid";
+import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
+
 import useDebounce from "react-use/esm/useDebounce";
-import { useUser } from "../hooks/use-user";
 import { useStore } from "../store";
 import { Button } from "./catalyst/button";
 import {
@@ -38,31 +25,16 @@ import {
 } from "./catalyst/dialog";
 import { Field, Label } from "./catalyst/fieldset";
 import {
-  Navbar,
-  NavbarItem,
-  NavbarSection,
-  NavbarSpacer,
-} from "./catalyst/navbar";
-import {
   Sidebar,
   SidebarBody,
-  SidebarFooter,
   SidebarHeader,
-  SidebarItem,
   SidebarSection,
   SidebarSpacer,
 } from "./catalyst/sidebar";
-import { SidebarLayout } from "./catalyst/sidebar-layout";
 import { Text } from "./catalyst/text";
-import { LanguageSwitcher } from "./language-switcher";
 
 const CafeList = lazy(() => import("../components/cafe-list"));
 const CafeListSkeleton = lazy(() => import("../components/cafe-list-skeleton"));
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
 
 interface MainSidebarProps {
   children: React.ReactNode;
@@ -76,7 +48,8 @@ export default function MainSidebar({ children }: MainSidebarProps) {
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const { setOpenFilters, openFilters, searchFilters, setSearchFilters } =
     useStore();
-  const { loggedInUser } = useUser();
+
+  const [showSidebar, setShowSidebar] = useState(false);
 
   useDebounce(
     () => {
@@ -107,272 +80,155 @@ export default function MainSidebar({ children }: MainSidebarProps) {
   };
 
   return (
-    <>
-      <SidebarLayout
-        navbar={
-          <Navbar>
-            <NavbarSpacer />
-            <NavbarSection>
-              <NavbarItem aria-label={LL.searchCafes()}>
-                <MagnifyingGlassIcon />
-              </NavbarItem>
-              <Dropdown>
-                <DropdownButton as={NavbarItem}>Dropdown</DropdownButton>
-                <DropdownMenu className="min-w-64" anchor="bottom end">
-                  <DropdownItem href="/my-profile">
-                    <UserIcon />
-                    <DropdownLabel>My profile</DropdownLabel>
-                  </DropdownItem>
-                  <DropdownItem href="/settings">
-                    <Cog8ToothIcon />
-                    <DropdownLabel>Settings</DropdownLabel>
-                  </DropdownItem>
-                  <DropdownDivider />
-                  <DropdownItem href="/privacy-policy">
-                    <ShieldCheckIcon />
-                    <DropdownLabel>Privacy policy</DropdownLabel>
-                  </DropdownItem>
-                  <DropdownItem href="/share-feedback">
-                    <LightBulbIcon />
-                    <DropdownLabel>Share feedback</DropdownLabel>
-                  </DropdownItem>
-                  <DropdownDivider />
-                  <DropdownItem href="/logout">
-                    <ArrowRightStartOnRectangleIcon />
-                    <DropdownLabel>Sign out</DropdownLabel>
-                  </DropdownItem>
-                </DropdownMenu>
-              </Dropdown>
-            </NavbarSection>
-          </Navbar>
-        }
-        sidebar={
-          <Sidebar>
-            <SidebarHeader>
-              <div className="flex flex-col gap-4">
-                <div className="flex flex-col">
-                  <div>
-                    <div className="flex items-center space-x-4">
-                      <Heading>☕️KopiMap</Heading>
-                      <LanguageSwitcher />
-                    </div>
-                    <Text>{LL.appDescription()}</Text>
-                  </div>
+    <div className="relative flex w-full bg-white dark:bg-zinc-900 rounded-lg overflow-hidden size-full">
+      {/* Sidebar */}
+      <aside
+        className={` z-40 w-[300px] bg-white dark:bg-zinc-900 shadow-lg transform transition-transform duration-300 ease-in-out ${showSidebar ? "translate-x-0" : "-translate-x-full"} translate-x-0`}
+      >
+        <Sidebar>
+          <SidebarHeader>
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col">
+                <div>
+                  <Text>{LL.appDescription()}</Text>
                 </div>
               </div>
-              <div className="flex flex-col gap-1">
-                <div className="flex gap-2 w-full">
-                  <InputGroup className="w-full">
-                    <MagnifyingGlassIcon />
-                    <Input
-                      name="search"
-                      placeholder={LL.searchCafes()}
-                      aria-label={LL.searchCafes()}
-                      onChange={(e) => setSearchInput(e.target.value)}
-                      value={searchInput}
-                      autoComplete="off"
-                      className="w-[calc(300px_-_2rem)]"
-                    />
-                  </InputGroup>
-                  {searchInput && (
-                    <Button
-                      plain
-                      aria-label="Clear search"
-                      className="cursor-pointer"
-                      onClick={() => {
-                        setSearchInput("");
-                        setDebouncedSearchTerm("");
-                      }}
+            </div>
+            <div className="flex flex-col gap-1">
+              <div className="flex gap-2 w-full">
+                <InputGroup className="w-full">
+                  <MagnifyingGlassIcon />
+                  <Input
+                    name="search"
+                    placeholder={LL.searchCafes()}
+                    aria-label={LL.searchCafes()}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                    value={searchInput}
+                    autoComplete="off"
+                    className="w-[calc(300px_-_2rem)]"
+                  />
+                </InputGroup>
+                {searchInput && (
+                  <Button
+                    plain
+                    aria-label="Clear search"
+                    className="cursor-pointer"
+                    onClick={() => {
+                      setSearchInput("");
+                      setDebouncedSearchTerm("");
+                    }}
+                  >
+                    <XMarkIcon className="h-5 w-5" />
+                  </Button>
+                )}
+              </div>
+              <div className="flex items-baseline gap-2">
+                <Dropdown>
+                  <DropdownButton outline className="grow">
+                    <p className="text-xs">
+                      {searchFilters.gmaps_rating
+                        ? `>=${searchFilters.gmaps_rating}⭐️`
+                        : "Rating"}
+                    </p>
+                    <ChevronDownIcon />
+                  </DropdownButton>
+                  <DropdownMenu>
+                    <DropdownItem onClick={() => handleRatingChange("")}>
+                      Any
+                    </DropdownItem>
+                    <DropdownItem onClick={() => handleRatingChange("1")}>
+                      ⭐️
+                    </DropdownItem>
+                    <DropdownItem onClick={() => handleRatingChange("2")}>
+                      ⭐️⭐️
+                    </DropdownItem>
+                    <DropdownItem onClick={() => handleRatingChange("3")}>
+                      ⭐️⭐️⭐️
+                    </DropdownItem>
+                    <DropdownItem onClick={() => handleRatingChange("4")}>
+                      ⭐️⭐️⭐️⭐️
+                    </DropdownItem>
+                    <DropdownItem onClick={() => handleRatingChange("5")}>
+                      ⭐️⭐️⭐️⭐️⭐️
+                    </DropdownItem>
+                  </DropdownMenu>
+                </Dropdown>
+                <Dropdown>
+                  <DropdownButton outline className="grow">
+                    <p className="text-xs">
+                      {searchFilters.gmaps_total_reviews
+                        ? `>=${searchFilters.gmaps_total_reviews} reviews`
+                        : "Total Reviews"}
+                    </p>
+                    <ChevronDownIcon />
+                  </DropdownButton>
+                  <DropdownMenu>
+                    <DropdownItem onClick={() => handleTotalReviewsChange("")}>
+                      Any
+                    </DropdownItem>
+                    <DropdownItem
+                      onClick={() => handleTotalReviewsChange("10")}
                     >
-                      <XMarkIcon className="h-5 w-5" />
-                    </Button>
-                  )}
-                </div>
-                <div className="flex items-baseline gap-2">
-                  <Dropdown>
-                    <DropdownButton outline className="grow">
-                      <p className="text-xs">
-                        {searchFilters.gmaps_rating
-                          ? `>=${searchFilters.gmaps_rating}⭐️`
-                          : "Rating"}
-                      </p>
-                      <ChevronDownIcon />
-                    </DropdownButton>
-                    <DropdownMenu>
-                      <DropdownItem onClick={() => handleRatingChange("")}>
-                        Any
-                      </DropdownItem>
-                      <DropdownItem onClick={() => handleRatingChange("1")}>
-                        ⭐️
-                      </DropdownItem>
-                      <DropdownItem onClick={() => handleRatingChange("2")}>
-                        ⭐️⭐️
-                      </DropdownItem>
-                      <DropdownItem onClick={() => handleRatingChange("3")}>
-                        ⭐️⭐️⭐️
-                      </DropdownItem>
-                      <DropdownItem onClick={() => handleRatingChange("4")}>
-                        ⭐️⭐️⭐️⭐️
-                      </DropdownItem>
-                      <DropdownItem onClick={() => handleRatingChange("5")}>
-                        ⭐️⭐️⭐️⭐️⭐️
-                      </DropdownItem>
-                    </DropdownMenu>
-                  </Dropdown>
-                  <Dropdown>
-                    <DropdownButton outline className="grow">
-                      <p className="text-xs">
-                        {searchFilters.gmaps_total_reviews
-                          ? `>=${searchFilters.gmaps_total_reviews} reviews`
-                          : "Total Reviews"}
-                      </p>
-                      <ChevronDownIcon />
-                    </DropdownButton>
-                    <DropdownMenu>
-                      <DropdownItem
-                        onClick={() => handleTotalReviewsChange("")}
-                      >
-                        Any
-                      </DropdownItem>
-                      <DropdownItem
-                        onClick={() => handleTotalReviewsChange("10")}
-                      >
-                        10{">"}
-                      </DropdownItem>
-                      <DropdownItem
-                        onClick={() => handleTotalReviewsChange("50")}
-                      >
-                        50{">"}
-                      </DropdownItem>
-                      <DropdownItem
-                        onClick={() => handleTotalReviewsChange("100")}
-                      >
-                        100{">"}
-                      </DropdownItem>
-                      <DropdownItem
-                        onClick={() => handleTotalReviewsChange("500")}
-                      >
-                        500{">"}
-                      </DropdownItem>
-                    </DropdownMenu>
-                  </Dropdown>
-                </div>
-                <Button
-                  color="orange"
-                  className="cursor-pointer"
-                  onClick={() => setOpenFilters(!openFilters)}
-                >
-                  Filters
-                </Button>
+                      10{">"}
+                    </DropdownItem>
+                    <DropdownItem
+                      onClick={() => handleTotalReviewsChange("50")}
+                    >
+                      50{">"}
+                    </DropdownItem>
+                    <DropdownItem
+                      onClick={() => handleTotalReviewsChange("100")}
+                    >
+                      100{">"}
+                    </DropdownItem>
+                    <DropdownItem
+                      onClick={() => handleTotalReviewsChange("500")}
+                    >
+                      500{">"}
+                    </DropdownItem>
+                  </DropdownMenu>
+                </Dropdown>
               </div>
-            </SidebarHeader>
-            <SidebarBody className="overflow-y-hidden">
-              <SidebarSection className="max-lg:hidden h-full">
-                {/* {(isSearchLoading || isMapCafesLoading) && <Text>Loading</Text>} */}
-                {/* {(searchError || mapCafesError) && (
+              <Button
+                color="orange"
+                className="cursor-pointer"
+                onClick={() => setOpenFilters(!openFilters)}
+              >
+                Filters
+              </Button>
+            </div>
+          </SidebarHeader>
+          <SidebarBody className="overflow-y-hidden">
+            <SidebarSection className=" h-full">
+              {/* {(isSearchLoading || isMapCafesLoading) && <Text>Loading</Text>} */}
+              {/* {(searchError || mapCafesError) && (
 									<Text color="red">
 										{JSON.stringify(searchError || mapCafesError)}
 									</Text>
 								)} */}
-                <Suspense fallback={<CafeListSkeleton />}>
-                  <CafeList searchInput={debouncedSearchTerm} />
-                </Suspense>
-              </SidebarSection>
-              <SidebarSpacer />
-            </SidebarBody>
-            <SidebarFooter className="max-lg:hidden pb-4">
-              <div className="flex items-center gap-2">
-                <Button
-                  color="red"
-                  target="_blank"
-                  href="https://www.instagram.com/kopimap/"
-                  arial-label="Instagram Link"
-                  className="grow"
-                >
-                  <svg viewBox="0 0 24 24" className="w-5 fill-fuchsia-200">
-                    <path d={siInstagram.path} />
-                  </svg>
-                </Button>
-                <Button
-                  href="https://www.nihbuatjajan.com/egan"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="h-full grow"
-                  color="yellow"
-                >
-                  <p className="text-xs text-orange-900">Nih Buat Jajan</p>
-                </Button>
-              </div>
-              <Dropdown>
-                <DropdownButton as={SidebarItem}>
-                  <div className="flex items-baseline justify-between w-full">
-                    {loggedInUser && (
-                      <span className="flex min-w-0 items-center gap-3">
-                        <Avatar
-                          src={loggedInUser.user_metadata.avatar_url}
-                          className="size-10"
-                          square
-                          alt=""
-                        />
-                        <span className="min-w-0">
-                          <span className="block truncate text-sm/5 font-medium text-zinc-950 dark:text-white">
-                            {loggedInUser.user_metadata.name}
-                          </span>
-                          <span className="block truncate text-xs/5 font-normal text-zinc-500 dark:text-zinc-400">
-                            {loggedInUser.email}
-                          </span>
-                        </span>
-                      </span>
-                    )}
-                    {!loggedInUser && (
-                      <Text className="flex min-w-0 items-center gap-3">
-                        {LL.loginToReview()}
-                      </Text>
-                    )}
-                  </div>
+              <Suspense fallback={<CafeListSkeleton />}>
+                <CafeList searchInput={debouncedSearchTerm} />
+              </Suspense>
+            </SidebarSection>
+            <SidebarSpacer />
+          </SidebarBody>
+        </Sidebar>
+      </aside>
 
-                  <ChevronUpIcon />
-                </DropdownButton>
-                <DropdownMenu className="min-w-64" anchor="top start">
-                  {loggedInUser && (
-                    <>
-                      <DropdownItem
-                        onClick={async () => {
-                          await supabase.auth.signOut();
-                          window.location.reload();
-                        }}
-                      >
-                        <ArrowRightStartOnRectangleIcon />
-                        <DropdownLabel>{LL.signOut()}</DropdownLabel>
-                      </DropdownItem>
-                    </>
-                  )}
-                  {!loggedInUser && (
-                    <>
-                      {/* <DropdownDivider /> */}
-                      <DropdownItem
-                        onClick={async () => {
-                          await supabase.auth.signInWithOAuth({
-                            provider: "google",
-                            options: {
-                              redirectTo: import.meta.env.VITE_URL,
-                            },
-                          });
-                        }}
-                      >
-                        <ArrowRightStartOnRectangleIcon />
-                        <DropdownLabel>{LL.signIn()}</DropdownLabel>
-                      </DropdownItem>
-                    </>
-                  )}
-                </DropdownMenu>
-              </Dropdown>
-            </SidebarFooter>
-          </Sidebar>
-        }
-      >
-        {children}
-      </SidebarLayout>
+      {/* Main content */}
+      <div className="flex flex-col flex-1">
+        {/* Main content area */}
+        <main className="flex-1 overflow-auto">{children}</main>
+      </div>
+
+      {/* Overlay for mobile sidebar */}
+      {showSidebar && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
+          onClick={() => setShowSidebar(false)}
+        ></div>
+      )}
+
       <Dialog open={isOpen} onClose={setIsOpen}>
         <DialogTitle>Search Filters</DialogTitle>
         <DialogBody>
@@ -407,6 +263,6 @@ export default function MainSidebar({ children }: MainSidebarProps) {
           <Button onClick={() => setIsFeatureRoadmapOpen(false)}>Close</Button>
         </DialogActions>
       </Dialog>
-    </>
+    </div>
   );
 }

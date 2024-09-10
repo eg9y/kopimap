@@ -9,7 +9,6 @@ import { useData } from "vike-react/useData";
 
 import "@smastrom/react-rating/style.css";
 
-
 import type { MeiliSearchCafe } from "@/types";
 import { useStore } from "../store";
 
@@ -57,12 +56,11 @@ export const App = () => {
     }
   }, []);
 
-
   return (
     <>
       <Suspense fallback={<div>Loading...</div>}>
         {isWide ? (
-          <div className="flex w-[100vw] h-[100dvh] overflow-hidden">
+          <div className="flex h-[calc(100dvh_-_56px-0.5rem)] overflow-hidden">
             <DesktopView
               openFilters={openFilters}
               pmTilesReady={pmTilesReady}

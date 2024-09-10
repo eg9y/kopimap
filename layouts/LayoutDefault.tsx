@@ -8,6 +8,7 @@ import { MobileToolbar } from "@/components/mobile/mobile-toolbar";
 import { LocaleContext } from "@/components/locale-context";
 import { UsernamePrompt } from "@/components/username-prompt";
 import { WelcomeModal } from "@/components/welcome-modal";
+import { NavbarContainer } from "@/components/navbar-container";
 
 const queryClient = new QueryClient();
 
@@ -23,7 +24,12 @@ export default function LayoutDefault({
     <QueryClientProvider client={queryClient}>
       <LocaleContext>
         <div className="flex flex-col h-[100dvh] relative">
-          <main className="grow overflow-scroll">{children}</main>
+          {isMobile && <main className="grow overflow-scroll">{children}</main>}
+          {!isMobile && (
+            <NavbarContainer>
+              <main className="grow overflow-scroll">{children}</main>
+            </NavbarContainer>
+          )}
           {isMobile && <MobileToolbar />}
           <UsernamePrompt />
           <WelcomeModal />
