@@ -92,19 +92,19 @@ const id: Translation = {
     non_coffee_options: {
       name: "Pilihan Non-Kopi",
       options: {
-        Subpar: "Subpar",
-        Average: "Average",
-        Good: "Good",
-        Excellent: "Excellent",
+        Subpar: "Buruk",
+        Average: "Biasa",
+        Good: "Baik",
+        Excellent: "Unggul",
       },
     },
     food_options: {
       name: "Pilihan Makanan",
       options: {
-        Subpar: "Subpar",
-        Average: "Average",
-        Good: "Good",
-        Excellent: "Excellent",
+        Subpar: "Buruk",
+        Average: "Biasa",
+        Good: "Baik",
+        Excellent: "Unggul",
       },
     },
     price_quality_ratio: {
@@ -153,7 +153,7 @@ const id: Translation = {
       },
     },
     outdoor_seating: {
-      name: "Tempat Duduk Luar Ruangan",
+      name: "Tempat Duduk Luar",
       options: {
         None: "Tidak Ada",
         Limited: "Terbatas",
