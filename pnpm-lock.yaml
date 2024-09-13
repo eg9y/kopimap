@@ -164,6 +164,9 @@ dependencies:
   typesafe-i18n:
     specifier: ^5.26.2
     version: 5.26.2(typescript@5.2.2)
+  url-slug:
+    specifier: ^4.0.1
+    version: 4.0.1
   vike:
     specifier: ^0.4.182
     version: 0.4.182(vite@5.3.1)
@@ -7955,6 +7958,11 @@ packages:
     dependencies:
       querystringify: 2.2.0
       requires-port: 1.0.0
+    dev: false
+
+  /url-slug@4.0.1:
+    resolution: {integrity: sha512-OkHgffjR6bce7jNTp5BUDBhg2IcnqSAi9DEhLH8Rhxrq84uPBMbHFzvOxniEIRpSSGBcG13LhrtNR5XzUdztfQ==}
+    engines: {node: '>=18.0.0'}
     dev: false
 
   /url@0.11.4:

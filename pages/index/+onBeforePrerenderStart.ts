@@ -3,8 +3,7 @@
 import { Database } from "@/components/lib/database.types";
 import { createClient } from "@supabase/supabase-js";
 import type { OnBeforePrerenderStartAsync } from "vike/types";
-
-const BASE_URL = import.meta.env.VITE_URL || "https://kopimap.com";
+import urlSlug from "url-slug";
 
 const supabase = createClient<Database>(
   import.meta.env.VITE_SUPABASE_URL,
@@ -13,12 +12,9 @@ const supabase = createClient<Database>(
 
 const BATCH_SIZE = 1000;
 
-// Add this function to create a URL-friendly slug
+// Replace the createSlug function with this:
 function createSlug(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
+  return urlSlug(name);
 }
 
 export const onBeforePrerenderStart: OnBeforePrerenderStartAsync =
@@ -77,7 +73,9 @@ export const onBeforePrerenderStart: OnBeforePrerenderStartAsync =
         const cafeSlug = createSlug(cafe.name!);
 
         urls.push({
-          url: `/${locale}/?cafe=${cafeSlug}&place_id=${cafe.place_id}`,
+          url: `/${locale}/?cafe=${cafeSlug}&place_id=${
+            encodeURIComponent(cafe.place_id!)
+          }`,
           pageContext: {
             locale,
             data: {
