@@ -3,7 +3,7 @@
 import { Database } from "@/components/lib/database.types";
 import { createClient } from "@supabase/supabase-js";
 import type { OnBeforePrerenderStartAsync } from "vike/types";
-import urlSlug from "url-slug";
+import { convert } from "url-slug";
 
 const supabase = createClient<Database>(
   import.meta.env.VITE_SUPABASE_URL,
@@ -14,7 +14,7 @@ const BATCH_SIZE = 1000;
 
 // Replace the createSlug function with this:
 function createSlug(name: string): string {
-  return urlSlug(name);
+  return convert(name);
 }
 
 export const onBeforePrerenderStart: OnBeforePrerenderStartAsync =
