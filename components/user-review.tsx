@@ -181,13 +181,13 @@ export const UserReview: React.FC<UserReviewProps> = ({
       )}
       <div className="grow flex flex-col justify-end mt-2">
         {imageUrls && imageUrls.length > 0 && (
-          <div className="grid grid-cols-2 gap-2 mt-auto">
+          <div className="grid grid-cols-2 gap-2 mt-2">
             {imageUrls.map((url, index) => (
               <img
                 key={index}
                 src={url}
                 alt={`Review image ${index + 1}`}
-                className="w-full h-full object-cover"
+                className="w-full  object-contain"
               />
             ))}
           </div>
