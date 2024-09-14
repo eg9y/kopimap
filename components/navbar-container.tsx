@@ -46,7 +46,10 @@ export function NavbarContainer({ children }: { children: React.ReactNode }) {
         <Navbar>
           <div className="flex gap-1">
             <NavbarLabel className="font-bold text-lg text-amber-950 flex items-center">
-              <img src="../public/logo.png" className="w-6 h-6" />
+              <img
+                src="https://map-assets.kopimap.com/logo.png"
+                className="w-6 h-6"
+              />
               Kopimap
             </NavbarLabel>
           </div>
