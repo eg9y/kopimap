@@ -1,6 +1,5 @@
 // /renderer/+onBeforeRoute.ts
 
-import { modifyUrl } from "vike/modifyUrl";
 import type { OnBeforeRouteSync } from "vike/types";
 
 function extractLocale(url: URL): {
@@ -15,7 +14,6 @@ function extractLocale(url: URL): {
 
   if (locales.includes(maybeLocale)) {
     const locale = maybeLocale as "en" | "id";
-    const pathnameWithoutLocale = "/" + pathParts.slice(1).join("/");
     const urlWithoutLocale = url.pathname.slice(3) + url.search; // Remove locale and ensure it starts with /
     return { urlWithoutLocale, locale };
   }
@@ -24,17 +22,17 @@ function extractLocale(url: URL): {
 }
 
 export const onBeforeRoute: OnBeforeRouteSync = (
-  pageContext
+  pageContext,
 ): ReturnType<OnBeforeRouteSync> => {
   const url = new URL(pageContext.urlOriginal, "http://localhost");
   const { urlWithoutLocale, locale } = extractLocale(url);
 
-  // console.log("urlWithoutLocale", urlWithoutLocale);
-
   return {
     pageContext: {
       locale,
-      urlOriginal: urlWithoutLocale.startsWith("/") ? urlWithoutLocale : "/" + urlWithoutLocale,
+      urlOriginal: urlWithoutLocale.startsWith("/")
+        ? urlWithoutLocale
+        : "/" + urlWithoutLocale,
     },
   };
 };

@@ -104,11 +104,6 @@ export default function CafeDetails({
   const carouselImages = [
     ...(cafeDetailedInfo?.all_image_urls ?? []),
     ...((cafeDetailedInfo?.hosted_gmaps_images as string[]) ?? []),
-    // ...(cafeDetailedInfo?.gmaps_images
-    //   ? JSON.parse(cafeDetailedInfo?.gmaps_images as string)
-    //       .slice(1)
-    //       .map((gmapsImage: { link: string }) => gmapsImage.link)
-    //   : []),
   ];
 
   // Remove duplicates from carouselImages
@@ -412,14 +407,14 @@ const CustomCarousel: React.FC<CustomCarouselProps> = ({ images }) => {
 
       {selectedImage && (
         <div
-          className="fixed z-[1000] inset-0 bg-black bg-opacity-75 flex items-center justify-center"
+          className="fixed top-4 z-[1000] inset-0 bg-black bg-opacity-75 flex items-center justify-center"
           onClick={closeModal}
         >
-          <div className="max-w-4xl max-h-[90vh] relative">
+          <div className="max-w-4xl max-h-[80dvh] relative">
             <img
               src={selectedImage}
               alt="Expanded view"
-              className="max-w-full max-h-full object-contain"
+              className="max-h-[80dvh] object-contain"
             />
             <button
               className="absolute top-4 right-4 text-white bg-black bg-opacity-50 rounded-full p-2"

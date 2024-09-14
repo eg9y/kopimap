@@ -32,6 +32,7 @@ import {
   SidebarSpacer,
 } from "./catalyst/sidebar";
 import { Text } from "./catalyst/text";
+import { FilterIcon } from "lucide-react";
 
 const CafeList = lazy(() => import("../components/cafe-list"));
 const CafeListSkeleton = lazy(() => import("../components/cafe-list-skeleton"));
@@ -83,7 +84,7 @@ export default function MainSidebar({ children }: MainSidebarProps) {
     <div className="relative flex w-full bg-white dark:bg-zinc-900 rounded-lg overflow-hidden size-full">
       {/* Sidebar */}
       <aside
-        className={` z-40 w-[300px] bg-white dark:bg-zinc-900 shadow-lg transform transition-transform duration-300 ease-in-out ${showSidebar ? "translate-x-0" : "-translate-x-full"} translate-x-0`}
+        className={` w-[300px] bg-white dark:bg-zinc-900 shadow-lg transform transition-transform duration-300 ease-in-out ${showSidebar ? "translate-x-0" : "-translate-x-full"} translate-x-0`}
       >
         <Sidebar>
           <SidebarHeader>
@@ -194,6 +195,7 @@ export default function MainSidebar({ children }: MainSidebarProps) {
                 className="cursor-pointer"
                 onClick={() => setOpenFilters(!openFilters)}
               >
+                <FilterIcon className="w-4 h-4" />
                 Filters
               </Button>
             </div>

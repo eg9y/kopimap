@@ -46,7 +46,7 @@ export function NavbarContainer({ children }: { children: React.ReactNode }) {
         <Navbar>
           <div className="flex gap-1">
             <NavbarLabel className="font-bold text-lg text-amber-950 flex items-center">
-              <img src="/logo.png" className="w-6 h-6" />
+              <img src="../public/logo.png" className="w-6 h-6" />
               Kopimap
             </NavbarLabel>
           </div>
@@ -85,7 +85,7 @@ export function NavbarContainer({ children }: { children: React.ReactNode }) {
           <NavbarSpacer />
           <NavbarSection>
             <NavbarItem href="https://www.nihbuatjajan.com/egan">
-              Nih Buat Jajan
+              Donasi
             </NavbarItem>
 
             <Dropdown>
