@@ -84,7 +84,7 @@ export default function MainSidebar({ children }: MainSidebarProps) {
     <div className="relative flex w-full bg-white dark:bg-zinc-900 rounded-lg overflow-hidden size-full">
       {/* Sidebar */}
       <aside
-        className={` w-[300px] bg-white dark:bg-zinc-900 shadow-lg transform transition-transform duration-300 ease-in-out ${showSidebar ? "translate-x-0" : "-translate-x-full"} translate-x-0`}
+        className={` w-[300px] bg-white dark:bg-zinc-900 transform transition-transform duration-300 ease-in-out ${showSidebar ? "translate-x-0" : "-translate-x-full"} translate-x-0`}
       >
         <Sidebar>
           <SidebarHeader>

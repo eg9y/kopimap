@@ -1,4 +1,9 @@
-import { useInfiniteQuery, UseInfiniteQueryResult, QueryFunctionContext, InfiniteData } from "@tanstack/react-query";
+import {
+  InfiniteData,
+  QueryFunctionContext,
+  useInfiniteQuery,
+  UseInfiniteQueryResult,
+} from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
 import { useStore } from "../store";
 import type { MeiliSearchCafe } from "../types";
@@ -19,107 +24,137 @@ interface CafesResponse {
   totalHits: number;
 }
 
-type CafesQueryKey = [string, number, number, string, Record<string, any>, boolean];
+type CafesQueryKey = [
+  string,
+  number,
+  number,
+  string,
+  Record<string, any>,
+  boolean,
+];
 
 export const useCafes = (
   lat: number,
   lng: number,
   searchTerm?: string,
-  isIncludeDetails: boolean = true
+  isIncludeDetails: boolean = true,
 ): UseInfiniteQueryResult<InfiniteData<CafesResponse>, Error> => {
   const { searchFilters } = useStore();
 
   const queryKey = useMemo((): CafesQueryKey => {
-    return ["cafes", lat, lng, searchTerm || "No search term", searchFilters, isIncludeDetails];
+    return [
+      "cafes",
+      lat,
+      lng,
+      searchTerm || "No search term",
+      searchFilters,
+      isIncludeDetails,
+    ];
   }, [lat, lng, searchTerm, searchFilters, isIncludeDetails]);
 
-  const fetchCafes = useCallback(async ({ pageParam = 1 }: QueryFunctionContext<CafesQueryKey, number>): Promise<CafesResponse> => {
-    const filterParams = new URLSearchParams();
-    filterParams.append("lat", lat.toString());
-    filterParams.append("lng", lng.toString());
-    filterParams.append("radius", SEARCH_RADIUS.toString());
-    filterParams.append("page", pageParam.toString());
-    filterParams.append("hitsPerPage", PAGE_SIZE.toString());
-    filterParams.append("isIncludeDetails", isIncludeDetails.toString());
+  const fetchCafes = useCallback(
+    async (
+      { pageParam = 1 }: QueryFunctionContext<CafesQueryKey, number>,
+    ): Promise<CafesResponse> => {
+      const filterParams = new URLSearchParams();
+      filterParams.append("lat", lat.toString());
+      filterParams.append("lng", lng.toString());
+      filterParams.append("radius", SEARCH_RADIUS.toString());
+      filterParams.append("page", pageParam.toString());
+      filterParams.append("hitsPerPage", PAGE_SIZE.toString());
+      filterParams.append("isIncludeDetails", isIncludeDetails.toString());
 
-    if (searchTerm) {
-      filterParams.append("q", searchTerm);
-    }
+      if (searchTerm) {
+        filterParams.append("q", searchTerm);
+      }
 
-    for (const [key, value] of Object.entries(searchFilters)) {
-      if (value) {
-        if (key === "gmaps_rating" || key === "gmaps_total_reviews") {
-          filterParams.append(key, value);
-        } else {
-          filterParams.append(`${key}_mode`, value);
+      for (const [key, value] of Object.entries(searchFilters)) {
+        if (value) {
+          if (key === "gmaps_rating" || key === "gmaps_total_reviews") {
+            filterParams.append(key, value);
+          } else {
+            filterParams.append(`${key}_mode`, value);
+          }
         }
       }
-    }
 
-    console.log("filterParams", Array.from(filterParams.entries()))
+      const response = await fetch(
+        `${import.meta.env.VITE_MEILISEARCH_URL}/api/search?${filterParams.toString()}`,
+      );
 
-    const response = await fetch(
-      `${import.meta.env.VITE_MEILISEARCH_URL}/api/search?${filterParams.toString()}`
-    );
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch cafes");
-    }
-
-    const data: { hits: any[]; totalHits: number } = await response.json();
-
-    const cafes = data.hits.map((cafe: MeiliSearchCafe) => ({
-      gmaps_ratings: cafe.gmaps_rating.toString(),
-      latitude: cafe._geo.lat,
-      longitude: cafe._geo.lng,
-      distance: cafe._geoDistance,
-      ...cafe,
-      images: [] as string[],
-    }));
-
-    try {
-      const { data: images, error } = await supabase
-        .from("cafe_location_view")
-        .select("all_image_urls, hosted_gmaps_images, gmaps_images,gmaps_featured_image, place_id")
-        .in("place_id", cafes.map((cafe) => cafe.id));
-
-      if (error) {
-        console.error("Error fetching images from Supabase:", error);
-      } else if (images) {
-        // Create a map of place_id to image data for efficient lookup
-        const imageMap = new Map(images.map(img => [img.place_id, img]));
-
-        // Connect images with cafes
-        cafes.forEach(cafe => {
-          const cafeImages = imageMap.get(cafe.id);
-          if (cafeImages) {
-            const images = [
-              ...(cafeImages?.all_image_urls ?? []),
-              ...((cafeImages?.hosted_gmaps_images as string[]) ?? [cafeImages?.gmaps_featured_image]),
-              ...(cafeImages?.gmaps_images ? JSON.parse(cafeImages?.gmaps_images as string).map((gmapsImage: { link: string }) => gmapsImage.link) : []),
-            ];
-            cafe.images = images;
-          }
-        });
+      if (!response.ok) {
+        throw new Error("Failed to fetch cafes");
       }
-    } catch (error) {
-      console.error("Unexpected error while fetching images:", error);
-    }
 
-    return {
-      cafes,
-      nextPage: data.hits.length === PAGE_SIZE ? pageParam + 1 : undefined,
-      totalHits: data.totalHits,
-    };
-  }, [lat, lng, searchTerm, searchFilters, isIncludeDetails]);
+      const data: { hits: any[]; totalHits: number } = await response.json();
 
-  return useInfiniteQuery<CafesResponse, Error, InfiniteData<CafesResponse>, CafesQueryKey, number>({
+      const cafes = data.hits.map((cafe: MeiliSearchCafe) => ({
+        gmaps_ratings: cafe.gmaps_rating.toString(),
+        latitude: cafe._geo.lat,
+        longitude: cafe._geo.lng,
+        distance: cafe._geoDistance,
+        ...cafe,
+        images: [] as string[],
+      }));
+
+      try {
+        const { data: images, error } = await supabase
+          .from("cafe_location_view")
+          .select(
+            "all_image_urls, hosted_gmaps_images, gmaps_images,gmaps_featured_image, place_id",
+          )
+          .in("place_id", cafes.map((cafe) => cafe.id));
+
+        if (error) {
+          console.error("Error fetching images from Supabase:", error);
+        } else if (images) {
+          // Create a map of place_id to image data for efficient lookup
+          const imageMap = new Map(images.map((img) => [img.place_id, img]));
+
+          // Connect images with cafes
+          cafes.forEach((cafe) => {
+            const cafeImages = imageMap.get(cafe.id);
+            if (cafeImages) {
+              const images = [
+                ...(cafeImages?.all_image_urls ?? []),
+                ...((cafeImages?.hosted_gmaps_images as string[]) ??
+                  [cafeImages?.gmaps_featured_image]),
+                ...(cafeImages?.gmaps_images
+                  ? JSON.parse(cafeImages?.gmaps_images as string).map((
+                    gmapsImage: { link: string },
+                  ) => gmapsImage.link)
+                  : []),
+              ];
+              cafe.images = images;
+            }
+          });
+        }
+      } catch (error) {
+        console.error("Unexpected error while fetching images:", error);
+      }
+
+      return {
+        cafes,
+        nextPage: data.hits.length === PAGE_SIZE ? pageParam + 1 : undefined,
+        totalHits: data.totalHits,
+      };
+    },
+    [lat, lng, searchTerm, searchFilters, isIncludeDetails],
+  );
+
+  return useInfiniteQuery<
+    CafesResponse,
+    Error,
+    InfiniteData<CafesResponse>,
+    CafesQueryKey,
+    number
+  >({
     queryKey,
     queryFn: fetchCafes,
     initialPageParam: 1,
     getNextPageParam: (lastPage) => lastPage.nextPage,
     staleTime: 1000 * 60 * 5, // 5 minutes
     refetchOnWindowFocus: false,
-    placeholderData: (prev) => prev
+    placeholderData: (prev) => prev,
   });
 };

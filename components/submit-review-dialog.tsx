@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useForm, Controller, FieldValues } from "react-hook-form";
 import { toast } from "sonner";
 import { Rating } from "react-simple-star-rating";
+import { XIcon } from "lucide-react";
 
 import {
   Dialog,
@@ -62,6 +63,7 @@ export function SubmitReviewDialog({
   const [isUploading, setIsUploading] = useState(false);
   const imageUploadRef = useRef<ImageUploadRef>(null);
   const [sessionInfo, setSessionInfo] = useState<Session | null>(null);
+  const [showErrorMessage, setShowErrorMessage] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -209,7 +211,10 @@ export function SubmitReviewDialog({
           ? LL.submitReview.modifyingExisting()
           : LL.submitReview.fillOptions()}
       </DialogDescription>
-      <form onSubmit={handleSubmit(onSubmit)} className="grow">
+      <form
+        onSubmit={handleSubmit(onSubmit, () => setShowErrorMessage(true))}
+        className="grow"
+      >
         <DialogBody className="flex flex-col gap-2 h-[60vh] overflow-scroll">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {/* Overall Rating */}
@@ -261,6 +266,42 @@ export function SubmitReviewDialog({
                           {errors.rating.message as string}
                         </span>
                       )}
+                    </div>
+                  )}
+                />
+              </Field>
+            </div>
+            {/* Review Text */}
+            <div className="p-2 rounded-md bg-slate-100 w-full flex flex-col">
+              <Field>
+                <p className="text-base font-semibold mb-2">
+                  {LL.submitReview.reviewText()}
+                </p>
+                <Controller
+                  name="review_text"
+                  control={control}
+                  rules={{
+                    maxLength: {
+                      value: 500,
+                      message: LL.submitReview.reviewTextTooLong(),
+                    },
+                  }}
+                  render={({ field }) => (
+                    <div>
+                      <textarea
+                        {...field}
+                        className="w-full p-2 border rounded-md"
+                        rows={4}
+                        placeholder={LL.submitReview.reviewTextPlaceholder()}
+                      />
+                      {errors.review_text && (
+                        <span className="text-red-500 text-sm">
+                          {errors.review_text.message as string}
+                        </span>
+                      )}
+                      <p className="text-sm text-gray-500 mt-1">
+                        {field.value ? field.value.length : 0}/500
+                      </p>
                     </div>
                   )}
                 />
@@ -379,7 +420,7 @@ export function SubmitReviewDialog({
             ))}
           </div>
           {/* Error display */}
-          {Object.keys(errors).length > 0 && (
+          {showErrorMessage && Object.keys(errors).length > 0 && (
             <div
               className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
               role="alert"
@@ -389,7 +430,17 @@ export function SubmitReviewDialog({
               </strong>
               <ul className="mt-2 list-disc list-inside">
                 {errors.rating && <li>{LL.submitReview.ratingRequired()}</li>}
+                {errors.review_text && (
+                  <li>{errors.review_text.message as string}</li>
+                )}
               </ul>
+              <button
+                onClick={() => setShowErrorMessage(false)}
+                className="absolute top-0 right-0 mt-2 mr-2 text-red-700"
+                type="button"
+              >
+                <XIcon size={16} />
+              </button>
             </div>
           )}
         </DialogBody>

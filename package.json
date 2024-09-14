@@ -79,7 +79,7 @@
     "zustand": "^4.5.4"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.8.3",
+    "@biomejs/biome": "1.9.0",
     "@capacitor/cli": "^6.1.1",
     "@redux-devtools/extension": "^3.3.0",
     "@tanstack/react-query-devtools": "^5.50.1",

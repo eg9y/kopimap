@@ -71,7 +71,7 @@ export default function DesktopView({
             <>
               <motion.div
                 className={
-                  "ml-[300px] h-[calc(100%_-_56px_-0.5rem)] min-w-[400px] w-[30vw] overflow-y-scroll pointer-events-auto bg-slate-50 absolute ring-1 ring-slate-300 shadow-md flex flex-col gap-2"
+                  "ml-[300px] z-10 h-[calc(100%_-_56px_-0.5rem)] min-w-[400px] w-[30vw] overflow-y-scroll pointer-events-auto bg-slate-50 absolute ring-1 ring-slate-300 shadow-md flex flex-col gap-2"
                 }
                 animate={{
                   width: "30vw",

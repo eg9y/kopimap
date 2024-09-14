@@ -1,7 +1,6 @@
 import {
   Dropdown,
   DropdownButton,
-  DropdownDivider,
   DropdownItem,
   DropdownLabel,
   DropdownMenu,
@@ -23,7 +22,6 @@ import { createClient } from "@supabase/supabase-js";
 import { useUser } from "../hooks/use-user";
 import { useI18nContext } from "@/src/i18n/i18n-react";
 import { LanguageSwitcher } from "./language-switcher";
-import { Button } from "./catalyst/button";
 import { siInstagram } from "simple-icons";
 
 const supabase = createClient(
@@ -54,16 +52,6 @@ export function NavbarContainer({ children }: { children: React.ReactNode }) {
             </NavbarLabel>
           </div>
           <LanguageSwitcher />
-          <Button
-            color="red"
-            target="_blank"
-            href="https://www.instagram.com/kopimap/"
-            arial-label="Instagram Link"
-          >
-            <svg viewBox="0 0 24 24" className="w-5 fill-fuchsia-200">
-              <path d={siInstagram.path} />
-            </svg>
-          </Button>
           <NavbarDivider className="max-lg:hidden" />
           <NavbarSection className="">
             {navItems.map(({ label, url }) => (
@@ -87,6 +75,11 @@ export function NavbarContainer({ children }: { children: React.ReactNode }) {
           </NavbarSection>
           <NavbarSpacer />
           <NavbarSection>
+            <NavbarItem href="https://www.instagram.com/kopimap/">
+              <svg viewBox="0 0 24 24" className="w-4 ">
+                <path d={siInstagram.path} />
+              </svg>
+            </NavbarItem>
             <NavbarItem href="https://www.nihbuatjajan.com/egan">
               Donasi
             </NavbarItem>

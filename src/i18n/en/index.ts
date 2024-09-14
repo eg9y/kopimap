@@ -206,7 +206,7 @@ const en: BaseTranslation = {
     submitSuccess: "Your review has been successfully submitted.",
     reviewText: "Review Text",
     reviewTextPlaceholder: "Share your thoughts about this cafe (optional)",
-    reviewTextTooLong: "Review text must be 280 characters or less",
+    reviewTextTooLong: "Review text must be 500 characters or less",
   },
   cafeDetails: {
     userReviews: "User Reviews",

@@ -261,7 +261,7 @@ export function MobileSubmitReview({
                   control={control}
                   rules={{
                     maxLength: {
-                      value: 280,
+                      value: 500,
                       message: LL.submitReview.reviewTextTooLong(),
                     },
                   }}
@@ -279,7 +279,7 @@ export function MobileSubmitReview({
                         </span>
                       )}
                       <p className="text-sm text-gray-500 mt-1">
-                        {field.value ? field.value.length : 0}/280
+                        {field.value ? field.value.length : 0}/500
                       </p>
                     </div>
                   )}

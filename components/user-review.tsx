@@ -12,6 +12,8 @@ import {
 } from "lucide-react";
 import { Database } from "@/components/lib/database.types";
 import { Badge } from "./catalyst/badge";
+import { Link } from "./catalyst/link";
+import convert from "url-slug";
 
 type ReviewMetadata = {
   coffee_quality: Database["public"]["Enums"]["quality_rating"] | null;
@@ -37,6 +39,7 @@ interface UserReviewProps {
   cafeGmapsRating?: string;
   cafeGmapsTotalReviews?: number;
   cafePriceRange?: string;
+  placeId?: string;
 }
 
 export const UserReview: React.FC<UserReviewProps> = ({
@@ -49,6 +52,7 @@ export const UserReview: React.FC<UserReviewProps> = ({
   imageUrls,
   showCafeInfo = true,
   metadata,
+  placeId,
 }) => {
   const [expanded, setExpanded] = useState(false);
 
@@ -110,37 +114,43 @@ export const UserReview: React.FC<UserReviewProps> = ({
   const visibleItems = expanded ? metadataItems : metadataItems.slice(0, 4);
 
   return (
-    <div className="bg-white shadow-md rounded-lg p-4 mb-4 border border-gray-200">
-      <div className="flex justify-between items-baseline">
-        <div className="flex items-center mb-2">
-          <User size={20} className="mr-1 mt-1 text-gray-600" />
-          <span className="font-semibold text-base">
+    <div className="p-4 flex flex-col border border-gray-200 shadow-sm h-full">
+      <div className="flex justify-between items-baseline mb-2">
+        <div className="flex items-center">
+          <User size={16} className="mr-1 text-gray-600" />
+          <span className="font-semibold text-sm">
             {username || "Anonymous"}
           </span>
         </div>
-        <p className="text-xs text-gray-500 mt-2">
-          {new Date(createdAt).toLocaleDateString("id", {
+        <p className="text-xs text-gray-500">
+          {new Date(createdAt).toLocaleString("id-ID", {
             day: "numeric",
             month: "short",
-            year: "numeric",
+            year: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
           })}
         </p>
       </div>
       {showCafeInfo && cafeName && (
-        <div className="text-sm text-gray-600 mb-2 pb-2 border-b border-gray-200">
-          <p className="flex items-center">
-            <MapPin size={14} className="mr-1" />
-            <span>{cafeName}</span>
-          </p>
-        </div>
+        <Link href={`/?cafe=${convert(cafeName)}&place_id=${placeId}`}>
+          <div className="text-sm text-blue-600 mb-2">
+            <p className="flex items-center">
+              <MapPin size={12} className="mr-1" />
+              <span>{cafeName}</span>
+            </p>
+          </div>
+        </Link>
       )}
-      {reviewText && <p className="text-sm text-gray-800 mb-2">{reviewText}</p>}
-      <div className="flex flex-wrap items-baseline gap-2 pb-2 text-xs">
+      {reviewText && (
+        <p className="text-sm text-gray-800 mb-2 line-clamp-3">{reviewText}</p>
+      )}
+      <div className="flex flex-wrap items-baseline gap-2 mb-2 text-xs">
         <Badge color="yellow" className="flex items-center">
           <Star
             className="text-orange-400 mr-1"
             fill="rgb(251 146 60)"
-            size={18}
+            size={14}
           />
           <span className="text-base font-medium">{rating.toFixed(1)}</span>
         </Badge>
@@ -169,18 +179,20 @@ export const UserReview: React.FC<UserReviewProps> = ({
           )}
         </button>
       )}
-      {imageUrls && imageUrls.length > 0 && (
-        <div className="flex flex-wrap gap-1 mt-2">
-          {imageUrls.map((url, index) => (
-            <img
-              key={index}
-              src={url}
-              alt={`Review image ${index + 1}`}
-              className="w-16 h-16 object-cover rounded"
-            />
-          ))}
-        </div>
-      )}
+      <div className="grow flex flex-col justify-end mt-2">
+        {imageUrls && imageUrls.length > 0 && (
+          <div className="grid grid-cols-2 gap-2 mt-auto">
+            {imageUrls.map((url, index) => (
+              <img
+                key={index}
+                src={url}
+                alt={`Review image ${index + 1}`}
+                className="w-full h-full object-cover"
+              />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

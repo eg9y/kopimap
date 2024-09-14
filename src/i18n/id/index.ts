@@ -206,7 +206,7 @@ const id: Translation = {
     submitSuccess: "Ulasan Anda telah berhasil dikirim.",
     reviewText: "Teks Ulasan",
     reviewTextPlaceholder: "Bagikan pendapat Anda tentang kafe ini (opsional)",
-    reviewTextTooLong: "Teks ulasan harus 280 karakter atau kurang",
+    reviewTextTooLong: "Teks ulasan harus 500 karakter atau kurang",
   },
   cafeDetails: {
     userReviews: "Ulasan",
