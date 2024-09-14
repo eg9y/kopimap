@@ -25,6 +25,7 @@ import { Rate } from "./rate";
 import { AggregatedReviews } from "./aggregated-reviews";
 import { CafeDetailedInfo } from "@/types";
 import { UserReview } from "./user-review";
+import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 
 const isInstagramLink = (url: string) => {
   return url.includes("instagram.com") || url.includes("www.instagram.com");
@@ -372,14 +373,25 @@ const CustomCarousel: React.FC<CustomCarouselProps> = ({ images }) => {
     setIsSwipingHorizontally(false);
   }, []);
 
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(
+    null
+  );
 
-  const openModal = (image: string) => {
-    setSelectedImage(image);
+  const openModal = (index: number) => {
+    setSelectedImageIndex(index);
   };
 
   const closeModal = () => {
-    setSelectedImage(null);
+    setSelectedImageIndex(null);
+  };
+
+  const navigateImage = (direction: "prev" | "next") => {
+    if (selectedImageIndex === null) return;
+    const newIndex =
+      direction === "prev"
+        ? (selectedImageIndex - 1 + images.length) % images.length
+        : (selectedImageIndex + 1) % images.length;
+    setSelectedImageIndex(newIndex);
   };
 
   return (
@@ -392,7 +404,7 @@ const CustomCarousel: React.FC<CustomCarouselProps> = ({ images }) => {
         {images.map((image, index) => (
           <ErrorBoundary fallback={<ImageError />} key={image}>
             <Suspense fallback={<ImageLoader />}>
-              <a onClick={() => openModal(image)}>
+              <a onClick={() => openModal(index)}>
                 <ImageWithSuspense
                   key={index}
                   src={image}
@@ -405,22 +417,37 @@ const CustomCarousel: React.FC<CustomCarouselProps> = ({ images }) => {
         ))}
       </Carousel>
 
-      {selectedImage && (
+      {selectedImageIndex !== null && (
         <div
-          className="fixed top-4 z-[1000] inset-0 bg-black bg-opacity-75 flex items-center justify-center"
+          className="fixed top-0 left-0 z-[1000] w-full h-full bg-black bg-opacity-75 flex items-center justify-center"
           onClick={closeModal}
         >
-          <div className="max-w-4xl max-h-[80dvh] relative">
+          <div
+            className="w-[90vw] h-[90vh] max-w-4xl max-h-[80vh] relative bg-black flex items-center justify-center"
+            onClick={(e) => e.stopPropagation()}
+          >
             <img
-              src={selectedImage}
+              src={images[selectedImageIndex]}
               alt="Expanded view"
-              className="max-h-[80dvh] object-contain"
+              className="max-w-full max-h-full object-contain"
             />
             <button
               className="absolute top-4 right-4 text-white bg-black bg-opacity-50 rounded-full p-2"
               onClick={closeModal}
             >
               <XIcon size={24} />
+            </button>
+            <button
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white bg-black bg-opacity-50 rounded-full p-2"
+              onClick={() => navigateImage("prev")}
+            >
+              <ChevronLeftIcon size={24} />
+            </button>
+            <button
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white bg-black bg-opacity-50 rounded-full p-2"
+              onClick={() => navigateImage("next")}
+            >
+              <ChevronRightIcon size={24} />
             </button>
           </div>
         </div>
