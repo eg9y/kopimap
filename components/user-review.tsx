@@ -14,6 +14,7 @@ import { Database } from "@/components/lib/database.types";
 import { Badge } from "./catalyst/badge";
 import { Link } from "./catalyst/link";
 import convert from "url-slug";
+import { cn } from "./lib/utils";
 
 type ReviewMetadata = {
   coffee_quality: Database["public"]["Enums"]["quality_rating"] | null;
@@ -111,8 +112,6 @@ export const UserReview: React.FC<UserReviewProps> = ({
     },
   ];
 
-  const visibleItems = expanded ? metadataItems : metadataItems.slice(0, 4);
-
   return (
     <div className="p-4 flex flex-col border border-gray-200 shadow-sm h-full">
       <div className="flex justify-between items-baseline mb-2">
@@ -142,43 +141,49 @@ export const UserReview: React.FC<UserReviewProps> = ({
           </div>
         </Link>
       )}
-      {reviewText && (
-        <p className="text-sm text-gray-800 mb-2 line-clamp-3">{reviewText}</p>
-      )}
-      <div className="flex flex-wrap items-baseline gap-2 mb-2 text-xs">
-        <Badge color="yellow" className="flex items-center">
-          <Star
-            className="text-orange-400 mr-1"
-            fill="rgb(251 146 60)"
-            size={14}
-          />
-          <span className="text-base font-medium">{rating.toFixed(1)}</span>
-        </Badge>
-        {visibleItems.map((item, index) =>
-          renderMetadataItem(item.icon, item.label, item.value)
+      <div
+        className={cn(
+          "flex flex-col overflow-hidden",
+          !expanded && "max-h-[4rem] line-clamp-4 md:line-clamp-8 md:max-h-max"
+        )}
+      >
+        {reviewText && (
+          <p className="text-sm text-gray-800 mb-2">{reviewText}</p>
+        )}
+        <div className="flex flex-wrap items-baseline gap-2 mb-2 text-xs">
+          <Badge color="yellow" className="flex items-center">
+            <Star
+              className="text-orange-400 mr-1"
+              fill="rgb(251 146 60)"
+              size={14}
+            />
+            <span className="text-base font-medium">{rating.toFixed(1)}</span>
+          </Badge>
+          {metadataItems.map((item, index) =>
+            renderMetadataItem(item.icon, item.label, item.value)
+          )}
+        </div>
+        {showCafeInfo && (
+          <p className="text-sm text-slate-500 overflow-hidden whitespace-nowrap text-ellipsis tracking-tight mb-2">
+            @{cafeAddress}
+          </p>
         )}
       </div>
-      {expanded && showCafeInfo && (
-        <p className="text-sm text-slate-500 overflow-hidden whitespace-nowrap text-ellipsis tracking-tight mb-2">
-          @{cafeAddress}
-        </p>
-      )}
-      {metadataItems.length > 4 && (
-        <button
-          onClick={toggleExpanded}
-          className="text-xs text-blue-500 flex items-center mt-2 hover:underline focus:outline-none"
-        >
-          {expanded ? (
-            <>
-              <ChevronUp size={14} className="mr-1" /> Show less
-            </>
-          ) : (
-            <>
-              <ChevronDown size={14} className="mr-1" /> Show more
-            </>
-          )}
-        </button>
-      )}
+
+      <button
+        onClick={toggleExpanded}
+        className="text-xs text-blue-500 flex items-center mt-2 hover:underline focus:outline-none"
+      >
+        {expanded ? (
+          <>
+            <ChevronUp size={14} className="mr-1" /> Show less
+          </>
+        ) : (
+          <>
+            <ChevronDown size={14} className="mr-1" /> Show more
+          </>
+        )}
+      </button>
       <div className="grow flex flex-col justify-end mt-2">
         {imageUrls && imageUrls.length > 0 && (
           <div className="grid grid-cols-2 gap-2 mt-2">
