@@ -9,6 +9,7 @@ import {
   Utensils,
   ChevronDown,
   ChevronUp,
+  ExternalLinkIcon,
 } from "lucide-react";
 import { Database } from "@/components/lib/database.types";
 import { Badge } from "./catalyst/badge";
@@ -66,7 +67,7 @@ export const UserReview: React.FC<UserReviewProps> = ({
   ) => {
     if (value === null || value === undefined) return null;
     return (
-      <Badge className="flex items-center gap-1">
+      <Badge className="flex items-center gap-1" key={label}>
         {icon}
         <p>{label}:</p>
         <p>{value === true ? "Yes" : value === false ? "No" : value}</p>
@@ -112,8 +113,15 @@ export const UserReview: React.FC<UserReviewProps> = ({
     },
   ];
 
+  const transformImageUrl = (url: string) => {
+    const baseUrl = url.split("/storage/v1/object/public/")[0];
+    const imagePath = url.split("/storage/v1/object/public/")[1];
+    // phone vertical image
+    return `${baseUrl}/storage/v1/render/image/public/${imagePath}?width=346&height=461`;
+  };
+
   return (
-    <div className="p-4 flex flex-col border border-gray-200 shadow-sm h-full">
+    <div className="p-4 flex flex-col border rounded-md shadow-md border-gray-200  bg-white">
       <div className="flex justify-between items-baseline mb-2">
         <div className="flex items-center">
           <User size={16} className="mr-1 text-gray-600" />
@@ -137,6 +145,7 @@ export const UserReview: React.FC<UserReviewProps> = ({
             <p className="flex items-center">
               <MapPin size={12} className="mr-1" />
               <span>{cafeName}</span>
+              <ExternalLinkIcon size={12} className="ml-1" />
             </p>
           </div>
         </Link>
@@ -186,13 +195,13 @@ export const UserReview: React.FC<UserReviewProps> = ({
       </button>
       <div className="grow flex flex-col justify-end mt-2">
         {imageUrls && imageUrls.length > 0 && (
-          <div className="grid grid-cols-2 gap-2 mt-2">
+          <div className="grid grid-cols-2 gap-2 mt-2 ">
             {imageUrls.map((url, index) => (
               <img
                 key={index}
-                src={url}
+                src={transformImageUrl(url)}
                 alt={`Review image ${index + 1}`}
-                className="w-full  object-contain"
+                className="object-contain"
               />
             ))}
           </div>
