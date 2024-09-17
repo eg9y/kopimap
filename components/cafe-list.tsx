@@ -37,7 +37,7 @@ export default function CafeList({ searchInput }: CafeListProps) {
   const rowVirtualizer = useVirtualizer({
     count: hasNextPage ? allCafes.length + 1 : allCafes.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 80,
+    estimateSize: () => 100,
     overscan: 5,
   });
 
@@ -160,22 +160,36 @@ export default function CafeList({ searchInput }: CafeListProps) {
                     "No more cafes to load"
                   )
                 ) : (
-                  <SidebarItem onClick={() => handleCafeSelect(cafe)}>
-                    <div className="grow w-full">
-                      <div>
+                  <SidebarItem
+                    onClick={() => handleCafeSelect(cafe)}
+                    className="flex gap-2"
+                  >
+                    <img
+                      src={cafe.images[0]}
+                      className="w-16 h-16 object-cover rounded-md shadow-sm flex-shrink-0"
+                      alt={cafe.name}
+                    />
+                    <div className="w-[calc(100%_-_4.5rem)]">
+                      <div className="">
                         <p className="text-nowrap text-ellipsis overflow-hidden">
                           {cafe.name}
                         </p>
-                        <div className="flex gap-2">
-                          <Badge className="grow">
-                            gmaps rating: {cafe.gmaps_rating} (
-                            {cafe.gmaps_total_reviews.toLocaleString("id-ID")})
+                        <div className="flex flex-col gap-1 w-full">
+                          <Badge className="w-full flex justify-between">
+                            <p>gmaps rating</p>
+                            <p>
+                              {cafe.gmaps_rating} (
+                              {cafe.gmaps_total_reviews.toLocaleString("id-ID")}
+                              )
+                            </p>
                           </Badge>
-                          <Badge className="grow">
-                            rating:{" "}
-                            {cafe.avg_rating
-                              ? `${cafe.avg_rating} (${cafe.review_count})`
-                              : "-"}
+                          <Badge className="w-full flex justify-between">
+                            <p>rating</p>
+                            <p>
+                              {cafe.avg_rating
+                                ? `${cafe.avg_rating} (${cafe.review_count})`
+                                : "-"}
+                            </p>
                           </Badge>
                         </div>
                         <p className="font-light text-ellipsis text-nowrap text-slate-500 overflow-hidden">

@@ -33,6 +33,13 @@ type CafesQueryKey = [
   boolean,
 ];
 
+const transformImageUrl = (url: string) => {
+  const baseUrl = url.split("/storage/v1/object/public/")[0];
+  const imagePath = url.split("/storage/v1/object/public/")[1];
+  // phone vertical image
+  return `${baseUrl}/storage/v1/render/image/public/${imagePath}?width=120&height=120`;
+};
+
 export const useCafes = (
   lat: number,
   lng: number,
@@ -116,9 +123,14 @@ export const useCafes = (
             const cafeImages = imageMap.get(cafe.id);
             if (cafeImages) {
               const images = [
-                ...(cafeImages?.all_image_urls ?? []),
-                ...((cafeImages?.hosted_gmaps_images as string[]) ??
-                  [cafeImages?.gmaps_featured_image]),
+                ...(cafeImages?.all_image_urls
+                  ? cafeImages.all_image_urls.map(transformImageUrl)
+                  : []),
+                ...((cafeImages?.hosted_gmaps_images as string[])
+                  ? (cafeImages.hosted_gmaps_images as string[]).map(
+                    transformImageUrl,
+                  )
+                  : []),
                 ...(cafeImages?.gmaps_images
                   ? JSON.parse(cafeImages?.gmaps_images as string).map((
                     gmapsImage: { link: string },

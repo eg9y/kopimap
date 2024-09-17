@@ -6,6 +6,8 @@ import { useCafes } from "@/hooks/use-cafes";
 import useMedia from "react-use/esm/useMedia";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 
+
+
 interface CafeListProps {
   searchInput: string;
   setIsOpen: (x: boolean) => void;
