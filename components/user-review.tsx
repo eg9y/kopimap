@@ -67,7 +67,10 @@ export const UserReview: React.FC<UserReviewProps> = ({
   ) => {
     if (value === null || value === undefined) return null;
     return (
-      <Badge className="flex items-center gap-1" key={label}>
+      <Badge
+        className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+        key={label}
+      >
         {icon}
         <p>{label}:</p>
         <p>{value === true ? "Yes" : value === false ? "No" : value}</p>
@@ -121,15 +124,15 @@ export const UserReview: React.FC<UserReviewProps> = ({
   };
 
   return (
-    <div className="p-4 flex flex-col border rounded-md shadow-md border-gray-200  bg-white">
+    <div className="p-4 flex flex-col border rounded-md shadow-md border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200">
       <div className="flex justify-between items-baseline mb-2">
         <div className="flex items-center">
-          <User size={16} className="mr-1 text-gray-600" />
+          <User size={16} className="mr-1 text-gray-600 dark:text-gray-400" />
           <span className="font-semibold text-sm">
             {username || "Anonymous"}
           </span>
         </div>
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-gray-500 dark:text-gray-400">
           {new Date(createdAt).toLocaleString("id-ID", {
             day: "numeric",
             month: "short",
@@ -141,7 +144,7 @@ export const UserReview: React.FC<UserReviewProps> = ({
       </div>
       {showCafeInfo && cafeName && (
         <Link href={`/?cafe=${convert(cafeName)}&place_id=${placeId}`}>
-          <div className="text-sm text-blue-600 mb-2">
+          <div className="text-sm text-blue-600 dark:text-blue-400 mb-2">
             <p className="flex items-center">
               <MapPin size={12} className="mr-1" />
               <span>{cafeName}</span>
@@ -157,7 +160,9 @@ export const UserReview: React.FC<UserReviewProps> = ({
         )}
       >
         {reviewText && (
-          <p className="text-sm text-gray-800 mb-2">{reviewText}</p>
+          <p className="text-sm text-gray-800 dark:text-gray-200 mb-2">
+            {reviewText}
+          </p>
         )}
         <div className="flex flex-wrap items-baseline gap-2 mb-2 text-xs">
           <Badge color="yellow" className="flex items-center">
@@ -173,7 +178,7 @@ export const UserReview: React.FC<UserReviewProps> = ({
           )}
         </div>
         {showCafeInfo && (
-          <p className="text-sm text-slate-500 overflow-hidden whitespace-nowrap text-ellipsis tracking-tight mb-2">
+          <p className="text-sm text-slate-500 dark:text-slate-400 overflow-hidden whitespace-nowrap text-ellipsis tracking-tight mb-2">
             @{cafeAddress}
           </p>
         )}
@@ -181,7 +186,7 @@ export const UserReview: React.FC<UserReviewProps> = ({
 
       <button
         onClick={toggleExpanded}
-        className="text-xs text-blue-500 flex items-center mt-2 hover:underline focus:outline-none"
+        className="text-xs text-blue-500 dark:text-blue-400 flex items-center mt-2 hover:underline focus:outline-none"
       >
         {expanded ? (
           <>

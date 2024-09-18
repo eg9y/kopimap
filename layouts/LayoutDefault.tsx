@@ -23,7 +23,7 @@ export default function LayoutDefault({
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="system" storageKey="kopimap-theme">
+      <ThemeProvider>
         <LocaleContext>
           <div className="flex flex-col h-[100dvh] relative">
             {isMobile && <main className="grow overflow-scroll">{children}</main>}

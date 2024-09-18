@@ -1,4 +1,4 @@
-import { MutableRefObject, createRef } from "react";
+import { createRef, MutableRefObject } from "react";
 import { MapRef } from "react-map-gl";
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
@@ -37,6 +37,7 @@ export const useStore = create<MapState>()(
         selectedCafe: null,
         selectCafe(cafe) {
           set(() => ({ selectedCafe: cafe }));
+          set(() => ({ openFilters: false }));
         },
         mapCenter: {
           lat: -6.274163,
@@ -55,7 +56,12 @@ export const useStore = create<MapState>()(
         expandDetails: false,
         setExpandDetails: (expand: boolean) => set({ expandDetails: expand }),
         openFilters: false,
-        setOpenFilters: (expand: boolean) => set({ openFilters: expand }),
+        setOpenFilters: (expand: boolean) => {
+          set(() => ({ openFilters: expand }));
+          if (expand) {
+            set(() => ({ selectedCafe: null }));
+          }
+        },
         fetchedCafes: [],
         setFetchedCafes: (cafes: MeiliSearchCafe[]) => {
           set({ fetchedCafes: cafes });
@@ -65,9 +71,11 @@ export const useStore = create<MapState>()(
         searchInput: "",
         setSearchInput: (input: string) => set({ searchInput: input }),
         isListDialogOpen: false,
-        setIsListDialogOpen: (isOpen: boolean) => set({ isListDialogOpen: isOpen }),
+        setIsListDialogOpen: (isOpen: boolean) =>
+          set({ isListDialogOpen: isOpen }),
         openSubmitReviewDialog: false,
-        setOpenSubmitReviewDialog: (isOpen: boolean) => set({ openSubmitReviewDialog: isOpen }),
+        setOpenSubmitReviewDialog: (isOpen: boolean) =>
+          set({ openSubmitReviewDialog: isOpen }),
       }),
       {
         name: "map-storage",
@@ -83,7 +91,7 @@ export const useStore = create<MapState>()(
             sessionStorage.removeItem(key);
           },
         },
-      }
-    )
-  )
+      },
+    ),
+  ),
 );

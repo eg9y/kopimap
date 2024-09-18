@@ -17,7 +17,7 @@ const DesktopView = lazy(() => import("./desktop-view"));
 const MobileView = lazy(() => import("./mobile/mobile-view"));
 
 export const App = () => {
-  const { openFilters, selectCafe, selectedCafe } = useStore();
+  const { openFilters, selectCafe, selectedCafe, setOpenFilters } = useStore();
   const [pmTilesReady, setPmTilesReady] = useState(false);
   const isWide = useMedia("(min-width: 640px)", true);
   const data = useData<undefined | { cafeToSelect?: MeiliSearchCafe }>();
@@ -38,7 +38,7 @@ export const App = () => {
     document.title = selectedCafe
       ? `Kopimap | ${selectedCafe.name}`
       : `Kopimap - Discover Jakarta's Best Cafes 🗺️☕️`;
-  }, [selectedCafe]);
+  }, [selectedCafe, setOpenFilters]);
 
   useEffect(() => {
     const protocol = new pmtiles.Protocol();

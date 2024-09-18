@@ -40,29 +40,19 @@ export function NavbarContainer({ children }: { children: React.ReactNode }) {
   const { LL } = useI18nContext();
   const { loggedInUser } = useUser();
   const { theme } = useTheme();
-  const isDarkMode = theme === "dark";
-
   return (
     <StackedLayout
       navbar={
-        <Navbar>
+        <Navbar className="dark:text-slate-50 text-slate-900">
           <div className="flex gap-1">
             <NavbarLabel
-              className={`font-bold text-lg flex items-center ${
-                isDarkMode ? "text-amber-400" : "text-amber-950"
-              }`}
+              className={`font-bold text-lg flex items-center  dark:text-amber-400 text-amber-950`}
             >
               <img
                 src="https://map-assets.kopimap.com/logo.png"
                 className={`w-6 h-6`}
               />
-              <span
-                className={`ml-2 ${
-                  isDarkMode ? "text-white" : "text-amber-950"
-                }`}
-              >
-                Kopimap
-              </span>
+              <span className="ml-2">Kopimap</span>
             </NavbarLabel>
           </div>
           <NavbarDivider className="max-lg:hidden" />
