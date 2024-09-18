@@ -1,19 +1,19 @@
-import type { GeolocateControl as GeolocateControlType } from "maplibre-gl"
+import type { GeolocateControl as GeolocateControlType } from "maplibre-gl";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { GeolocateControl, Map as Mapgl, Popup } from "react-map-gl/maplibre";
 import useMedia from "react-use/esm/useMedia";
-
-import { GeolocateResultEvent } from "react-map-gl/dist/esm/types";
-import { mapStyle } from "../config";
+import { useTheme } from "./theme-provider";
+import { mapStyle, darkMapStyle } from "../config";
 import { useMapCafes } from "../hooks/use-map-cafes";
 import { useStore } from "../store";
 import Clusters, { ClustersRef } from "./clusters";
 import "maplibre-gl/dist/maplibre-gl.css";
 import type { LngLatBoundsLike } from "react-map-gl";
+import { GeolocateResultEvent } from "react-map-gl/dist/esm/types";
 
-interface MapComponentProps { }
+interface MapComponentProps {}
 
-export default function MapComponent({ }: MapComponentProps) {
+export default function MapComponent({}: MapComponentProps) {
   const { selectCafe, setMapRef, mapRef, mapCenter, setMapCenter } = useStore();
   const [popupInfo, setPopupInfo] = useState<any>(null);
   const popupTimeoutRef = useRef<number | null>(null);
@@ -21,6 +21,7 @@ export default function MapComponent({ }: MapComponentProps) {
   const geoControlRef = useRef<GeolocateControlType>();
   const clustersRef = useRef<ClustersRef>(null);
   const isWide = useMedia("(min-width: 640px)");
+  const { theme } = useTheme();
 
   const [viewport, setViewport] = useState({
     latitude: -6.274163,
@@ -37,7 +38,7 @@ export default function MapComponent({ }: MapComponentProps) {
 
   const { data: mapCafesData, refetch: refetchMapCafes } = useMapCafes(
     mapCenter.lat,
-    mapCenter.long,
+    mapCenter.long
   );
 
   useEffect(() => {
@@ -74,7 +75,7 @@ export default function MapComponent({ }: MapComponentProps) {
         });
       }
     },
-    [mapRef],
+    [mapRef]
   );
 
   const handleFlyTo = useCallback(
@@ -90,7 +91,7 @@ export default function MapComponent({ }: MapComponentProps) {
         });
       }
     },
-    [mapRef, isWide],
+    [mapRef, isWide]
   );
 
   const handleMapMove = useCallback(() => {
@@ -139,7 +140,7 @@ export default function MapComponent({ }: MapComponentProps) {
       maxZoom={24}
       minZoom={10}
       style={{ width: "100%", height: "100%" }}
-      mapStyle={mapStyle}
+      mapStyle={theme === "dark" ? darkMapStyle : mapStyle}
       onResize={handleMapMove}
       ref={setMapRef as any}
       onClick={(e) => {

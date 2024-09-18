@@ -23,6 +23,8 @@ import { useUser } from "../hooks/use-user";
 import { useI18nContext } from "@/src/i18n/i18n-react";
 import { LanguageSwitcher } from "./language-switcher";
 import { siInstagram } from "simple-icons";
+import { ThemeToggle } from "./theme-toggle";
+import { useTheme } from "./theme-provider";
 
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
@@ -37,21 +39,32 @@ const navItems = [
 export function NavbarContainer({ children }: { children: React.ReactNode }) {
   const { LL } = useI18nContext();
   const { loggedInUser } = useUser();
+  const { theme } = useTheme();
+  const isDarkMode = theme === "dark";
 
   return (
     <StackedLayout
       navbar={
         <Navbar>
           <div className="flex gap-1">
-            <NavbarLabel className="font-bold text-lg text-amber-950 flex items-center">
+            <NavbarLabel
+              className={`font-bold text-lg flex items-center ${
+                isDarkMode ? "text-amber-400" : "text-amber-950"
+              }`}
+            >
               <img
                 src="https://map-assets.kopimap.com/logo.png"
-                className="w-6 h-6"
+                className={`w-6 h-6`}
               />
-              Kopimap
+              <span
+                className={`ml-2 ${
+                  isDarkMode ? "text-white" : "text-amber-950"
+                }`}
+              >
+                Kopimap
+              </span>
             </NavbarLabel>
           </div>
-          <LanguageSwitcher />
           <NavbarDivider className="max-lg:hidden" />
           <NavbarSection className="">
             {navItems.map(({ label, url }) => (
@@ -75,7 +88,10 @@ export function NavbarContainer({ children }: { children: React.ReactNode }) {
           </NavbarSection>
           <NavbarSpacer />
           <NavbarSection>
-            <NavbarItem href="https://www.instagram.com/kopimap/">
+            <NavbarItem
+              href="https://www.instagram.com/kopimap/"
+              target="_blank"
+            >
               <svg viewBox="0 0 24 24" className="w-4 ">
                 <path d={siInstagram.path} />
               </svg>
@@ -125,6 +141,12 @@ export function NavbarContainer({ children }: { children: React.ReactNode }) {
                 )}
               </DropdownMenu>
             </Dropdown>
+          </NavbarSection>
+          <NavbarSection>
+            <LanguageSwitcher />
+          </NavbarSection>
+          <NavbarSection>
+            <ThemeToggle />
           </NavbarSection>
         </Navbar>
       }

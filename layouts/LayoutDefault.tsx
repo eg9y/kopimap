@@ -9,6 +9,7 @@ import { LocaleContext } from "@/components/locale-context";
 import { UsernamePrompt } from "@/components/username-prompt";
 import { WelcomeModal } from "@/components/welcome-modal";
 import { NavbarContainer } from "@/components/navbar-container";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const queryClient = new QueryClient();
 
@@ -22,19 +23,21 @@ export default function LayoutDefault({
 
   return (
     <QueryClientProvider client={queryClient}>
-      <LocaleContext>
-        <div className="flex flex-col h-[100dvh] relative">
-          {isMobile && <main className="grow overflow-scroll">{children}</main>}
-          {!isMobile && (
-            <NavbarContainer>
-              <main className="grow overflow-scroll">{children}</main>
-            </NavbarContainer>
-          )}
-          {isMobile && <MobileToolbar />}
-          <UsernamePrompt />
-          <WelcomeModal />
-        </div>
-      </LocaleContext>
+      <ThemeProvider defaultTheme="system" storageKey="kopimap-theme">
+        <LocaleContext>
+          <div className="flex flex-col h-[100dvh] relative">
+            {isMobile && <main className="grow overflow-scroll">{children}</main>}
+            {!isMobile && (
+              <NavbarContainer>
+                <main className="grow overflow-scroll">{children}</main>
+              </NavbarContainer>
+            )}
+            {isMobile && <MobileToolbar />}
+            <UsernamePrompt />
+            <WelcomeModal />
+          </div>
+        </LocaleContext>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }

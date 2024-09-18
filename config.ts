@@ -15,3 +15,9 @@ export const mapStyle: string | StyleSpecification | undefined = {
   glyphs: "https://map-assets.kopimap.com/fonts/{fontstack}/{range}.pbf",
   sprite: "https://map-assets.kopimap.com/sprites/v3/light",
 };
+
+export const darkMapStyle: string | StyleSpecification | undefined = {
+  ...mapStyle,
+  layers: layers("protomaps", "dark"),
+  sprite: "https://map-assets.kopimap.com/sprites/v3/dark",
+};

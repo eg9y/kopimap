@@ -4,7 +4,6 @@ import { StarIcon, PhoneIcon, ClockIcon } from "@heroicons/react/20/solid";
 import { useImage } from "react-image";
 import { ErrorBoundary } from "react-error-boundary";
 import Carousel from "react-multi-carousel";
-
 import "react-multi-carousel/lib/styles.css";
 
 import { useStore } from "../store";
@@ -26,6 +25,7 @@ import { AggregatedReviews } from "./aggregated-reviews";
 import { CafeDetailedInfo } from "@/types";
 import { UserReview } from "./user-review";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import { useTheme } from "./theme-provider";
 
 const transformImageUrl = (url: string) => {
   if (!url.includes("ktpfrnrvqjlmjtqutpqx")) {
@@ -99,6 +99,8 @@ export default function CafeDetails({
 }) {
   const { LL } = useI18nContext();
   const { selectedCafe, selectCafe } = useStore();
+  const { theme } = useTheme();
+  const isDarkMode = theme === 'dark';
 
   const buttonRef = useRef<HTMLButtonElement>(null);
 
@@ -121,18 +123,18 @@ export default function CafeDetails({
   const uniqueCarouselImages = Array.from(new Set(carouselImages));
 
   return (
-    <div className="flex flex-col gap-4 p-4">
+    <div className={`flex flex-col gap-4 p-4 ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
       {cafeDetailedInfo ? (
         <>
           <div className="flex items-center justify-between">
-            <Heading className="text-2xl">{cafeDetailedInfo.name}</Heading>
-            <BadgeButton color="zinc" onClick={() => selectCafe(null)}>
+            <Heading className={`text-2xl ${isDarkMode ? 'text-white' : 'text-black'}`}>{cafeDetailedInfo.name}</Heading>
+            <BadgeButton color={isDarkMode ? "yellow" : "zinc"} onClick={() => selectCafe(null)}>
               <XIcon />
             </BadgeButton>
           </div>
 
           {/* Cafe Details */}
-          <div className="grid grid-cols-2 gap-2 ">
+          <div className="grid grid-cols-2 gap-2">
             <div className="flex flex-wrap gap-2">
               <BadgeButton
                 color="red"
@@ -159,26 +161,23 @@ export default function CafeDetails({
                 </BadgeButton>
               )}
               {cafeDetailedInfo.price_range && (
-                <Badge>{cafeDetailedInfo.price_range}</Badge>
+                <Badge className={isDarkMode ? 'bg-gray-700 text-white' : ''}>{cafeDetailedInfo.price_range}</Badge>
               )}
 
               {/* Opening Hours */}
               {reviewData?.cafeDetails?.workday_timings && (
-                <Badge className="text-nowrap">
-                  <ClockIcon className="h-5 w-5 text-gray-500" />
+                <Badge className={`text-nowrap ${isDarkMode ? 'bg-gray-700 text-white' : ''}`}>
+                  <ClockIcon className={`h-5 w-5 ${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`} />
                   <p>Open {cafeDetailedInfo.workday_timings}</p>
                 </Badge>
               )}
               {reviewData?.cafeDetails?.phone && (
-                <Badge color="green" className="text-nowrap">
+                <Badge color={isDarkMode ? "emerald" : "green"} className="text-nowrap">
                   <p>
                     <div className="flex items-center gap-2">
-                      {/* <svg viewBox="0 0 24 24" className="w-5 fill-green-700">
-                        <path d={siWhatsapp.path} />
-                      </svg> */}
                       <PhoneIcon className="size-4" />
                       <a
-                        href={`te:${reviewData.cafeDetails.phone}`}
+                        href={`tel:${reviewData.cafeDetails.phone}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="hover:underline"
@@ -197,18 +196,18 @@ export default function CafeDetails({
               )}
 
               {/* Address */}
-              <div className="p-2 rounded-md bg-blue-100">
+              <div className={`p-2 rounded-md ${isDarkMode ? 'bg-blue-900' : 'bg-blue-100'}`}>
                 <p className="text-pretty text-xs">
                   <MapPinIcon className="size-4 inline" />{" "}
                   {cafeDetailedInfo.address}
                 </p>
               </div>
             </div>
-            <div className="flex text-nowrap flex-col bg-white p-4 rounded-lg shadow-md">
+            <div className={`flex text-nowrap flex-col p-4 rounded-lg shadow-md ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
               <div className="flex gap-1">
                 <p className="text-sm">GMaps Rating</p>
                 <div className="flex">
-                  <StarIcon className="size-4" />
+                  <StarIcon className="size-4 text-yellow-400" />
                   <p className="text-nowrap text-sm flex items-center">
                     {cafeDetailedInfo.gmaps_rating} (
                     {cafeDetailedInfo.gmaps_total_reviews})
@@ -230,7 +229,7 @@ export default function CafeDetails({
                         className="flex items-center text-xs mb-1"
                       >
                         <span className="w-3">{rating}</span>
-                        <div className="flex-grow mx-2 bg-gray-200 rounded-full h-2">
+                        <div className={`flex-grow mx-2 rounded-full h-2 ${isDarkMode ? 'bg-gray-600' : 'bg-gray-200'}`}>
                           <div
                             className="bg-yellow-400 h-2 rounded-full"
                             style={{ width: `${percentage}%` }}
@@ -248,13 +247,13 @@ export default function CafeDetails({
           {/* Image and User Reviews Grid */}
           <div className="grid grid-cols-1 md:grid-cols-[250px_1fr] gap-4">
             {/* Cafe Image */}
-            <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div className={`rounded-lg shadow-md overflow-hidden ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
               <CustomCarousel images={uniqueCarouselImages} />
             </div>
 
             {/* User Reviews Summary */}
-            <div className="bg-white p-4 rounded-lg shadow-md">
-              <Heading className="text-xl mb-2">
+            <div className={`p-4 rounded-lg shadow-md ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+              <Heading className={`text-xl mb-2 ${isDarkMode ? 'text-white' : 'text-black'}`}>
                 {LL.cafeDetails.userReviews()}
               </Heading>
               <Rate rating={reviewData?.aggregatedReview?.avg_rating ?? 0} />
@@ -304,14 +303,14 @@ export default function CafeDetails({
           </div>
 
           {/* Ratings Breakdown */}
-          <div className="bg-white p-4 rounded-lg shadow-md">
-            <Heading className="mb-2 text-xl">{LL.ratingsBreakdown()}</Heading>
+          <div className={`p-4 rounded-lg shadow-md ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+            <Heading className={`mb-2 text-xl ${isDarkMode ? 'text-white' : 'text-black'}`}>{LL.ratingsBreakdown()}</Heading>
             <AggregatedReviews cafeDetailedInfo={cafeDetailedInfo} />
           </div>
 
           {/* Individual Reviews */}
-          <div className="bg-white p-4 rounded-lg shadow-md">
-            <Heading className="mb-4 text-xl">User Reviews</Heading>
+          <div className={`p-4 rounded-lg shadow-md ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+            <Heading className={`mb-4 text-xl ${isDarkMode ? 'text-white' : 'text-black'}`}>User Reviews</Heading>
             <div className="space-y-4">
               {reviewData?.reviews?.map((review) => (
                 <UserReview
@@ -339,7 +338,7 @@ export default function CafeDetails({
         </>
       ) : (
         <div className="h-full w-full flex items-center justify-center">
-          <Loader2Icon size={100} className="animate-spin text-slate-300" />
+          <Loader2Icon size={100} className={`animate-spin ${isDarkMode ? 'text-gray-600' : 'text-slate-300'}`} />
         </div>
       )}
     </div>

@@ -10,6 +10,8 @@ import {
 } from "./catalyst/sidebar";
 import { useCafes } from "@/hooks/use-cafes";
 import CafeListSkeleton from "./cafe-list-skeleton";
+import { Rating } from "react-simple-star-rating";
+import { siGoogle } from "simple-icons";
 
 interface CafeListProps {
   searchInput: string;
@@ -171,25 +173,43 @@ export default function CafeList({ searchInput }: CafeListProps) {
                     />
                     <div className="w-[calc(100%_-_4.5rem)]">
                       <div className="">
-                        <p className="text-nowrap text-ellipsis overflow-hidden">
+                        <p className="text-nowrap text-lg font-medium tracking-tight text-ellipsis overflow-hidden">
                           {cafe.name}
                         </p>
-                        <div className="flex flex-col gap-1 w-full">
-                          <Badge className="w-full flex justify-between">
-                            <p>gmaps rating</p>
-                            <p>
-                              {cafe.gmaps_rating} (
+                        <div className="flex gap-1 w-full">
+                          <Badge className="flex items-center gap-1">
+                            <img
+                              src="https://map-assets.kopimap.com/google-maps-logo.png"
+                              className="w-4 h-4"
+                            />
+                            <Rating
+                              readonly
+                              initialValue={cafe.gmaps_rating}
+                              size={16}
+                              allowFraction
+                              SVGclassName={`inline-block`}
+                              className="pb-[2px]"
+                            />
+                            <span className="text-xs">
+                              (
                               {cafe.gmaps_total_reviews.toLocaleString("id-ID")}
                               )
-                            </p>
+                            </span>
                           </Badge>
-                          <Badge className="w-full flex justify-between">
-                            <p>rating</p>
-                            <p>
-                              {cafe.avg_rating
-                                ? `${cafe.avg_rating} (${cafe.review_count})`
-                                : "-"}
-                            </p>
+                          <Badge className="flex items-center gap-1">
+                            <Rating
+                              readonly
+                              initialValue={cafe.avg_rating || 0}
+                              size={16}
+                              allowFraction
+                              SVGclassName={`inline-block`}
+                              className="pb-[2px]"
+                            />
+                            {cafe.avg_rating && (
+                              <span className="text-xs">
+                                {cafe.review_count}
+                              </span>
+                            )}
                           </Badge>
                         </div>
                         <p className="font-light text-ellipsis text-nowrap text-slate-500 overflow-hidden">

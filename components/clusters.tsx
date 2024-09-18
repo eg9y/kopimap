@@ -17,6 +17,7 @@ import { motion, Variants } from "framer-motion";
 
 import { useStore } from "../store";
 import { MeiliSearchCafe } from "../types";
+import { useTheme } from "../components/theme-provider";
 
 const AnimatedStar = motion(StarIcon);
 
@@ -112,6 +113,28 @@ const unclusteredPointLayer: LayerSpecification = {
   },
 };
 
+const getCafeNameLayer = (isDarkMode: boolean): LayerSpecification => ({
+  id: "cafe-names",
+  type: "symbol",
+  source: "cafes",
+  filter: ["!", ["has", "point_count"]],
+  layout: {
+    "text-field": ["get", "name"],
+    "text-font": ["Noto Sans Regular"],
+    "text-size": 12,
+    "text-anchor": "top",
+    "text-offset": [0, 1],
+    "text-allow-overlap": false,
+    "text-ignore-placement": false,
+    "symbol-sort-key": ["get", "gmaps_rating"],
+  },
+  paint: {
+    "text-color": isDarkMode ? "#ffffff" : "#000000",
+    "text-halo-color": isDarkMode ? "#000000" : "#ffffff",
+    "text-halo-width": 2,
+  },
+});
+
 const cafeNameLayer: LayerSpecification = {
   id: "cafe-names",
   type: "symbol",
@@ -141,8 +164,7 @@ const Clusters = forwardRef<ClustersRef, ClustersProps>(
     const { selectCafe, selectedCafe } = useStore();
     const [visibleCafes, setVisibleCafes] = useState<MeiliSearchCafe[]>([]);
     const visibleCafesRef = useRef<MeiliSearchCafe[]>([]);
-    // const isWide = useMedia("(min-width: 640px)");
-
+    const { theme } = useTheme();
 
     const updateVisibleCafes = useCallback(() => {
       if (map && cafes) {
@@ -292,8 +314,7 @@ const Clusters = forwardRef<ClustersRef, ClustersProps>(
           <Layer {...clusterLayer} />
           <Layer {...clusterCountLayer} />
           <Layer {...unclusteredPointLayer} />
-          {/* {!isWide && <Layer {...cafeNameLayer} />} */}
-          <Layer {...cafeNameLayer} />
+          <Layer {...getCafeNameLayer(theme === 'dark')} />
         </Source>
         {selectedCafe && (
           <Marker

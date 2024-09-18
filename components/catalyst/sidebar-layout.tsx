@@ -84,7 +84,7 @@ export function SidebarLayout({
       </header>
 
       {/* Content */}
-      <main className="flex flex-1 flex-col pb-2 lg:min-w-0 lg:pl-[330px] lg:pr-2 lg:pt-2 h-[100vh]">
+      <main className="flex flex-1 flex-col pb-2 lg:min-w-0 lg:pl-[430px] lg:pr-2 lg:pt-2 h-[100vh]">
         <div className="grow lg:rounded-lg lg:bg-white  lg:shadow-sm lg:ring-1 lg:ring-zinc-950/5 h-full dark:lg:bg-zinc-900 dark:lg:ring-white/10">
           <div className="mx-auto w-full h-full">{children}</div>
         </div>
