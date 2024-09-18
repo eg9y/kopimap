@@ -17,6 +17,7 @@ import { createClient } from "@supabase/supabase-js";
 import { usePageContext } from "vike-react/usePageContext";
 import { navigate } from "vike/client/router";
 import { LanguageSwitcher } from "../language-switcher";
+import { ThemeToggle } from "../theme-toggle";
 
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
@@ -101,6 +102,7 @@ export const MobileToolbar: React.FC = () => {
           <div className="mt-6">
             <p className="text-sm font-medium text-gray-700 mb-2">Language</p>
             <LanguageSwitcher />
+            <ThemeToggle />
           </div>
         </Block>
       </Sheet>
