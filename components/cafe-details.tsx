@@ -27,6 +27,16 @@ import { CafeDetailedInfo } from "@/types";
 import { UserReview } from "./user-review";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 
+const transformImageUrl = (url: string) => {
+  if (!url.includes("ktpfrnrvqjlmjtqutpqx")) {
+    return url;
+  }
+  const baseUrl = url.split("/storage/v1/object/public/")[0];
+  const imagePath = url.split("/storage/v1/object/public/")[1];
+  // phone vertical image
+  return `${baseUrl}/storage/v1/render/image/public/${imagePath}?width=250&height=250`;
+};
+
 const isInstagramLink = (url: string) => {
   return url.includes("instagram.com") || url.includes("www.instagram.com");
 };
@@ -407,7 +417,7 @@ const CustomCarousel: React.FC<CustomCarouselProps> = ({ images }) => {
               <a onClick={() => openModal(index)}>
                 <ImageWithSuspense
                   key={index}
-                  src={image}
+                  src={transformImageUrl(image)}
                   alt={`Cafe Image ${index + 1}`}
                   className="object-cover w-full h-[250px] cursor-pointer"
                 />

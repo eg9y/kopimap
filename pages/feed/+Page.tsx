@@ -71,12 +71,12 @@ export default function Feed() {
   if (error) return <div>Error: {error.message}</div>;
 
   return (
-    <div className="flex flex-col h-[calc(100dvh_-_56px-0.5rem)]">
-      <div className="px-6 py-4">
+    <div className="flex flex-col h-[calc(100dvh_-_56px-0.5rem)] max-w-6xl mx-auto">
+      <div className="px-6 py-4 gap-4">
         <h1 className="text-3xl font-bold">Kopi Feed</h1>
         <h2 className="text-lg font-medium">What's brewing</h2>
       </div>
-      <div ref={parentRef} className="flex-1 px-6 pb-4 overflow-auto">
+      <div ref={parentRef} className="w-full">
         <div
           style={{
             height: rowVirtualizer.getTotalSize(),
