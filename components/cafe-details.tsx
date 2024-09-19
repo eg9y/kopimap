@@ -33,7 +33,8 @@ const transformImageUrl = (url: string) => {
   const baseUrl = url.split("/storage/v1/object/public/")[0];
   const imagePath = url.split("/storage/v1/object/public/")[1];
   // phone vertical image
-  return `${baseUrl}/storage/v1/render/image/public/${imagePath}?width=250&height=250`;
+  // return `${baseUrl}/storage/v1/render/image/public/${imagePath}?width=250&height=250`;
+  return url;
 };
 
 const isInstagramLink = (url: string) => {
