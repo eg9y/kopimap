@@ -22,7 +22,7 @@ import { createClient } from "@supabase/supabase-js";
 import { useUser } from "../hooks/use-user";
 import { useI18nContext } from "@/src/i18n/i18n-react";
 import { LanguageSwitcher } from "./language-switcher";
-import { siInstagram } from "simple-icons";
+import { siInstagram, siTiktok } from "simple-icons";
 import { ThemeToggle } from "./theme-toggle";
 import { useTheme } from "./theme-provider";
 
@@ -82,8 +82,13 @@ export function NavbarContainer({ children }: { children: React.ReactNode }) {
               href="https://www.instagram.com/kopimap/"
               target="_blank"
             >
-              <svg viewBox="0 0 24 24" className="w-4 ">
+              <svg viewBox="0 0 24 24" className="w-4 h-4">
                 <path d={siInstagram.path} />
+              </svg>
+            </NavbarItem>
+            <NavbarItem href="https://www.tiktok.com/@kopimap" target="_blank">
+              <svg viewBox="0 0 24 24" className="w-4 h-4">
+                <path d={siTiktok.path} />
               </svg>
             </NavbarItem>
             <NavbarItem href="https://www.nihbuatjajan.com/egan">

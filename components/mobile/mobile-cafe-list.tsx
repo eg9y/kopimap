@@ -6,8 +6,6 @@ import { useCafes } from "@/hooks/use-cafes";
 import useMedia from "react-use/esm/useMedia";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 
-
-
 interface CafeListProps {
   searchInput: string;
   setIsOpen: (x: boolean) => void;
@@ -54,12 +52,14 @@ export const MobileCafeList: React.FC<CafeListProps> = ({
 
   return (
     <div className="z-30 pointer-events-auto absolute inset-x-0 top-16 bottom-14 flex items-center justify-center p-4">
-      <div className="size-full max-w-md rounded-xl bg-white shadow-xl max-h-full flex flex-col">
-        <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-          <p className="text-lg font-semibold">Cafes ({allCafes.length})</p>
+      <div className="size-full max-w-md rounded-xl bg-white dark:bg-gray-800 shadow-xl max-h-full flex flex-col">
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+          <p className="text-lg font-semibold dark:text-white">
+            Cafes ({allCafes.length})
+          </p>
           <button
             onClick={handleClose}
-            className="text-gray-400 hover:text-gray-500"
+            className="text-gray-400 hover:text-gray-500 dark:text-gray-300 dark:hover:text-gray-200"
           >
             <XMarkIcon className="h-6 w-6" />
           </button>
@@ -67,8 +67,8 @@ export const MobileCafeList: React.FC<CafeListProps> = ({
 
         <div className="flex-grow overflow-y-auto">
           {searchInput && (
-            <div className="p-4 bg-blue-50 border-b border-blue-100">
-              <p className="text-sm text-blue-700">
+            <div className="p-4 bg-blue-50 dark:bg-blue-900 border-b border-blue-100 dark:border-blue-800">
+              <p className="text-sm text-blue-700 dark:text-blue-200">
                 Showing results for "{searchInput}"
               </p>
             </div>
@@ -77,7 +77,7 @@ export const MobileCafeList: React.FC<CafeListProps> = ({
             <div
               key={cafe.id}
               onClick={() => handleCafeClick(cafe)}
-              className="flex gap-2 justify-between p-4 border-b grab border-gray-200 hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer"
+              className="flex gap-2 justify-between p-4 border-b grab border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 active:bg-gray-100 dark:active:bg-gray-600 transition-colors cursor-pointer"
             >
               <img
                 src={cafe.images[0]}
@@ -85,7 +85,7 @@ export const MobileCafeList: React.FC<CafeListProps> = ({
                 alt={cafe.name}
               />
               <div className="grow overflow-hidden">
-                <p className="font-semibold text-nowrap text-ellipsis ">
+                <p className="font-semibold text-nowrap text-ellipsis dark:text-white">
                   {cafe.name}
                 </p>
                 <div className="flex gap-2 my-1">
@@ -99,7 +99,7 @@ export const MobileCafeList: React.FC<CafeListProps> = ({
                     </Badge>
                   )}
                 </div>
-                <p className="text-sm text-gray-500 text-ellipsis text-nowrap overflow-hidden">
+                <p className="text-sm text-gray-500 dark:text-gray-400 text-ellipsis text-nowrap overflow-hidden">
                   {cafe.address}
                 </p>
               </div>
