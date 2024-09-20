@@ -16,6 +16,7 @@ const supabase = createClient<Database>(
 );
 
 const SEARCH_RADIUS = 3000; // 3km radius
+const SEARCH_WITH_FILTERS_RADIUS = 10000; // 10km radius
 const PAGE_SIZE = 20; // Number of cafes per page
 
 interface CafesResponse {
@@ -67,7 +68,17 @@ export const useCafes = (
       const filterParams = new URLSearchParams();
       filterParams.append("lat", lat.toString());
       filterParams.append("lng", lng.toString());
-      filterParams.append("radius", SEARCH_RADIUS.toString());
+
+      // Determine the search radius based on filters
+      let searchRadius = SEARCH_RADIUS;
+      for (const [key, value] of Object.entries(searchFilters)) {
+        if (value && key !== "gmaps_rating" && key !== "gmaps_total_reviews") {
+          searchRadius = SEARCH_WITH_FILTERS_RADIUS;
+          break;
+        }
+      }
+      filterParams.append("radius", searchRadius.toString());
+
       filterParams.append("page", pageParam.toString());
       filterParams.append("hitsPerPage", PAGE_SIZE.toString());
       filterParams.append("isIncludeDetails", isIncludeDetails.toString());
