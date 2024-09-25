@@ -1,3 +1,8 @@
+import { useCafeDetailedInfo } from "@/hooks/use-cafe-detailed-info";
+import { useUserReview } from "@/hooks/use-user-review";
+import { useI18nContext } from "@/src/i18n/i18n-react";
+import { createClient } from "@supabase/supabase-js";
+import { CircleXIcon, SearchIcon } from "lucide-react";
 import React, {
   useState,
   useRef,
@@ -6,18 +11,13 @@ import React, {
   useEffect,
   useCallback,
 } from "react";
-import { CircleXIcon, SearchIcon } from "lucide-react";
 import { Sheet, SheetRef } from "react-modal-sheet";
 import useDebounce from "react-use/esm/useDebounce";
-import { useStore } from "../../store";
-import { useI18nContext } from "@/src/i18n/i18n-react";
-import { MobileCafeList } from "./mobile-cafe-list";
-import CafeDetails from "../cafe-details";
-import { useUser } from "../../hooks/use-user";
-import { createClient } from "@supabase/supabase-js";
-import { useUserReview } from "@/hooks/use-user-review";
-import { useCafeDetailedInfo } from "@/hooks/use-cafe-detailed-info";
 import useWindowSize from "react-use/esm/useWindowSize";
+import { useUser } from "../../hooks/use-user";
+import { useStore } from "../../store";
+import CafeDetails from "../cafe-details";
+import { MobileCafeList } from "./mobile-cafe-list";
 import { MobileSubmitReview } from "./mobile-submit-review";
 
 const MapComponent = lazy(() => import("../map-component"));
@@ -28,10 +28,11 @@ const supabase = createClient(
 );
 
 const CafeDetailsLoader = () => (
-  <div className="w-full h-full bg-white animate-pulse">
+  <div className="w-full h-full bg-gray-100 dark:bg-gray-800 animate-pulse">
     Loading Cafe Details...
   </div>
 );
+
 
 export default function MobileView({
   pmTilesReady,
@@ -110,7 +111,7 @@ export default function MobileView({
   }, [mapRef, handleMapMoveEnd]);
 
   const renderCollapsedContent = () => (
-    <div className="p-4">
+    <div className="p-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
       <h2 className="text-xl font-semibold">{cafeDetailedInfo?.name}</h2>
     </div>
   );
@@ -132,9 +133,9 @@ export default function MobileView({
             initialSnap={0}
             onSnap={handleSnap}
           >
-            <Sheet.Container>
+            <Sheet.Container className="!bg-white dark:!bg-gray-800">
               <Sheet.Header />
-              <Sheet.Content style={{ paddingBottom: sheetRef.current?.y }}>
+              <Sheet.Content className="!bg-white dark:!bg-gray-800" style={{ paddingBottom: sheetRef.current?.y }}>
                 {snapPoint === 2 && renderCollapsedContent()}
                 {snapPoint === 1 && (
                   <Suspense fallback={<CafeDetailsLoader />}>
@@ -158,6 +159,7 @@ export default function MobileView({
                 )}
               </Sheet.Content>
             </Sheet.Container>
+            <Sheet.Backdrop />
           </Sheet>
         )}
         <div className="absolute top-0 left-0 right-0 bottom-0 z-[1000] p-4 w-full h-[100dvh] flex flex-col pointer-events-none">
