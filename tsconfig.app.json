@@ -1,37 +1,37 @@
 {
-  "compilerOptions": {
-    "strict": true,
-    "allowJs": true,
-    "checkJs": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
-    "sourceMap": true,
-    "module": "ESNext",
-    "noEmit": true,
-    "moduleResolution": "Bundler",
-    "target": "ES2022",
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "types": ["vite/client", "vike-react", "./vike.d.ts"],
-    "jsx": "preserve",
-    "jsxImportSource": "react",
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./*"]
-    }
-  },
-  "include": [
-    "components",
-    "pages",
-    "hooks",
-    "layouts",
-    "i18n",
-    "*.ts",
-    "*.tsx",
-    "src",
-    "renderer",
-    "**/*.json"
-  ],
-  "exclude": ["node_modules", "dist"]
+	"compilerOptions": {
+		"strict": true,
+		"allowJs": true,
+		"checkJs": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"resolveJsonModule": true,
+		"skipLibCheck": true,
+		"sourceMap": true,
+		"module": "ESNext",
+		"noEmit": true,
+		"moduleResolution": "Bundler",
+		"target": "ES2022",
+		"lib": ["DOM", "DOM.Iterable", "ESNext"],
+		"types": ["vite/client", "vike-react", "./vike.d.ts"],
+		"jsx": "preserve",
+		"jsxImportSource": "react",
+		"baseUrl": ".",
+		"paths": {
+			"@/*": ["./*"]
+		}
+	},
+	"include": [
+		"components",
+		"pages",
+		"hooks",
+		"layouts",
+		"i18n",
+		"*.ts",
+		"*.tsx",
+		"src",
+		"renderer",
+		"**/*.json"
+	],
+	"exclude": ["node_modules", "dist"]
 }

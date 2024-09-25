@@ -8,25 +8,25 @@ type Attribute = {
 
 export type CategoryAttributes = {
   color:
-  | "orange"
-  | "blue"
-  | "emerald"
-  | "purple"
-  | "fuchsia"
-  | "zinc"
-  | "cyan"
-  | "green"
-  | "indigo"
-  | "lime"
-  | "pink"
-  | "red"
-  | "teal"
-  | "violet"
-  | "yellow"
-  | "amber"
-  | "sky"
-  | "rose"
-  | undefined;
+    | "orange"
+    | "blue"
+    | "emerald"
+    | "purple"
+    | "fuchsia"
+    | "zinc"
+    | "cyan"
+    | "green"
+    | "indigo"
+    | "lime"
+    | "pink"
+    | "red"
+    | "teal"
+    | "violet"
+    | "yellow"
+    | "amber"
+    | "sky"
+    | "rose"
+    | undefined;
   category: string;
   attributes: Attribute[];
 };
@@ -84,6 +84,7 @@ export type SearchFilters = {
 } & CafeAttributes;
 
 // Define a new interface that extends the original one but with has_musholla as string
-export interface ReviewWithStringMusholla extends Omit<Database["public"]["Tables"]["reviews"]["Row"], "has_musholla"> {
+export interface ReviewWithStringMusholla
+  extends Omit<Database["public"]["Tables"]["reviews"]["Row"], "has_musholla"> {
   has_musholla: string | null;
 }

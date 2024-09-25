@@ -198,15 +198,15 @@ export function SubmitReviewDialog({
     <Dialog
       open={isOpen && !!cafeDetailedInfo}
       onClose={() => setIsOpen(false)}
-      className=" !max-w-[70vw] flex flex-col overflow-y-auto jang  "
+      className="!max-w-[70vw] flex flex-col overflow-y-auto jang dark:bg-gray-800 dark:text-white"
     >
-      <DialogTitle>
+      <DialogTitle className="dark:text-white">
         {isUpdating
           ? LL.submitReview.updateReview()
           : LL.submitReview.createReview()}
         : {cafeDetailedInfo ? cafeDetailedInfo.name : "Loading..."}
       </DialogTitle>
-      <DialogDescription>
+      <DialogDescription className="dark:text-gray-300">
         {isUpdating
           ? LL.submitReview.modifyingExisting()
           : LL.submitReview.fillOptions()}
@@ -218,7 +218,7 @@ export function SubmitReviewDialog({
         <DialogBody className="flex flex-col gap-2 h-[60vh] overflow-scroll">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {/* Overall Rating */}
-            <div className="p-2 rounded-md bg-slate-100 w-full flex flex-col">
+            <div className="p-2 rounded-md bg-slate-100 dark:bg-gray-700 w-full flex flex-col">
               <Field className="">
                 <p className="text-base font-semibold">
                   {LL.submitReview.overallRating()}
@@ -272,7 +272,7 @@ export function SubmitReviewDialog({
               </Field>
             </div>
             {/* Review Text */}
-            <div className="p-2 rounded-md bg-slate-100 w-full flex flex-col">
+            <div className="p-2 rounded-md bg-slate-100 dark:bg-gray-700 w-full flex flex-col">
               <Field>
                 <p className="text-base font-semibold mb-2">
                   {LL.submitReview.reviewText()}
@@ -290,7 +290,7 @@ export function SubmitReviewDialog({
                     <div>
                       <textarea
                         {...field}
-                        className="w-full p-2 border rounded-md"
+                        className="w-full p-2 border rounded-md dark:bg-gray-600 dark:text-white dark:border-gray-500"
                         rows={4}
                         placeholder={LL.submitReview.reviewTextPlaceholder()}
                       />
@@ -308,7 +308,7 @@ export function SubmitReviewDialog({
               </Field>
             </div>
             {/* Images section */}
-            <div className="p-2 rounded-md bg-slate-100 w-full flex flex-col">
+            <div className="p-2 rounded-md bg-slate-100 dark:bg-gray-700 w-full flex flex-col">
               <p className="text-base font-semibold">
                 {LL.submitReview.images()}
               </p>
@@ -357,6 +357,7 @@ export function SubmitReviewDialog({
                 key={attr.category}
                 className={cn(
                   `flex flex-col p-2 gap-4 rounded-md`,
+                  "dark:bg-gray-700", // Uniform dark color for dark mode
                   attr.color === "lime" && "bg-lime-200",
                   attr.color === "fuchsia" && "bg-fuchsia-200",
                   attr.color === "purple" && "bg-purple-200",
@@ -368,6 +369,7 @@ export function SubmitReviewDialog({
                 <p
                   className={cn(
                     `text-base font-semibold`,
+                    "dark:text-white", // White text for dark mode
                     attr.color === "lime" && "text-lime-800",
                     attr.color === "fuchsia" && "text-fuchsia-800",
                     attr.color === "purple" && "text-purple-800",
@@ -386,7 +388,9 @@ export function SubmitReviewDialog({
                   >;
                   return (
                     <Field key={attribute.name}>
-                      <Label>{LL.attributes[attrName].name()}</Label>
+                      <Label className="dark:text-gray-300">
+                        {LL.attributes[attrName].name()}
+                      </Label>
                       <Controller
                         name={attribute.name}
                         control={control}
@@ -398,12 +402,16 @@ export function SubmitReviewDialog({
                                 color={
                                   field.value === option ? attr.color : "white"
                                 }
-                                className="cursor-pointer"
+                                className={cn(
+                                  "cursor-pointer",
+                                  "dark:bg-gray-600 dark:text-white",
+                                  field.value === option && "dark:bg-gray-500"
+                                )}
                                 onClick={() => {
                                   if (field.value === option) {
-                                    field.onChange(null); // Remove the value if it's already selected
+                                    field.onChange(null);
                                   } else {
-                                    field.onChange(option); // Set the new value
+                                    field.onChange(option);
                                   }
                                 }}
                               >
@@ -422,7 +430,7 @@ export function SubmitReviewDialog({
           {/* Error display */}
           {showErrorMessage && Object.keys(errors).length > 0 && (
             <div
-              className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
+              className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4 dark:bg-red-900 dark:border-red-700 dark:text-red-200"
               role="alert"
             >
               <strong className="font-bold">
@@ -445,13 +453,17 @@ export function SubmitReviewDialog({
           )}
         </DialogBody>
         <DialogActions>
-          <Button plain onClick={() => setIsOpen(false)}>
+          <Button
+            plain
+            onClick={() => setIsOpen(false)}
+            className="dark:text-gray-300"
+          >
             {LL.submitReview.cancel()}
           </Button>
           <Button
             type="submit"
             color="emerald"
-            className="cursor-pointer"
+            className="cursor-pointer dark:bg-emerald-700 dark:hover:bg-emerald-600 dark:text-white"
             disabled={isUploading}
           >
             {isUpdating ? LL.submitReview.update() : LL.submitReview.submit()}
