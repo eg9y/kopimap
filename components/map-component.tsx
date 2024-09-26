@@ -84,9 +84,8 @@ export default function MapComponent({}: MapComponentProps) {
 				mapRef.current.flyTo({
 					center: {
 						lat: lat + (isWide ? 0 : 0.0025),
-						lon: lng - (isWide ? 0.0025 : -0.0025),
+						lon: lng - (isWide ? 0.0045 : -0.0025),
 					},
-					zoom: 16,
 					essential: true,
 				});
 			}
@@ -162,32 +161,7 @@ export default function MapComponent({}: MapComponentProps) {
 				setPopupInfo={setPopupInfo}
 				cafes={mapCafesData?.visibleCafes || []}
 			/>
-			{popupInfo && (
-				<Popup
-					anchor="top"
-					longitude={popupInfo.longitude}
-					latitude={popupInfo.latitude}
-					onClose={() => setPopupInfo(null)}
-					className={`z-[100] !p-0 `}
-					closeButton={false}
-				>
-					<div
-						typeof="button"
-						onMouseEnter={handlePopupMouseEnter}
-						onMouseLeave={handlePopupMouseLeave}
-						className={`-mx-3 -mb-6 -mt-5 cursor-pointer dark:bg-gray-800 dark:text-slate-50 bg-white text-slate-950`}
-						onClick={() => {
-							selectCafe(popupInfo);
-							handleFlyTo(popupInfo.latitude, popupInfo.longitude);
-							setPopupInfo(null);
-						}}
-					>
-						<div className="p-2 flex w-full items-center">
-							<div className="font-bold">{popupInfo.name}</div>
-						</div>
-					</div>
-				</Popup>
-			)}
+
 			<GeolocateControl
 				ref={geoControlRef as any}
 				positionOptions={{
