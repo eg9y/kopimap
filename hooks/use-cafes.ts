@@ -1,14 +1,14 @@
+import { Database } from "@/components/lib/database.types";
+import { createClient } from "@supabase/supabase-js";
 import {
   InfiniteData,
   QueryFunctionContext,
-  useInfiniteQuery,
   UseInfiniteQueryResult,
+  useInfiniteQuery,
 } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
 import { useStore } from "../store";
 import type { MeiliSearchCafe } from "../types";
-import { createClient } from "@supabase/supabase-js";
-import { Database } from "@/components/lib/database.types";
 
 const supabase = createClient<Database>(
   import.meta.env.VITE_SUPABASE_URL,
@@ -34,10 +34,19 @@ type CafesQueryKey = [
   boolean,
 ];
 
+
 const transformImageUrl = (url: string) => {
   const baseUrl = url.split("/storage/v1/object/public/")[0];
   const imagePath = url.split("/storage/v1/object/public/")[1];
-  return url;
+  if (!imagePath) return url;
+
+  const lastDotIndex = imagePath.lastIndexOf('.');
+  if (lastDotIndex === -1) return url;
+
+  const nameWithoutExtension = imagePath.substring(0, lastDotIndex);
+  const extension = imagePath.substring(lastDotIndex);
+
+  return `${baseUrl}/storage/v1/object/public/${nameWithoutExtension}_120x120${extension}`;
 };
 
 export const useCafes = (
