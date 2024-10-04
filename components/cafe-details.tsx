@@ -56,9 +56,8 @@ const ImageWithSuspense = ({
 	alt: string;
 	className: string;
 }) => {
-	const bestUrl = useBestImageUrl(src);
 	const { src: loadedSrc } = useImage({
-		srcList: [bestUrl],
+		srcList: [src],
 	});
 	return <img src={loadedSrc} alt={alt} className={className} />;
 };
@@ -508,48 +507,4 @@ function generateResizedImageUrl(
 	const resizedUrl = `${path}${resizedFilename}`;
 
 	return resizedUrl;
-}
-
-// Custom hook to get the best image URL
-function useBestImageUrl(originalUrl: string): string {
-	const [bestUrl, setBestUrl] = useState(originalUrl);
-
-	useEffect(() => {
-		let isCancelled = false;
-
-		async function checkResizedImage() {
-			// Check if the image is from our storage (e.g., Supabase)
-			if (originalUrl.includes("ktpfrnrvqjlmjtqutpqx")) {
-				// Generate the 346x461 version URL
-				const resizedUrl = generateResizedImageUrl(originalUrl, "346x461");
-
-				try {
-					const response = await fetch(resizedUrl, { method: "HEAD" });
-					if (!isCancelled && response.ok) {
-						// The resized image exists
-						setBestUrl(resizedUrl);
-					} else {
-						// The resized image doesn't exist
-						setBestUrl(originalUrl);
-					}
-				} catch (error) {
-					// Error fetching the resized image
-					if (!isCancelled) {
-						setBestUrl(originalUrl);
-					}
-				}
-			} else {
-				// Not from our storage, use original URL
-				setBestUrl(originalUrl);
-			}
-		}
-
-		checkResizedImage();
-
-		return () => {
-			isCancelled = true;
-		};
-	}, [originalUrl]);
-
-	return bestUrl;
 }
