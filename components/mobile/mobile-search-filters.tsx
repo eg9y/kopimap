@@ -2,7 +2,7 @@ import { useStore } from "@/store";
 import { motion } from "framer-motion";
 import { ArmchairIcon, CoffeeIcon, SunIcon, WifiIcon } from "lucide-react";
 
-const FilterButton = ({ label, icon: Icon, isActive, onClick }) => {
+const FilterButton = ({ label, icon: Icon, isActive, onClick }: any) => {
 	return (
 		<motion.button
 			onClick={onClick}
@@ -23,7 +23,7 @@ const FilterButton = ({ label, icon: Icon, isActive, onClick }) => {
 export default function MobileSearchFilters() {
 	const { searchFilters, setSearchFilters } = useStore();
 
-	const handleFilterChange = (filterName, filterValue) => {
+	const handleFilterChange = (filterName: string, filterValue: string) => {
 		const isActive = searchFilters[filterName] === filterValue;
 		const newFilters = { ...searchFilters };
 
