@@ -3,53 +3,67 @@ import { createClient } from "@supabase/supabase-js";
 import { useInfiniteQuery } from "@tanstack/react-query";
 
 const supabase = createClient<Database>(
-  import.meta.env.VITE_SUPABASE_URL!,
-  import.meta.env.VITE_SUPABASE_ANON_KEY!,
+	import.meta.env.VITE_SUPABASE_URL!,
+	import.meta.env.VITE_SUPABASE_ANON_KEY!,
 );
 
+const transformImageUrl = (url: string) => {
+	const baseUrl = url.split("/storage/v1/object/public/")[0];
+	const imagePath = url.split("/storage/v1/object/public/")[1];
+	if (!imagePath) return url;
+
+	const lastDotIndex = imagePath.lastIndexOf(".");
+	if (lastDotIndex === -1) return url;
+
+	const nameWithoutExtension = imagePath.substring(0, lastDotIndex);
+	const extension = imagePath.substring(lastDotIndex);
+
+	return `${baseUrl}/storage/v1/object/public/${nameWithoutExtension}_346x461${extension}`;
+};
+
 export const useLatestReviews = (pageSize = 10) => {
-  const {
-    status,
-    data,
-    error,
-    isFetching,
-    isFetchingNextPage,
-    fetchNextPage,
-    hasNextPage,
-  } = useInfiniteQuery({
-    queryKey: ["latestReviews"],
-    queryFn: ({ pageParam = 0 }) => fetchLatestReviews(pageSize, pageParam),
-    getNextPageParam: (lastPage, allPages) => {
-      if (lastPage.length < pageSize) {
-        return undefined; // No more pages
-      }
-      return allPages.length * pageSize;
-    },
-    initialPageParam: 0,
-  });
+	const {
+		status,
+		data,
+		error,
+		isFetching,
+		isFetchingNextPage,
+		fetchNextPage,
+		hasNextPage,
+	} = useInfiniteQuery({
+		queryKey: ["latestReviews"],
+		queryFn: ({ pageParam = 0 }) => fetchLatestReviews(pageSize, pageParam),
+		getNextPageParam: (lastPage, allPages) => {
+			if (lastPage.length < pageSize) {
+				return undefined; // No more pages
+			}
+			return allPages.length * pageSize;
+		},
+		initialPageParam: 0,
+	});
 
-  const allReviews = data ? data.pages.flatMap((page) => page) : [];
+	const allReviews = data ? data.pages.flatMap((page) => page) : [];
 
-  return {
-    status,
-    data: allReviews,
-    error,
-    isFetching,
-    isFetchingNextPage,
-    fetchNextPage,
-    hasNextPage,
-  };
+	return {
+		status,
+		data: allReviews,
+		error,
+		isFetching,
+		isFetchingNextPage,
+		fetchNextPage,
+		hasNextPage,
+	};
 };
 
 async function fetchLatestReviews(
-  limit: number,
-  offset: number,
-  maxImages = 3,
+	limit: number,
+	offset: number,
+	maxImages = 3,
 ) {
-  // Fetch reviews with more metadata
-  const { data: reviews, error: reviewsError } = await supabase
-    .from("reviews")
-    .select(`
+	// Fetch reviews with more metadata
+	const { data: reviews, error: reviewsError } = await supabase
+		.from("reviews")
+		.select(`
       id,
       updated_at,
       rating,
@@ -73,44 +87,49 @@ async function fetchLatestReviews(
         place_id
       )
     `)
-    .order("updated_at", { ascending: false })
-    .range(offset, offset + limit - 1);
+		.order("updated_at", { ascending: false })
+		.range(offset, offset + limit - 1);
 
-  if (reviewsError) {
-    throw new Error("Error fetching latest reviews");
-  }
+	if (reviewsError) {
+		throw new Error("Error fetching latest reviews");
+	}
 
-  // Limit image_urls to maxImages
-  const reviewsWithLimitedImages = reviews.map((review) => ({
-    ...review,
-    image_urls: review.image_urls?.slice(0, maxImages) || [],
-  }));
+	// Limit image_urls to maxImages
+	const reviewsWithLimitedImages = reviews.map((review) => ({
+		...review,
+		image_urls:
+			review.image_urls
+				?.slice(0, maxImages)
+				.map((url) => transformImageUrl(url)) || [],
+	}));
 
-  // Fetch user profiles
-  const userIds = reviewsWithLimitedImages.map((review) => review.user_id);
-  const { data: profiles, error: profilesError } = await supabase
-    .from("profiles")
-    .select("id, first_name, last_name, username")
-    .in("id", userIds);
+	console.log("reviewsWithLimitedImages", reviewsWithLimitedImages);
 
-  if (profilesError) {
-    throw new Error("Error fetching user profiles");
-  }
+	// Fetch user profiles
+	const userIds = reviewsWithLimitedImages.map((review) => review.user_id);
+	const { data: profiles, error: profilesError } = await supabase
+		.from("profiles")
+		.select("id, first_name, last_name, username")
+		.in("id", userIds);
 
-  // Combine review and profile data
-  const reviewsWithProfiles = reviewsWithLimitedImages.map((review) => {
-    const profile = profiles.find((p) => p.id === review.user_id);
-    return {
-      ...review,
-      user: profile
-        ? {
-          username: profile.username,
-          first_name: profile.first_name,
-          last_name: profile.last_name,
-        }
-        : null,
-    };
-  });
+	if (profilesError) {
+		throw new Error("Error fetching user profiles");
+	}
 
-  return reviewsWithProfiles;
+	// Combine review and profile data
+	const reviewsWithProfiles = reviewsWithLimitedImages.map((review) => {
+		const profile = profiles.find((p) => p.id === review.user_id);
+		return {
+			...review,
+			user: profile
+				? {
+						username: profile.username,
+						first_name: profile.first_name,
+						last_name: profile.last_name,
+					}
+				: null,
+		};
+	});
+
+	return reviewsWithProfiles;
 }
