@@ -336,7 +336,16 @@ export function MobileSubmitReview({
 						{reviewAttributes.map((attr) => (
 							<div
 								key={attr.category}
-								className="flex flex-col p-2 gap-3 rounded-md bg-gray-800"
+								className={cn(
+									"flex flex-col p-2 gap-3 rounded-md",
+									"dark:bg-gray-800",
+									attr.color === "lime" && "bg-lime-100",
+									attr.color === "fuchsia" && "bg-fuchsia-100",
+									attr.color === "purple" && "bg-purple-100",
+									attr.color === "emerald" && "bg-emerald-100",
+									attr.color === "blue" && "bg-blue-100",
+									attr.color === "orange" && "bg-orange-100",
+								)}
 							>
 								<p className="text-base font-semibold text-white">
 									{LL.categories[attr.category as keyof typeof LL.categories]()}
@@ -361,9 +370,14 @@ export function MobileSubmitReview({
 															<Button
 																key={option}
 																color={
-																	field.value === option ? "blue" : "white"
+																	field.value === option ? attr.color : "white"
 																}
-																className="cursor-pointer text-xs py-1 px-2 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+																className={cn(
+																	"cursor-pointer text-xs py-1 px-2",
+																	"dark:bg-gray-700 dark:text-white dark:border-gray-600",
+																	field.value === option &&
+																		`dark:bg-${attr.color}-600 dark:text-white`,
+																)}
 																onClick={() => {
 																	if (field.value === option) {
 																		field.onChange(null);
