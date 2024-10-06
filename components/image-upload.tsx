@@ -14,33 +14,11 @@ interface ImageUploadProps {
 	onFilesSelected: (files: any[]) => void;
 	sessionInfo: Session;
 	existingUrls?: string[];
-	placeId: string; // Add this new prop
+	placeId: string;
 }
 
 export interface ImageUploadRef {
 	triggerUpload: () => Promise<string[]>;
-}
-
-async function isSafe(file: File) {
-	return true;
-	// try {
-	//   const predictions = await NSFWFilter.predictImg(file, 3);
-	//   const pornPrediction = predictions.find(
-	//     ({ className }) => className === 'Porn'
-	//   );
-	//   const hentaiPrediction = predictions.find(
-	//     ({ className }) => className === 'Hentai'
-	//   );
-
-	//   // Check if either Porn or Hentai probability exceeds the threshold
-	//   return !(
-	//     (pornPrediction && pornPrediction.probability > 0.25) ||
-	//     (hentaiPrediction && hentaiPrediction.probability > 0.25)
-	//   );
-	// } catch (error) {
-	//   console.error(error);
-	//   throw error;
-	// }
 }
 
 export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(
@@ -98,33 +76,27 @@ export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(
 			let targetHeight: number;
 
 			if (isOriginal) {
-				// Reduce dimensions by 50%, retaining aspect ratio
+				// Reduce dimensions by 50%, maintaining aspect ratio
+				const scaleFactor = 0.5;
+				targetWidth = Math.round(img.width * scaleFactor);
+				targetHeight = Math.round(img.height * scaleFactor);
+
+				// Ensure minimum dimensions
 				const minDimension = 800;
-				let scaleFactor = 0.5;
-
-				// Calculate scaled dimensions
-				let scaledWidth = Math.round(img.width * scaleFactor);
-				let scaledHeight = Math.round(img.height * scaleFactor);
-
-				// Ensure dimensions are not less than minDimension
-				if (scaledWidth < minDimension || scaledHeight < minDimension) {
-					// Adjust scaleFactor to maintain minDimension without enlarging the image
-					scaleFactor = Math.min(
+				if (targetWidth < minDimension || targetHeight < minDimension) {
+					const minScaleFactor = Math.min(
 						1,
 						minDimension / Math.min(img.width, img.height),
 					);
-					scaledWidth = Math.round(img.width * scaleFactor);
-					scaledHeight = Math.round(img.height * scaleFactor);
+					targetWidth = Math.round(img.width * minScaleFactor);
+					targetHeight = Math.round(img.height * minScaleFactor);
 				}
-
-				targetWidth = scaledWidth;
-				targetHeight = scaledHeight;
 			} else {
-				// Existing logic for non-original images
+				// Fit within max dimensions, maintaining aspect ratio
 				const aspectRatio = img.width / img.height;
 				if (aspectRatio > maxWidth / maxHeight) {
-					targetHeight = Math.round(maxWidth / aspectRatio);
 					targetWidth = maxWidth;
+					targetHeight = Math.round(maxWidth / aspectRatio);
 				} else {
 					targetWidth = Math.round(maxHeight * aspectRatio);
 					targetHeight = maxHeight;
@@ -135,17 +107,17 @@ export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(
 			canvas.width = targetWidth;
 			canvas.height = targetHeight;
 
-			await pica.resize(img, canvas, {
-				filter: "mks2013",
-				unsharpAmount: 160,
-				unsharpRadius: 0.6,
-				unsharpThreshold: 1,
-			});
+			await pica.resize(img, canvas);
 
-			// Convert canvas to blob
-			const resizedBlob = await pica.toBlob(canvas, "image/webp", 0.9);
+			// Set quality parameter to reduce file size
+			const qualityFactor = 0.7;
+			const resizedBlob = await pica.toBlob(
+				canvas,
+				"image/webp",
+				qualityFactor,
+			);
 
-			// Generate the new file name
+			// Generate new file name
 			const originalName = file.name.replace(/\.[^/.]+$/, ""); // Remove extension
 			let newName = `${originalName}_${targetWidth}x${targetHeight}.webp`;
 			if (isOriginal) {
@@ -168,15 +140,15 @@ export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(
 
 				const timestamp = Date.now();
 
-				// Compress and convert original file to WebP, with a max width and height
+				// Compress and resize original image
 				const originalWebp = await compressAndResizeImage(
 					file.data as File,
-					2048, // Max width for original image
-					2048, // Max height for original image
+					2048, // Max width (unused for original)
+					2048, // Max height (unused for original)
 					true,
 				);
 
-				// Update the original file's data with the resized blob
+				// Update original file's data with resized blob
 				uppy.setFileState(file.id, {
 					...file,
 					data: originalWebp.blob,
@@ -186,7 +158,7 @@ export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(
 					extension: "webp",
 				});
 
-				// Set metadata for the original WebP file
+				// Set metadata for original WebP file
 				uppy.setFileMeta(file.id, {
 					timestamp,
 					bucketName: "review-images",
@@ -195,7 +167,7 @@ export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(
 					contentType: "image/webp",
 				});
 
-				// Generate resized images (unchanged)
+				// Generate resized images
 				const resized120x120 = await compressAndResizeImage(
 					file.data as File,
 					120,
@@ -207,7 +179,7 @@ export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(
 					461,
 				);
 
-				// Add resized images to Uppy (unchanged)
+				// Add resized images to Uppy
 				[resized120x120, resized346x461].forEach((resizedFile) => {
 					uppy.addFile({
 						name: resizedFile.name,
@@ -235,14 +207,14 @@ export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(
 				return;
 			}
 
-			// const isSafeImage = await checkNSFW(file);
+			// Placeholder for NSFW check
+			// const isSafeImage = await isSafe(file.data as File);
 			// if (!isSafeImage) {
 			//   uppy.removeFile(file.id);
 			//   return;
 			// }
 
-			// The timestamp is already set in handleFileAdded, so we don't need to set it again here
-			uppy?.setFileMeta(file.id, {
+			uppy.setFileMeta(file.id, {
 				...file.meta,
 				checkedNSFW: true, // Mark as checked
 			});
@@ -263,8 +235,8 @@ export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(
 				if (!result?.successful) {
 					return [];
 				}
-				const newUrls = result?.successful
-					.filter((file) => !file.meta.isResizedVersion) // Filter out resized versions
+				const newUrls = result.successful
+					.filter((file) => !file.meta.isResizedVersion)
 					.map(
 						(file) =>
 							`${
