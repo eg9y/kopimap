@@ -33,7 +33,7 @@ export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(
 					placeId, // Pass placeId to the server
 				},
 			}).use(XHRUpload, {
-				endpoint: "http://localhost:3000/api/upload-image", // Nitro server API endpoint
+				endpoint: `${import.meta.env.VITE_MEILISEARCH_URL}/api/upload-image`, // Nitro server API endpoint
 				headers: {
 					authorization: `Bearer ${sessionInfo.access_token}`,
 				},
