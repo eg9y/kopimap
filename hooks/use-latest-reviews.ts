@@ -7,20 +7,6 @@ const supabase = createClient<Database>(
 	import.meta.env.VITE_SUPABASE_ANON_KEY!,
 );
 
-const transformImageUrl = (url: string) => {
-	const baseUrl = url.split("/storage/v1/object/public/")[0];
-	const imagePath = url.split("/storage/v1/object/public/")[1];
-	if (!imagePath) return url;
-
-	const lastDotIndex = imagePath.lastIndexOf(".");
-	if (lastDotIndex === -1) return url;
-
-	const nameWithoutExtension = imagePath.substring(0, lastDotIndex);
-	const extension = imagePath.substring(lastDotIndex);
-
-	return `${baseUrl}/storage/v1/object/public/${nameWithoutExtension}_346x461${extension}`;
-};
-
 export const useLatestReviews = (pageSize = 10) => {
 	const {
 		status,
@@ -97,10 +83,7 @@ async function fetchLatestReviews(
 	// Limit image_urls to maxImages
 	const reviewsWithLimitedImages = reviews.map((review) => ({
 		...review,
-		image_urls:
-			review.image_urls
-				?.slice(0, maxImages)
-				.map((url) => transformImageUrl(url)) || [],
+		image_urls: review.image_urls?.slice(0, maxImages) || [],
 	}));
 
 	console.log("reviewsWithLimitedImages", reviewsWithLimitedImages);

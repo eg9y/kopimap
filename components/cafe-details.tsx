@@ -33,18 +33,20 @@ import { Rate } from "./rate";
 import { UserReview } from "./user-review";
 
 const transformImageUrl = (url: string) => {
-	if (!url.includes("ktpfrnrvqjlmjtqutpqx")) {
-		return url;
-	}
-	const baseUrl = url.split("/storage/v1/object/public/")[0];
 	const imagePath = url.split("/storage/v1/object/public/")[1];
-	// phone vertical image
-	// return `${baseUrl}/storage/v1/render/image/public/${imagePath}?width=250&height=250`;
-	return url;
-};
+	if (!imagePath) return url;
 
+	return `https://kopimap-cdn.b-cdn.net/${imagePath}?width=346&sharpen=true`;
+};
 const isInstagramLink = (url: string) => {
 	return url.includes("instagram.com") || url.includes("www.instagram.com");
+};
+
+const transformImageUrlFull = (url: string) => {
+	const imagePath = url.split("/storage/v1/object/public/")[1];
+	if (!imagePath) return url;
+
+	return `https://kopimap-cdn.b-cdn.net/${imagePath}?width=346&sharpen=true`;
 };
 
 const ImageWithSuspense = ({
@@ -181,19 +183,17 @@ export default function CafeDetails({
 							)}
 							{reviewData?.cafeDetails?.phone && (
 								<Badge color="green" className="text-nowrap">
-									<p>
-										<div className="flex items-center gap-2">
-											<PhoneIcon className="size-4" />
-											<a
-												href={`tel:${reviewData.cafeDetails.phone}`}
-												target="_blank"
-												rel="noopener noreferrer"
-												className="hover:underline"
-											>
-												{reviewData.cafeDetails.phone}
-											</a>
-										</div>
-									</p>
+									<div className="flex items-center gap-2">
+										<PhoneIcon className="size-4" />
+										<a
+											href={`tel:${reviewData.cafeDetails.phone}`}
+											target="_blank"
+											rel="noopener noreferrer"
+											className="hover:underline"
+										>
+											{reviewData.cafeDetails.phone}
+										</a>
+									</div>
 								</Badge>
 							)}
 
@@ -448,7 +448,7 @@ const CustomCarousel: React.FC<CustomCarouselProps> = ({ images }) => {
 				>
 					<div className="w-[90vw] h-[90vh] max-w-4xl max-h-[80vh] relative bg-black flex items-center justify-center">
 						<img
-							src={images[selectedImageIndex]}
+							src={transformImageUrlFull(images[selectedImageIndex])}
 							alt="Expanded view"
 							className="max-w-full max-h-full object-contain"
 							onClick={(e) => e.stopPropagation()}

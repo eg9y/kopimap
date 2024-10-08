@@ -48,7 +48,7 @@ export const MobileCafeList: React.FC<CafeListProps> = ({
 	const rowVirtualizer = useVirtualizer({
 		count: hasNextPage ? allCafes.length + 1 : allCafes.length,
 		getScrollElement: () => parentRef.current,
-		estimateSize: () => 120,
+		estimateSize: () => 200,
 		overscan: 5,
 	});
 
@@ -246,13 +246,18 @@ export const MobileCafeList: React.FC<CafeListProps> = ({
 									) : (
 										<div
 											onClick={() => handleCafeClick(cafe)}
-											className="flex gap-2 justify-between p-4 border-b grab border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 active:bg-gray-100 dark:active:bg-gray-600 transition-colors cursor-pointer"
+											className="flex flex-col gap-2 justify-between p-4 border-b grab border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 active:bg-gray-100 dark:active:bg-gray-600 transition-colors cursor-pointer"
 										>
-											<img
-												src={cafe.images[0]}
-												className="w-20 h-20 object-cover rounded-md shadow-sm flex-shrink-0"
-												alt={cafe.name}
-											/>
+											<div className="flex gap-2 overflow-scroll scrollbar-hide">
+												{cafe.images.slice(0, 4).map((image) => (
+													<img
+														key={image}
+														src={image}
+														className="w-24 h-24 object-cover rounded-md shadow-sm flex-shrink-0"
+														alt={cafe.name}
+													/>
+												))}
+											</div>
 											<div className="grow overflow-hidden">
 												<p className="font-semibold text-nowrap text-ellipsis dark:text-white">
 													{cafe.name}
