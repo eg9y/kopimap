@@ -68,6 +68,9 @@ dependencies:
   '@uppy/tus':
     specifier: ^4.0.0
     version: 4.0.0(@uppy/core@4.0.1)
+  '@uppy/xhr-upload':
+    specifier: ^4.2.0
+    version: 4.2.0(@uppy/core@4.0.1)
   '@use-gesture/react':
     specifier: ^10.3.1
     version: 10.3.1(react@18.3.1)
@@ -104,9 +107,6 @@ dependencies:
   masonic:
     specifier: ^4.0.1
     version: 4.0.1(react@18.3.1)
-  pica:
-    specifier: ^9.0.1
-    version: 9.0.1
   pmtiles:
     specifier: ^3.0.6
     version: 3.0.6
@@ -2282,6 +2282,17 @@ packages:
       p-retry: 6.2.0
     dev: false
 
+  /@uppy/companion-client@4.1.0(@uppy/core@4.0.1):
+    resolution: {integrity: sha512-nQ8CQfZcYVBNtFQ6ePj7FDIq38DXlH0YpzP/91LR9gnDVISJKKUuvWfr6tPktj1lRw9FZV8jLmlMKT2ituVKiw==}
+    peerDependencies:
+      '@uppy/core': ^4.2.0
+    dependencies:
+      '@uppy/core': 4.0.1
+      '@uppy/utils': 6.0.2
+      namespace-emitter: 2.0.1
+      p-retry: 6.2.0
+    dev: false
+
   /@uppy/compressor@2.1.0(@uppy/core@4.0.1):
     resolution: {integrity: sha512-F3fBqKSlMy/JCdT0sn6l+I+WlSRox2+/85JU1C51HdOgFbrzFnf0s0yNSLv201f5TRJsvaAWQDF/O+UV26YUsA==}
     peerDependencies:
@@ -2462,6 +2473,16 @@ packages:
     dependencies:
       lodash: 4.17.21
       preact: 10.23.1
+    dev: false
+
+  /@uppy/xhr-upload@4.2.0(@uppy/core@4.0.1):
+    resolution: {integrity: sha512-MhpazjMEjFgEyB9Ewiz+ba4U3uZ6yBDrylBeMI0XSxJD5ZwygYBzqpacB6eoVZqHqyb9He90fdZnod5dD9Cc0g==}
+    peerDependencies:
+      '@uppy/core': ^4.2.0
+    dependencies:
+      '@uppy/companion-client': 4.1.0(@uppy/core@4.0.1)
+      '@uppy/core': 4.0.1
+      '@uppy/utils': 6.0.2
     dev: false
 
   /@use-gesture/core@10.3.1:
@@ -3463,10 +3484,6 @@ packages:
     engines: {node: '>=4'}
     dev: true
 
-  /glur@1.1.2:
-    resolution: {integrity: sha512-l+8esYHTKOx2G/Aao4lEQ0bnHWg4fWtJbVoZZT9Knxi01pB8C80BR85nONLFwkkQoFRCmXY+BUcGZN3yZ2QsRA==}
-    dev: false
-
   /gopd@1.0.1:
     resolution: {integrity: sha512-d65bNlIadxvpb/A2abVdlqKqV563juRnZ1Wtk6s1sIR8uNsXR70xqIzVqxVf1eTqDunwT2MkczEeaezCKTZhwA==}
     dependencies:
@@ -4064,13 +4081,6 @@ packages:
     resolution: {integrity: sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==}
     dev: true
 
-  /multimath@2.0.0:
-    resolution: {integrity: sha512-toRx66cAMJ+Ccz7pMIg38xSIrtnbozk0dchXezwQDMgQmbGpfxjtv68H+L00iFL8hxDaVjrmwAFSb3I6bg8Q2g==}
-    dependencies:
-      glur: 1.1.2
-      object-assign: 4.1.1
-    dev: false
-
   /murmurhash-js@1.0.0:
     resolution: {integrity: sha512-TvmkNhkv8yct0SVBSy+o8wYzXjE4Zz3PCesbfs8HiCXXdcTuocApFv11UWlNFWKYsP2okqrhb7JNlSm9InBhIw==}
     dev: false
@@ -4330,15 +4340,6 @@ packages:
   /pend@1.2.0:
     resolution: {integrity: sha512-F3asv42UuXchdzt+xXqfW1OGlVBe+mxa2mqI0pg5yAHZPvFmY3Y6drSf/GQ1A86WgWEN9Kzh/WrgKa6iGcHXLg==}
     dev: true
-
-  /pica@9.0.1:
-    resolution: {integrity: sha512-v0U4vY6Z3ztz9b4jBIhCD3WYoecGXCQeCsYep+sXRefViL+mVVoTL+wqzdPeE+GpBFsRUtQZb6dltvAt2UkMtQ==}
-    dependencies:
-      glur: 1.1.2
-      multimath: 2.0.0
-      object-assign: 4.1.1
-      webworkify: 1.5.0
-    dev: false
 
   /picocolors@1.0.1:
     resolution: {integrity: sha512-anP1Z8qwhkbmu7MFP5iTt+wQKXgwzf7zTyGlcdzabySa9vd0Xt392U0rVmz9poOaBj0uHJKyyo9/upk0HrEQew==}
@@ -5623,10 +5624,6 @@ packages:
 
   /webidl-conversions@3.0.1:
     resolution: {integrity: sha512-2JAn3z8AR6rjK8Sm8orRC0h/bcl/DqL7tRPdGZ4I1CjdF+EaMLmYxBHyXuKL849eucPFhvBoxMsflfOb8kxaeQ==}
-    dev: false
-
-  /webworkify@1.5.0:
-    resolution: {integrity: sha512-AMcUeyXAhbACL8S2hqqdqOLqvJ8ylmIbNwUIqQujRSouf4+eUFaXbG6F1Rbu+srlJMmxQWsiU7mOJi0nMBfM1g==}
     dev: false
 
   /whatwg-url@5.0.0:
