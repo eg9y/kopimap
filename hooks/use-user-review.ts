@@ -17,6 +17,7 @@ const fetchUserReview = async (userId: string, cafeId: string): Promise<ReviewWi
     .eq("cafe_place_id", cafeId)
     .single();
 
+ 
   if (error) {
     if (error.code === "PGRST116") {
       return null; // No matching row found
@@ -28,10 +29,20 @@ const fetchUserReview = async (userId: string, cafeId: string): Promise<ReviewWi
     return null;
   }
 
+  const {data: images, error: imagesError} = await supabase
+  .from("images")
+    .select("*")
+    .eq("review_id", data.id);
+
+  if (imagesError) {
+    throw imagesError;
+  }
+
   // Convert has_musholla to string
   const convertedData: ReviewWithStringMusholla = {
     ...data,
-    has_musholla: data.has_musholla === null ? null : data.has_musholla ? "Yes" : "No"
+    has_musholla: data.has_musholla === null ? null : data.has_musholla ? "Yes" : "No",
+    image_urls: images.map((img) => img.url!),
   };
 
   return convertedData;

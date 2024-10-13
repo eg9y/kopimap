@@ -1,3 +1,5 @@
+// ImageUpload.tsx
+
 import { Session } from "@supabase/supabase-js";
 import Uppy, { UppyFile } from "@uppy/core";
 import { Dashboard, useUppyEvent } from "@uppy/react";
@@ -12,11 +14,9 @@ import {
 import { toast } from "sonner";
 import * as tf from "@tensorflow/tfjs";
 import "@tensorflow/tfjs-backend-wasm";
-import {
-  setWasmPaths,
-  getThreadsCount,
-  setThreadsCount,
-} from "@tensorflow/tfjs-backend-wasm";
+import { setWasmPaths } from "@tensorflow/tfjs-backend-wasm";
+import { createClient } from "@supabase/supabase-js";
+import { Database } from "./lib/database.types";
 
 import "@uppy/core/dist/style.min.css";
 import "@uppy/dashboard/dist/style.min.css";
@@ -31,13 +31,27 @@ interface ImageUploadProps {
 }
 
 export interface ImageUploadRef {
-  triggerUpload: () => Promise<string[]>;
+  triggerUpload: (reviewId: string) => Promise<void>;
 }
+
+const supabase = createClient<Database>(
+  import.meta.env.VITE_SUPABASE_URL!,
+  import.meta.env.VITE_SUPABASE_ANON_KEY!
+);
+
+// Add this type definition
+type ExtendedMetadata = {
+  classification?: string;
+  placeId: string;
+};
+
+// Define a type alias for the UppyFile with ExtendedMetadata
+type ExtendedUppyFile = UppyFile<ExtendedMetadata, Record<string, unknown>>;
 
 export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(
   ({ onFilesSelected, sessionInfo, existingUrls = [], placeId }, ref) => {
     const [uppy] = useState(() =>
-      new Uppy({
+      new Uppy<ExtendedMetadata>({
         id: "imageUploader",
         autoProceed: false,
         restrictions: {
@@ -62,14 +76,14 @@ export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(
     const [modelLoading, setModelLoading] = useState(true);
     const workerRef = useRef<Worker | null>(null);
     const classificationQueue = useRef<
-      Array<{ file: UppyFile<any, any>; resolve: (value: any) => void }>
+      Array<{ file: ExtendedUppyFile; resolve: (value: any) => void }>
     >([]);
 
     useEffect(() => {
       async function setupWasm() {
         try {
           setWasmPaths(
-            "https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@4.21.0/dist/"
+            "https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@4.0.0/dist/"
           );
           await tf.setBackend("wasm");
           await tf.ready();
@@ -83,27 +97,34 @@ export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(
       }
 
       setupWasm().then(() => {
-        workerRef.current = new Worker(
-          new URL("./lib/model-worker.ts", import.meta.url),
-          { type: "module" }
-        );
+        if (!workerRef.current) {
+          workerRef.current = new Worker(
+            new URL("./lib/model-worker.ts", import.meta.url),
+            { type: "module" }
+          );
 
-        workerRef.current.onmessage = (event) => {
-          if (event.data.type === "modelLoaded") {
-            setModelLoading(false);
-            processQueue();
-          } else if (event.data.type === "modelLoadError") {
-            toast.error("Failed to load the image classification model.");
-            setModelLoading(false);
-          } else if (event.data.type === "predictionResult") {
-            const { prediction } = event.data;
-            console.log("Image classification results:", prediction);
-          } else if (event.data.type === "predictionError") {
-            toast.error("An error occurred during image classification.");
-          }
-        };
+          workerRef.current.onmessage = (event) => {
+            if (event.data.type === "modelLoaded") {
+              setModelLoading(false);
+              processQueue();
+            } else if (event.data.type === "setupError") {
+              toast.error("Failed to load the image classification model.");
+              setModelLoading(false);
+            } else if (event.data.type === "predictionResult") {
+              const { prediction, fileId } = event.data;
+              console.log("Image classification results:", prediction);
+              // Update the file metadata with the prediction
+              uppy.setFileMeta(fileId, {
+                ...uppy.getFile(fileId)?.meta,
+                classification: prediction,
+              });
+            } else if (event.data.type === "predictionError") {
+              toast.error("An error occurred during image classification.");
+            }
+          };
 
-        workerRef.current.postMessage({ type: "loadModel" });
+          workerRef.current.postMessage({ type: "loadModel" });
+        }
       });
 
       return () => {
@@ -114,18 +135,20 @@ export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(
     const processQueue = () => {
       while (classificationQueue.current.length > 0) {
         const { file, resolve } = classificationQueue.current.shift()!;
-        runPrediction(file.data as File).then(resolve);
+        runPrediction(file).then(resolve);
       }
     };
 
-    const runPrediction = async (file: File) => {
+    const runPrediction = async (file: ExtendedUppyFile) => {
       if (!workerRef.current) {
         console.warn("Worker not initialized");
         return null;
       }
 
+      const fileData = file.data as File;
+
       const img = new Image();
-      img.src = URL.createObjectURL(file);
+      img.src = URL.createObjectURL(fileData);
       await new Promise((resolve) => (img.onload = resolve));
 
       const canvas = document.createElement("canvas");
@@ -137,37 +160,49 @@ export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(
 
       return new Promise((resolve) => {
         if (workerRef.current) {
-          workerRef.current.onmessage = (event) => {
+          const messageHandler = (event: MessageEvent) => {
             if (event.data.type === "predictionResult") {
               console.log("Prediction result:", event.data.prediction);
               resolve(event.data.prediction);
+              workerRef.current?.removeEventListener("message", messageHandler);
             } else if (event.data.type === "predictionError") {
               console.error("Prediction error:", event.data.error);
               resolve(null);
+              workerRef.current?.removeEventListener("message", messageHandler);
             }
           };
-          console.log("Sending message to worker", imageData);
-          workerRef.current.postMessage({ type: "runPrediction", imageData });
+
+          workerRef.current.addEventListener("message", messageHandler);
+
+          workerRef.current.postMessage({
+            type: "runPrediction",
+            imageData,
+            fileId: file.id,
+          });
         } else {
           resolve(null);
         }
       });
     };
 
-    useUppyEvent(uppy, "file-added", async (file) => {
+    useUppyEvent(uppy, "file-added", async (file: ExtendedUppyFile) => {
       let prediction;
       if (!modelLoading) {
-        prediction = await runPrediction(file.data as File);
+        prediction = await runPrediction(file);
       } else {
         prediction = await new Promise((resolve) => {
           classificationQueue.current.push({ file, resolve });
         });
       }
 
-      if (prediction) {
+      const bestPrediction = (
+        prediction as { probability: number; className: string }[]
+      )?.find((p) => p.probability > 0.7);
+
+      if (bestPrediction) {
         uppy.setFileMeta(file.id, {
           ...file.meta,
-          classification: prediction,
+          classification: bestPrediction.className,
         });
       }
 
@@ -180,17 +215,36 @@ export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(
     });
 
     useImperativeHandle(ref, () => ({
-      triggerUpload: async () => {
-        if (!uppy) return [];
+      triggerUpload: async (reviewId: string) => {
+        if (!uppy) return;
 
         const result = await uppy.upload();
         if (!result?.successful) {
-          return [];
+          return;
         }
-        const newUrls = result.successful
-          .filter((file) => !!file.response?.body?.url)
-          .map((file) => file.response!.body!.url);
-        return newUrls;
+
+        for (const file of result.successful) {
+          if (file.response?.body?.url) {
+            const imageUrl = file.response.body.url;
+            const classification = file.meta.classification;
+
+            const { error: insertError } = await supabase
+              .from("images")
+              .insert({
+                url: imageUrl,
+                label: classification,
+                review_id: reviewId,
+                place_id: placeId,
+              });
+
+            if (insertError) {
+              console.error("Error inserting image:", insertError);
+              toast.error(
+                `Failed to save image information: ${insertError.message}`
+              );
+            }
+          }
+        }
       },
     }));
 

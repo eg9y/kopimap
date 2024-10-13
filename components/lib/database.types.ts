@@ -13,29 +13,38 @@ export type Database = {
         Row: {
           created_account: boolean | null
           created_at: string
+          first_five_reviews: boolean
+          first_full_review: boolean
           first_review: boolean | null
-          id: number
-          user_profile_id: string | null
+          first_ten_reviews: boolean
+          five_site_visits_in_a_row: boolean
+          user_profile_id: string
         }
         Insert: {
           created_account?: boolean | null
           created_at?: string
+          first_five_reviews?: boolean
+          first_full_review?: boolean
           first_review?: boolean | null
-          id?: number
-          user_profile_id?: string | null
+          first_ten_reviews?: boolean
+          five_site_visits_in_a_row?: boolean
+          user_profile_id: string
         }
         Update: {
           created_account?: boolean | null
           created_at?: string
+          first_five_reviews?: boolean
+          first_full_review?: boolean
           first_review?: boolean | null
-          id?: number
-          user_profile_id?: string | null
+          first_ten_reviews?: boolean
+          five_site_visits_in_a_row?: boolean
+          user_profile_id?: string
         }
         Relationships: [
           {
             foreignKeyName: "achievements_user_profile_id_fkey"
             columns: ["user_profile_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -296,6 +305,55 @@ export type Database = {
         }
         Relationships: []
       }
+      images: {
+        Row: {
+          created_at: string
+          id: string
+          label: string | null
+          place_id: string | null
+          review_id: string
+          url: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          label?: string | null
+          place_id?: string | null
+          review_id: string
+          url?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          label?: string | null
+          place_id?: string | null
+          review_id?: string
+          url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "images_place_id_fkey"
+            columns: ["place_id"]
+            isOneToOne: false
+            referencedRelation: "cafe_location_view"
+            referencedColumns: ["place_id"]
+          },
+          {
+            foreignKeyName: "images_place_id_fkey"
+            columns: ["place_id"]
+            isOneToOne: false
+            referencedRelation: "cafes"
+            referencedColumns: ["place_id"]
+          },
+          {
+            foreignKeyName: "images_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: false
+            referencedRelation: "reviews"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           first_name: string | null
@@ -337,7 +395,6 @@ export type Database = {
           food_options: Database["public"]["Enums"]["food_options"] | null
           has_musholla: boolean | null
           id: string
-          image_urls: string[] | null
           instagram_worthiness:
             | Database["public"]["Enums"]["instagram_worthiness"]
             | null
@@ -379,7 +436,6 @@ export type Database = {
           food_options?: Database["public"]["Enums"]["food_options"] | null
           has_musholla?: boolean | null
           id?: string
-          image_urls?: string[] | null
           instagram_worthiness?:
             | Database["public"]["Enums"]["instagram_worthiness"]
             | null
@@ -425,7 +481,6 @@ export type Database = {
           food_options?: Database["public"]["Enums"]["food_options"] | null
           has_musholla?: boolean | null
           id?: string
-          image_urls?: string[] | null
           instagram_worthiness?:
             | Database["public"]["Enums"]["instagram_worthiness"]
             | null

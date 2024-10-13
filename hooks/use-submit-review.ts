@@ -1,3 +1,5 @@
+// useSubmitReview.ts
+
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@supabase/supabase-js";
 import { toast } from "sonner";
@@ -6,7 +8,7 @@ import { useUser } from "./use-user";
 
 const supabase = createClient<Database>(
   import.meta.env.VITE_SUPABASE_URL!,
-  import.meta.env.VITE_SUPABASE_ANON_KEY!,
+  import.meta.env.VITE_SUPABASE_ANON_KEY!
 );
 
 const checkAchievement = async (userId: string) => {
@@ -29,7 +31,7 @@ const checkAchievement = async (userId: string) => {
           user_profile_id: userId,
           first_review: true,
         },
-        { onConflict: "user_profile_id" },
+        { onConflict: "user_profile_id" }
       );
 
     if (achievementError) {
@@ -42,11 +44,13 @@ const submitReview = async (
   reviewData: Omit<
     Database["public"]["Tables"]["reviews"]["Insert"],
     "id" | "created_at"
-  >,
-): Promise<any> => {
-  const { error: reviewError } = await supabase
+  >
+): Promise<{ id: string }> => {
+  const { data: reviewResponse, error: reviewError } = await supabase
     .from("reviews")
-    .upsert(reviewData, { onConflict: "user_id,cafe_id" });
+    .upsert(reviewData, { onConflict: "user_id,cafe_id" })
+    .select("id")
+    .single();
 
   if (reviewError) {
     throw new Error(reviewError.message);
@@ -54,19 +58,21 @@ const submitReview = async (
 
   await checkAchievement(reviewData.user_id!);
 
-  return reviewData;
+  return { id: reviewResponse.id };
 };
 
 export const useSubmitReview = (
-  onSuccess: () => void,
   placeId: string | null,
-  userId: string | null,
+  userId: string | null
 ) => {
   const queryClient = useQueryClient();
   const { loggedInUser } = useUser();
 
   return useMutation({
-    mutationFn: submitReview,
+    mutationFn: (reviewData: Omit<
+      Database["public"]["Tables"]["reviews"]["Insert"],
+      "id" | "created_at"
+    >) => submitReview(reviewData),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["cafeAggregatedReview", placeId],
@@ -82,12 +88,10 @@ export const useSubmitReview = (
           queryKey: ["userAchievements", loggedInUser.id],
         });
       }
-      onSuccess();
     },
     onError: (error: Error) => {
       toast.error("Error", {
-        description:
-          `There was an error submitting your review: ${error.message}. Please try again.`,
+        description: `There was an error submitting your review: ${error.message}. Please try again.`,
         position: "top-right",
       });
     },

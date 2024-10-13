@@ -53,7 +53,6 @@ async function fetchLatestReviews(
       id,
       updated_at,
       rating,
-      image_urls,
       user_id,
       review_text,
       coffee_quality,
@@ -80,13 +79,17 @@ async function fetchLatestReviews(
 		throw new Error("Error fetching latest reviews");
 	}
 
+	const { data: images, error: imagesError } = await supabase
+		.from("images")
+		.select("url, review_id, place_id")
+		.in("review_id", reviews.map((review) => review.id));
+
 	// Limit image_urls to maxImages
 	const reviewsWithLimitedImages = reviews.map((review) => ({
 		...review,
-		image_urls: review.image_urls?.slice(0, maxImages) || [],
+		image_urls: images?.filter((img) => img.review_id === review.id).map((img) => img.url),
 	}));
 
-	console.log("reviewsWithLimitedImages", reviewsWithLimitedImages);
 
 	// Fetch user profiles
 	const userIds = reviewsWithLimitedImages.map((review) => review.user_id);

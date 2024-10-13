@@ -7,25 +7,22 @@ const CLASS_NAMES = ["Food & Drinks", "Menu", "Vibes"];
 let model: tf.GraphModel | null = null;
 let isSetupComplete = false;
 
-async function setupWorker() {
+async function setupWorkerAndLoadModel() {
   if (isSetupComplete) {
-    console.log('Worker setup already completed. Skipping initialization.');
+    console.log('Worker setup and model loading already completed. Skipping initialization.');
     return;
   }
 
   try {
-    // Set WASM paths
-    setWasmPaths('/');
-
-    // Check for SIMD support
-    const simdSupported = await tf.env().getAsync('WASM_HAS_SIMD_SUPPORT');
-    console.log('SIMD supported:', simdSupported);
-
-    // Set the backend to WASM
+    setWasmPaths('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@4.21.0/dist/');
     await tf.setBackend('wasm');
     await tf.ready();
 
-    // Set threads if supported
+    console.log("WASM backend set up in worker, current backend:", tf.getBackend());
+
+    const simdSupported = await tf.env().getAsync('WASM_HAS_SIMD_SUPPORT');
+    console.log('SIMD supported:', simdSupported);
+
     if (await tf.env().getAsync('WASM_HAS_MULTITHREAD_SUPPORT')) {
       console.log('Multi-threading supported');
       // @ts-ignore (setThreadsCount is not in the type definitions)
@@ -34,41 +31,33 @@ async function setupWorker() {
       console.log('Multi-threading not supported');
     }
 
+    model = await tf.loadGraphModel(
+      "https://kopimap-cdn.b-cdn.net/ml-models/last_web_model_nice/model.json"
+    );
+
     isSetupComplete = true;
-    console.log('Worker setup completed');
+    console.log("Worker setup completed and model loaded successfully");
+    self.postMessage({ type: 'modelLoaded' });
   } catch (error) {
-    console.error("Error setting up worker:", error);
+    console.error("Error setting up worker or loading model:", error);
     self.postMessage({ type: 'setupError', error: (error as Error).message });
   }
 }
-
-async function loadModel() {
-    try {
-      setWasmPaths('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@4.21.0/dist/');
-      await tf.setBackend('wasm');
-      await tf.ready();
-      console.log("WASM backend set up in worker, current backend:", tf.getBackend());
-  
-      // Replace this URL with the correct path to your model
-      model = await tf.loadGraphModel(
-        "https://map-assets.kopimap.com/last_tflite_web_model/model.json"
-      );
-      console.log("Model loaded successfully in worker");
-      self.postMessage({ type: 'modelLoaded' });
-    } catch (error) {
-      console.error("Error loading the model in worker:", error);
-      self.postMessage({ type: 'modelLoadError', error: (error as Error).message });
-    }
-  }
 
 async function runPrediction(imageData: ImageData) {
   if (!model) {
     throw new Error("Model not loaded");
   }
 
-  const tensor = tf.browser.fromPixels(imageData).expandDims();
+  const tensor = tf.browser.fromPixels(imageData)
+    .resizeBilinear([64, 64])
+    .expandDims()
+    .toFloat()
+    .div(255.0);
+
   const predictions = await model.predict(tensor) as tf.Tensor;
   const probabilities = await predictions.data();
+  
   tensor.dispose();
   predictions.dispose();
 
@@ -82,7 +71,7 @@ async function runPrediction(imageData: ImageData) {
 
 self.onmessage = async (event: MessageEvent) => {
   if (event.data.type === 'loadModel') {
-    await loadModel();
+    await setupWorkerAndLoadModel();
   } else if (event.data.type === 'runPrediction') {
     try {
       const prediction = await runPrediction(event.data.imageData);

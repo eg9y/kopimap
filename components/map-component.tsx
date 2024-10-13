@@ -125,7 +125,9 @@ export default function MapComponent({}: MapComponentProps) {
 			id="test"
 			reuseMaps
 			{...viewport}
-			onMove={(evt) => setViewport(evt.viewState)}
+			onMove={(evt) => {
+				setViewport(evt.viewState);
+			}}
 			onLoad={(evt) => {
 				const center = evt.target.getCenter();
 				setMapCenter({

@@ -1,28 +1,30 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useForm, Controller, FieldValues } from "react-hook-form";
-import { toast } from "sonner";
-import { Rating } from "react-simple-star-rating";
-import { XIcon } from "lucide-react";
+// SubmitReviewDialog.tsx
 
+import { XIcon } from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
+import { Controller, FieldValues, useForm } from "react-hook-form";
+import { Rating } from "react-simple-star-rating";
+import { toast } from "sonner";
+
+import { useI18nContext } from "@/src/i18n/i18n-react";
+import { Session, createClient } from "@supabase/supabase-js";
+import { LocalizedString } from "typesafe-i18n";
+import { useSubmitReview } from "../hooks/use-submit-review";
+import { useUser } from "../hooks/use-user";
+import { CafeDetailedInfo, ReviewWithStringMusholla } from "../types";
+import { Button } from "./catalyst/button";
 import {
   Dialog,
-  DialogTitle,
-  DialogDescription,
-  DialogBody,
   DialogActions,
+  DialogBody,
+  DialogDescription,
+  DialogTitle,
 } from "./catalyst/dialog";
-import { Button } from "./catalyst/button";
 import { Field, Label } from "./catalyst/fieldset";
-import { reviewAttributes } from "./lib/review-attributes";
-import { useSubmitReview } from "../hooks/use-submit-review";
-import { createClient, Session } from "@supabase/supabase-js";
+import { ImageUpload, ImageUploadRef } from "./image-upload";
 import { Database } from "./lib/database.types";
-import { CafeDetailedInfo, ReviewWithStringMusholla } from "../types";
+import { reviewAttributes } from "./lib/review-attributes";
 import { cn } from "./lib/utils";
-import { useUser } from "../hooks/use-user";
-import { useI18nContext } from "@/src/i18n/i18n-react";
-import { LocalizedString } from "typesafe-i18n";
-import { ImageUpload } from "./image-upload";
 
 const CUSTOM_ITEM_LABELS = ["Bad", "Poor", "Average", "Great", "Excellent"];
 
@@ -32,10 +34,6 @@ const supabase = createClient<Database>(
   import.meta.env.VITE_SUPABASE_URL!,
   import.meta.env.VITE_SUPABASE_ANON_KEY!
 );
-
-export interface ImageUploadRef {
-  triggerUpload: () => Promise<string[]>;
-}
 
 export function SubmitReviewDialog({
   isOpen,
@@ -97,26 +95,7 @@ export function SubmitReviewDialog({
     setSelectedFiles(files);
   };
 
-  const onSuccess = () => {
-    toast.success(
-      isUpdating
-        ? LL.submitReview.reviewUpdated()
-        : LL.submitReview.reviewSubmitted(),
-      {
-        description: isUpdating
-          ? LL.submitReview.updateSuccess()
-          : LL.submitReview.submitSuccess(),
-        position: "top-right",
-      }
-    );
-    setIsOpen(false);
-    reset();
-    setSelectedFiles([]);
-    setExistingImageUrls([]);
-  };
-
-  const { mutate } = useSubmitReview(
-    onSuccess,
+  const { mutateAsync } = useSubmitReview(
     cafeDetailedInfo ? cafeDetailedInfo.place_id : null,
     loggedInUser?.id ?? null
   );
@@ -131,20 +110,6 @@ export function SubmitReviewDialog({
     }
 
     setIsUploading(true);
-    let newUploadedUrls: string[] = [];
-
-    if (selectedFiles.length > 0 && imageUploadRef.current) {
-      try {
-        newUploadedUrls = await imageUploadRef.current.triggerUpload();
-      } catch (error) {
-        console.error("Error uploading images:", error);
-        toast.error(LL.submitReview.imageUploadError());
-        setIsUploading(false);
-        return;
-      }
-    }
-
-    setIsUploading(false);
 
     const payload = { ...data };
 
@@ -157,12 +122,50 @@ export function SubmitReviewDialog({
         typeof payload.rating === "number"
           ? payload.rating
           : parseFloat(payload.rating),
-      image_urls: [...existingImageUrls, ...newUploadedUrls],
+      // image_urls field removed as per the schema changes
     };
 
-    console.log("reviewData", reviewData);
+    try {
+      // Submit the review and get the reviewId
+        const { id: reviewId } = await mutateAsync(reviewData);
 
-    mutate(reviewData);
+      // Upload images with the reviewId
+      if (selectedFiles.length > 0 && imageUploadRef.current) {
+        try {
+            await imageUploadRef.current.triggerUpload(reviewId);
+        } catch (error) {
+          console.error("Error uploading images:", error);
+          toast.error(LL.submitReview.imageUploadError());
+          setIsUploading(false);
+          return;
+        }
+      }
+
+      setIsUploading(false);
+
+      // Success toast and reset form
+      toast.success(
+        isUpdating
+          ? LL.submitReview.reviewUpdated()
+          : LL.submitReview.reviewSubmitted(),
+        {
+          description: isUpdating
+            ? LL.submitReview.updateSuccess()
+            : LL.submitReview.submitSuccess(),
+          position: "top-right",
+        }
+      );
+      setIsOpen(false);
+      reset();
+      setSelectedFiles([]);
+      setExistingImageUrls([]);
+    } catch (error: any) {
+      console.error("Error submitting review:", error);
+      toast.error(
+        `There was an error submitting your review: ${error.message}. Please try again.`
+      );
+      setIsUploading(false);
+    }
   };
 
   if (!loggedInUser) {
@@ -198,7 +201,7 @@ export function SubmitReviewDialog({
     <Dialog
       open={isOpen && !!cafeDetailedInfo}
       onClose={() => setIsOpen(false)}
-      className="!max-w-[70vw] flex flex-col overflow-y-auto jang dark:bg-gray-800 dark:text-white"
+      className="!max-w-[70vw] flex flex-col overflow-y-auto dark:bg-gray-800 dark:text-white"
     >
       <DialogTitle className="dark:text-white">
         {isUpdating
@@ -307,6 +310,7 @@ export function SubmitReviewDialog({
                 />
               </Field>
             </div>
+
             {/* Images section */}
             <div className="p-2 rounded-md bg-slate-100 dark:bg-gray-700 w-full flex flex-col">
               <p className="text-base font-semibold">
@@ -320,6 +324,7 @@ export function SubmitReviewDialog({
                   placeId={cafeDetailedInfo.place_id!}
                 />
               )}
+              {/* Existing images display (if any) */}
               {existingImageUrls.length > 0 && (
                 <div className="mt-2">
                   <p>{LL.submitReview.existingImages()}</p>
@@ -335,6 +340,7 @@ export function SubmitReviewDialog({
                   </div>
                 </div>
               )}
+              {/* Newly selected files preview */}
               {selectedFiles.length > 0 && (
                 <div className="mt-2">
                   <p>{LL.submitReview.newImagesToUpload()}</p>
@@ -351,6 +357,7 @@ export function SubmitReviewDialog({
                 </div>
               )}
             </div>
+
             {/* Review attributes */}
             {reviewAttributes.map((attr) => (
               <div

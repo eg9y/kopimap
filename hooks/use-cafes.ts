@@ -116,37 +116,46 @@ export const useCafes = (
 			}));
 
 			try {
-				const { data: images, error } = await supabase
+				const { data: gmapsImages, error } = await supabase
 					.from("cafe_location_view")
 					.select(
-						"all_image_urls, hosted_gmaps_images, gmaps_images,gmaps_featured_image, place_id",
+						"hosted_gmaps_images, gmaps_images,gmaps_featured_image, place_id",
+					)
+					.in(
+						"place_id",
+						cafes.map((cafe) => cafe.id),
+					);
+				const { data: reviewImages, error: reviewImagesError } = await supabase
+					.from("images")
+					.select(
+						"url, place_id",
 					)
 					.in(
 						"place_id",
 						cafes.map((cafe) => cafe.id),
 					);
 
-				if (error) {
-					console.error("Error fetching images from Supabase:", error);
-				} else if (images) {
+				if (error || reviewImagesError) {
+					console.error("Error fetching images from Supabase:", error, reviewImagesError);
+				} else if (gmapsImages && reviewImages) {
 					// Create a map of place_id to image data for efficient lookup
-					const imageMap = new Map(images.map((img) => [img.place_id, img]));
+					const gmapsImageMap = new Map(gmapsImages.map((img) => [img.place_id, img]));
+					const reviewImageMap = new Map(reviewImages.map((img) => [img.place_id, img]));
 
 					// Connect images with cafes
 					cafes.forEach((cafe) => {
-						const cafeImages = imageMap.get(cafe.id);
-						if (cafeImages) {
+						const gmapsImages = gmapsImageMap.get(cafe.id);
+						const reviewImages = reviewImageMap.get(cafe.id);
+						if (gmapsImages || reviewImages) {
 							const images = [
-								...(cafeImages?.all_image_urls
-									? cafeImages.all_image_urls.map(transformImageUrl)
-									: []),
-								...((cafeImages?.hosted_gmaps_images as string[])
-									? (cafeImages.hosted_gmaps_images as string[]).map(
+								...(reviewImages?.url ? [reviewImages.url] : []),
+								...((gmapsImages?.hosted_gmaps_images as string[])
+									? (gmapsImages?.hosted_gmaps_images as string[]).map(
 											transformImageUrl,
 										)
 									: []),
-								...(cafeImages?.gmaps_images
-									? JSON.parse(cafeImages?.gmaps_images as string).map(
+								...(gmapsImages?.gmaps_images
+									? JSON.parse(gmapsImages?.gmaps_images as string).map(
 											(gmapsImage: { link: string }) => gmapsImage.link,
 										)
 									: []),

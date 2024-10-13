@@ -87,4 +87,5 @@ export type SearchFilters = {
 export interface ReviewWithStringMusholla
   extends Omit<Database["public"]["Tables"]["reviews"]["Row"], "has_musholla"> {
   has_musholla: string | null;
+  image_urls: string[];
 }
