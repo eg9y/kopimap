@@ -12,7 +12,7 @@ import { useUser } from "../../hooks/use-user";
 import { CafeDetailedInfo, ReviewWithStringMusholla } from "../../types";
 import { Button } from "../catalyst/button";
 import { Field, Label } from "../catalyst/fieldset";
-import { ImageUpload } from "../image-upload";
+import { ImageUpload, ImageUploadRef } from "../image-upload";
 import { Database } from "../lib/database.types";
 import { reviewAttributes } from "../lib/review-attributes";
 import { cn } from "../lib/utils";
@@ -26,9 +26,6 @@ const supabase = createClient<Database>(
 	import.meta.env.VITE_SUPABASE_ANON_KEY!,
 );
 
-export interface ImageUploadRef {
-	triggerUpload: () => Promise<string[]>;
-}
 
 export function MobileSubmitReview({
 	cafeDetailedInfo,
@@ -105,7 +102,7 @@ export function MobileSubmitReview({
 		setExistingImageUrls([]);
 	};
 
-	const { mutate } = useSubmitReview(
+	const { mutateAsync } = useSubmitReview(
 		onSuccess,
 		cafeDetailedInfo ? cafeDetailedInfo.place_id : null,
 		loggedInUser?.id ?? null,
@@ -121,37 +118,67 @@ export function MobileSubmitReview({
 		}
 
 		setIsUploading(true);
-		let newUploadedUrls: string[] = [];
-
-		if (selectedFiles.length > 0 && imageUploadRef.current) {
-			try {
-				newUploadedUrls = await imageUploadRef.current.triggerUpload();
-			} catch (error) {
-				console.error("Error uploading images:", error);
-				toast.error(LL.submitReview.imageUploadError());
-				setIsUploading(false);
-				return;
-			}
-		}
-
-		setIsUploading(false);
 
 		const payload = { ...data };
 
-		const reviewData: ReviewInsert = {
+		const finalPayload = {
 			...payload,
+		};
+
+		delete finalPayload.image_urls;
+
+		const reviewData: ReviewInsert = {
+			...finalPayload,
 			cafe_id: cafeDetailedInfo.id,
 			cafe_place_id: cafeDetailedInfo.place_id,
 			user_id: loggedInUser.id,
 			rating:
-				typeof payload.rating === "number"
-					? payload.rating
-					: parseFloat(payload.rating),
-			image_urls: [...existingImageUrls, ...newUploadedUrls],
-			review_text: payload.review_text,
+				typeof finalPayload.rating === "number"
+					? finalPayload.rating
+					: parseFloat(finalPayload.rating),
 		};
 
-		mutate(reviewData);
+		try {
+			// Submit the review and get the reviewId
+			const { id: reviewId } = await mutateAsync(reviewData);
+
+			// Upload images with the reviewId
+			if (selectedFiles.length > 0 && imageUploadRef.current) {
+				try {
+					await imageUploadRef.current.triggerUpload(reviewId);
+				} catch (error) {
+					console.error("Error uploading images:", error);
+					toast.error(LL.submitReview.imageUploadError());
+					setIsUploading(false);
+					return;
+				}
+			}
+
+			setIsUploading(false);
+
+			// Success toast and reset form
+			toast.success(
+				isUpdating
+					? LL.submitReview.reviewUpdated()
+					: LL.submitReview.reviewSubmitted(),
+				{
+					description: isUpdating
+						? LL.submitReview.updateSuccess()
+						: LL.submitReview.submitSuccess(),
+					position: "top-center",
+				}
+			);
+			onClose();
+			reset();
+			setSelectedFiles([]);
+			setExistingImageUrls([]);
+		} catch (error: any) {
+			console.error("Error submitting review:", error);
+			toast.error(
+				`There was an error submitting your review: ${error.message}. Please try again.`
+			);
+			setIsUploading(false);
+		}
 	};
 
 	if (!loggedInUser) {
@@ -446,7 +473,9 @@ export function MobileSubmitReview({
 						className="cursor-pointer grow"
 						disabled={isUploading}
 					>
-						{isUpdating ? LL.submitReview.update() : LL.submitReview.submit()}
+						{ isUpdating
+							? LL.submitReview.update()
+							: LL.submitReview.submit()}
 					</Button>
 				</div>
 			</div>

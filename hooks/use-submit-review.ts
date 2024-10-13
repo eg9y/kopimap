@@ -62,6 +62,7 @@ const submitReview = async (
 };
 
 export const useSubmitReview = (
+  onSuccess: () => void,
   placeId: string | null,
   userId: string | null
 ) => {
@@ -88,6 +89,7 @@ export const useSubmitReview = (
           queryKey: ["userAchievements", loggedInUser.id],
         });
       }
+      onSuccess();
     },
     onError: (error: Error) => {
       toast.error("Error", {

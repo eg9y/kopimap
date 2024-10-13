@@ -95,7 +95,27 @@ export function SubmitReviewDialog({
     setSelectedFiles(files);
   };
 
+  const onSuccess = () => {
+    toast.success(
+      isUpdating
+        ? LL.submitReview.reviewUpdated()
+        : LL.submitReview.reviewSubmitted(),
+      {
+        description: isUpdating
+          ? LL.submitReview.updateSuccess()
+          : LL.submitReview.submitSuccess(),
+        position: "top-right",
+      }
+    );
+    setIsOpen(false);
+    reset();
+    setSelectedFiles([]);
+    setExistingImageUrls([]);
+  };
+
+
   const { mutateAsync } = useSubmitReview(
+    onSuccess,
     cafeDetailedInfo ? cafeDetailedInfo.place_id : null,
     loggedInUser?.id ?? null
   );
