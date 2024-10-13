@@ -113,16 +113,21 @@ export function SubmitReviewDialog({
 
     const payload = { ...data };
 
+	const finalPayload = {
+		...payload,
+	};
+
+    delete finalPayload.image_urls;
+
     const reviewData: ReviewInsert = {
-      ...payload,
+      ...finalPayload,
       cafe_id: cafeDetailedInfo.id,
       cafe_place_id: cafeDetailedInfo.place_id,
       user_id: loggedInUser.id,
       rating:
-        typeof payload.rating === "number"
-          ? payload.rating
-          : parseFloat(payload.rating),
-      // image_urls field removed as per the schema changes
+        typeof finalPayload.rating === "number"
+          ? finalPayload.rating
+          : parseFloat(finalPayload.rating),
     };
 
     try {

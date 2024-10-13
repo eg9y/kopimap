@@ -20,7 +20,7 @@ const fetchCafeAggregatedReviewAndReviews = async (placeId: string | null) => {
     return null;
   }
 
-  const [aggregatedReview, reviews, cafeDetails] = await Promise.all([
+  const [aggregatedReview, reviews, images, cafeDetails] = await Promise.all([
     supabase
       .from("cafe_aggregated_reviews")
       .select("*")
@@ -32,7 +32,6 @@ const fetchCafeAggregatedReviewAndReviews = async (placeId: string | null) => {
          id,
         updated_at,
         rating,
-        image_urls,
         user_id,
         review_text,
         coffee_quality,
@@ -46,6 +45,10 @@ const fetchCafeAggregatedReviewAndReviews = async (placeId: string | null) => {
       `)
       .eq("cafe_place_id", placeId)
       .order("created_at", { ascending: false }),
+    supabase
+      .from("images")
+      .select("*")
+      .eq("place_id", placeId),
     supabase
       .from("cafes")
       .select(`
@@ -66,9 +69,16 @@ const fetchCafeAggregatedReviewAndReviews = async (placeId: string | null) => {
     throw new Error(reviews.error.message);
   }
 
+  if (images.error) {
+    throw new Error(images.error.message);
+  }
+
   return {
     aggregatedReview: aggregatedReview.data,
-    reviews: reviews.data,
+    reviews: reviews.data?.map((review) => ({
+      ...review,
+      image_urls: images.data?.filter((img) => img.review_id === review.id).map((img) => img.url!),
+    })),
     cafeDetails: cafeDetails.data,
   };
 };
