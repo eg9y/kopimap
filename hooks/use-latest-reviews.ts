@@ -87,7 +87,7 @@ async function fetchLatestReviews(
 	// Limit image_urls to maxImages
 	const reviewsWithLimitedImages = reviews.map((review) => ({
 		...review,
-		image_urls: images?.filter((img) => img.review_id === review.id).map((img) => img.url),
+		image_urls: images?.filter((img) => img.review_id === review.id && img.url).map((img) => img.url!),
 	}));
 
 
