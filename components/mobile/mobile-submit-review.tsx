@@ -16,6 +16,10 @@ import { ImageUpload, ImageUploadRef } from "../image-upload";
 import { Database } from "../lib/database.types";
 import { reviewAttributes } from "../lib/review-attributes";
 import { cn } from "../lib/utils";
+import { StatusBar } from "@uppy/react";
+
+import '@uppy/core/dist/style.min.css';
+import '@uppy/status-bar/dist/style.min.css';
 
 const CUSTOM_ITEM_LABELS = ["Bad", "Poor", "Average", "Great", "Excellent"];
 
@@ -446,6 +450,18 @@ export function MobileSubmitReview({
               <XIcon size={16} />
             </button>
           </div>
+        )}
+        {/* Uppy StatusBar */}
+        {imageUploadRef.current?.uppy && (
+          <StatusBar
+            uppy={imageUploadRef.current.uppy}
+            hideAfterFinish={false}
+            showProgressDetails={true}
+            hideUploadButton={true}
+            hideRetryButton={false}
+            hidePauseResumeButton={false}
+            hideCancelButton={false}
+          />
         )}
         <div className="flex z-[10000]">
           <Button plain onClick={onClose} className="grow dark:text-white">
