@@ -8,6 +8,13 @@ const supabase = createClient<Database>(
   import.meta.env.VITE_SUPABASE_ANON_KEY!
 );
 
+const transformImageUrl = (url: string) => {
+	const imagePath = url.split("/storage/v1/object/public/")[1];
+	if (!imagePath) return url;
+
+	return `https://kopimap-cdn.b-cdn.net/${imagePath}?width=128&sharpen=true`;
+};
+
 
 const fetchUserReview = async (userId: string, cafeId: string): Promise<ReviewWithStringMusholla | null> => {
   const { data, error } = await supabase
@@ -42,7 +49,7 @@ const fetchUserReview = async (userId: string, cafeId: string): Promise<ReviewWi
   const convertedData: ReviewWithStringMusholla = {
     ...data,
     has_musholla: data.has_musholla === null ? null : data.has_musholla ? "Yes" : "No",
-    image_urls: images.map((img) => img.url!),
+    image_urls: images.map((img) => img.url!).map(transformImageUrl),
   };
 
   return convertedData;

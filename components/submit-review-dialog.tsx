@@ -25,6 +25,11 @@ import { ImageUpload, ImageUploadRef } from "./image-upload";
 import { Database } from "./lib/database.types";
 import { reviewAttributes } from "./lib/review-attributes";
 import { cn } from "./lib/utils";
+import { StatusBar } from "@uppy/react";
+
+import '@uppy/core/dist/style.min.css';
+import '@uppy/status-bar/dist/style.min.css';
+
 
 const CUSTOM_ITEM_LABELS = ["Bad", "Poor", "Average", "Great", "Excellent"];
 
@@ -193,6 +198,16 @@ export function SubmitReviewDialog({
     }
   };
 
+  const handleClose = () => {
+    setIsOpen(false);
+    reset();
+    setSelectedFiles([]);
+    setExistingImageUrls([]);
+    if (imageUploadRef.current) {
+      imageUploadRef.current?.uppy.clear();
+    }
+  };
+
   if (!loggedInUser) {
     return (
       <Dialog
@@ -225,7 +240,7 @@ export function SubmitReviewDialog({
   return (
     <Dialog
       open={isOpen && !!cafeDetailedInfo}
-      onClose={() => setIsOpen(false)}
+      onClose={handleClose}
       className="!max-w-[70vw] flex flex-col overflow-y-auto dark:bg-gray-800 dark:text-white"
     >
       <DialogTitle className="dark:text-white">
@@ -365,22 +380,6 @@ export function SubmitReviewDialog({
                   </div>
                 </div>
               )}
-              {/* Newly selected files preview */}
-              {selectedFiles.length > 0 && (
-                <div className="mt-2">
-                  <p>{LL.submitReview.newImagesToUpload()}</p>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedFiles.map((file, index) => (
-                      <img
-                        key={index}
-                        src={URL.createObjectURL(file.data)}
-                        alt={`${LL.submitReview.newImage()} ${index + 1}`}
-                        className="w-20 h-20 object-cover rounded"
-                      />
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
 
             {/* Review attributes */}
@@ -485,9 +484,21 @@ export function SubmitReviewDialog({
           )}
         </DialogBody>
         <DialogActions>
+			  {/* Uppy StatusBar */}
+			  {imageUploadRef.current?.uppy && (
+			  <StatusBar
+				uppy={imageUploadRef.current?.uppy}
+				hideAfterFinish={false}
+				showProgressDetails={true}
+				hideUploadButton={true}
+				hideRetryButton={false}
+				hidePauseResumeButton={false}
+				hideCancelButton={false}
+				/>
+			  )}
           <Button
             plain
-            onClick={() => setIsOpen(false)}
+            onClick={handleClose}
             className="dark:text-gray-300"
           >
             {LL.submitReview.cancel()}

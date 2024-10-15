@@ -2,7 +2,7 @@
 
 import { Session } from "@supabase/supabase-js";
 import Uppy, { UppyFile } from "@uppy/core";
-import { Dashboard, useUppyEvent } from "@uppy/react";
+import { useUppyEvent } from "@uppy/react";
 import XHRUpload from "@uppy/xhr-upload";
 import {
   forwardRef,
@@ -19,7 +19,6 @@ import { createClient } from "@supabase/supabase-js";
 import { Database } from "./lib/database.types";
 
 import "@uppy/core/dist/style.min.css";
-import "@uppy/dashboard/dist/style.min.css";
 
 const CLASS_NAMES = ["Food & Drinks", "Menu", "Vibes"];
 
@@ -32,6 +31,7 @@ interface ImageUploadProps {
 
 export interface ImageUploadRef {
   triggerUpload: (reviewId: string) => Promise<void>;
+  uppy: Uppy<ExtendedMetadata, any>;
 }
 
 const supabase = createClient<Database>(
@@ -39,14 +39,12 @@ const supabase = createClient<Database>(
   import.meta.env.VITE_SUPABASE_ANON_KEY!
 );
 
-// Add this type definition
 type ExtendedMetadata = {
   classification?: string;
   placeId: string;
 };
 
-// Define a type alias for the UppyFile with ExtendedMetadata
-type ExtendedUppyFile = UppyFile<ExtendedMetadata, Record<string, unknown>>;
+type ExtendedUppyFile = UppyFile<ExtendedMetadata, any>;
 
 export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(
   ({ onFilesSelected, sessionInfo, existingUrls = [], placeId }, ref) => {
@@ -246,7 +244,32 @@ export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(
           }
         }
       },
+      uppy,
     }));
+
+    // Handle file input change
+    const handleFileInputChange = (
+      event: React.ChangeEvent<HTMLInputElement>
+    ) => {
+      const files = event.target.files;
+      if (files) {
+        Array.from(files).forEach((file) => {
+          try {
+            uppy.addFile({
+              name: file.name,
+              type: file.type,
+              data: file,
+              meta: { placeId },
+            });
+          } catch (err) {
+            console.error(err);
+            toast.error(`Failed to add file: ${file.name}`);
+          }
+        });
+      }
+    };
+
+    const selectedFiles = uppy.getFiles();
 
     return (
       <>
@@ -255,15 +278,55 @@ export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(
             Loading image classification model...
           </div>
         )}
-        <Dashboard
-          uppy={uppy as any}
-          hideUploadButton={true}
-          height={200}
-          metaFields={[{ id: "name", name: "Name", placeholder: "File name" }]}
-          showProgressDetails={true}
-          proudlyDisplayPoweredByUppy={false}
-          showSelectedFiles={false}
-        />
+        <label className="flex items-center justify-center px-4 py-2 bg-blue-500 text-white rounded-lg shadow-lg cursor-pointer hover:bg-blue-600 transition-colors duration-300">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6 mr-2"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+            />
+          </svg>
+          <span>Select Images</span>
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handleFileInputChange}
+            className="hidden"
+          />
+        </label>
+        {/* Display selected files */}
+        {selectedFiles.length > 0 && (
+          <div className="mt-4">
+            <p className="text-sm font-semibold mb-2">Selected Files:</p>
+            <div className="flex flex-wrap gap-2">
+              {selectedFiles.map((file) => (
+                <div key={file.id} className="relative">
+                  <img
+                    src={URL.createObjectURL(file.data as File)}
+                    alt={file.name}
+                    className="w-20 h-20 object-cover rounded-lg shadow-md"
+                  />
+                  {/* <button
+                    onClick={() => uppy.removeFile(file.id)}
+                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button> */}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </>
     );
   }
