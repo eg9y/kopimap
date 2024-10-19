@@ -32,7 +32,7 @@ async function setupWorkerAndLoadModel() {
     }
 
     model = await tf.loadGraphModel(
-      "https://kopimap-cdn.b-cdn.net/ml-models/last_web_model_nice/model.json"
+      "https://kopimap-cdn.b-cdn.net/ml-models/best_web_model/model.json"
     );
 
     isSetupComplete = true;
@@ -50,7 +50,8 @@ async function runPrediction(imageData: ImageData) {
   }
 
   const tensor = tf.browser.fromPixels(imageData)
-    .resizeBilinear([64, 64])
+    .resizeBilinear([320,320])
+    // .resizeBilinear([64, 64])
     .expandDims()
     .toFloat()
     .div(255.0);

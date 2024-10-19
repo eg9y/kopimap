@@ -245,7 +245,7 @@ export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(
         }
       },
       uppy,
-    }));
+    }), [uppy]);
 
     // Handle file input change
     const handleFileInputChange = (

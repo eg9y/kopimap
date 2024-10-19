@@ -2,7 +2,7 @@ import { useI18nContext } from "@/src/i18n/i18n-react";
 import { useStore } from "@/store";
 import { Session, createClient } from "@supabase/supabase-js";
 import { XIcon } from "lucide-react";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { Controller, FieldValues, useForm } from "react-hook-form";
 import { Rating } from "react-simple-star-rating";
 import { toast } from "sonner";
@@ -18,8 +18,8 @@ import { reviewAttributes } from "../lib/review-attributes";
 import { cn } from "../lib/utils";
 import { StatusBar } from "@uppy/react";
 
-import '@uppy/core/dist/style.min.css';
-import '@uppy/status-bar/dist/style.min.css';
+import "@uppy/core/dist/style.min.css";
+import "@uppy/status-bar/dist/style.min.css";
 
 const CUSTOM_ITEM_LABELS = ["Bad", "Poor", "Average", "Great", "Excellent"];
 
@@ -35,7 +35,7 @@ export function MobileSubmitReview({
   userReview,
   onClose,
 }: {
-  cafeDetailedInfo?: CafeDetailedInfo;
+  cafeDetailedInfo: CafeDetailedInfo;
   userReview?: ReviewWithStringMusholla | null;
   onClose: () => void;
 }) {
@@ -56,6 +56,9 @@ export function MobileSubmitReview({
   const imageUploadRef = useRef<ImageUploadRef>(null);
   const [sessionInfo, setSessionInfo] = useState<Session | null>(null);
   const [showErrorMessage, setShowErrorMessage] = useState(false);
+  const [triggerUpload, setTriggerUpload] = useState<
+    ((reviewId: string) => Promise<void>) | null
+  >(null);
 
   useEffect(() => {
     (async () => {
@@ -83,22 +86,17 @@ export function MobileSubmitReview({
     setSelectedFiles([]);
   }, [userReview, setValue, reset]);
 
+  useEffect(() => {
+    if (imageUploadRef.current?.triggerUpload) {
+      setTriggerUpload(() => imageUploadRef.current!.triggerUpload);
+    }
+  }, [imageUploadRef.current]);
+
   const handleFilesSelected = (files: any[]) => {
     setSelectedFiles(files);
   };
 
   const onSuccess = () => {
-    toast.success(
-      isUpdating
-        ? LL.submitReview.reviewUpdated()
-        : LL.submitReview.reviewSubmitted(),
-      {
-        description: isUpdating
-          ? LL.submitReview.updateSuccess()
-          : LL.submitReview.submitSuccess(),
-        position: "top-center",
-      }
-    );
     onClose();
     reset();
     setSelectedFiles([]);
@@ -111,78 +109,92 @@ export function MobileSubmitReview({
     loggedInUser?.id ?? null
   );
 
-  const onSubmit = async (data: FieldValues) => {
-    if (!loggedInUser || !cafeDetailedInfo) {
-      toast.warning(LL.submitReview.unableToSubmit(), {
-        description: LL.submitReview.ensureLoginAndCafe(),
-        position: "top-center",
-      });
-      return;
+  useEffect(() => {
+    if (imageUploadRef.current) {
+      console.log("ImageUpload ref is available");
+      console.log("imageUploadRef", imageUploadRef);
+    } else {
+      console.log("ImageUpload ref is not available");
     }
+  }, [imageUploadRef.current]);
 
-    setIsUploading(true);
-
-    const payload = { ...data };
-
-    const finalPayload = {
-      ...payload,
-    };
-
-    delete finalPayload.image_urls;
-
-    const reviewData: ReviewInsert = {
-      ...finalPayload,
-      cafe_id: cafeDetailedInfo.id,
-      cafe_place_id: cafeDetailedInfo.place_id,
-      user_id: loggedInUser.id,
-      rating:
-        typeof finalPayload.rating === "number"
-          ? finalPayload.rating
-          : parseFloat(finalPayload.rating),
-    };
-
-    try {
-      // Submit the review and get the reviewId
-      const { id: reviewId } = await mutateAsync(reviewData);
-
-      // Upload images with the reviewId
-      if (selectedFiles.length > 0 && imageUploadRef.current) {
-        try {
-          await imageUploadRef.current.triggerUpload(reviewId);
-        } catch (error) {
-          console.error("Error uploading images:", error);
-          toast.error(LL.submitReview.imageUploadError());
-          setIsUploading(false);
-          return;
-        }
+  const onSubmit = useCallback(
+    async (data: FieldValues) => {
+      if (!loggedInUser || !cafeDetailedInfo || !sessionInfo) {
+        toast.warning(LL.submitReview.unableToSubmit(), {
+          description: LL.submitReview.ensureLoginAndCafe(),
+          position: "top-center",
+        });
+        return;
       }
 
-      setIsUploading(false);
+      setIsUploading(true);
 
-      // Success toast and reset form
-      toast.success(
-        isUpdating
-          ? LL.submitReview.reviewUpdated()
-          : LL.submitReview.reviewSubmitted(),
-        {
-          description: isUpdating
-            ? LL.submitReview.updateSuccess()
-            : LL.submitReview.submitSuccess(),
-          position: "top-center",
+      const payload = { ...data };
+      const finalPayload = { ...payload };
+      delete finalPayload.image_urls;
+
+      const reviewData: ReviewInsert = {
+        ...finalPayload,
+        cafe_id: cafeDetailedInfo.id,
+        cafe_place_id: cafeDetailedInfo.place_id,
+        user_id: loggedInUser.id,
+        rating:
+          typeof finalPayload.rating === "number"
+            ? finalPayload.rating
+            : parseFloat(finalPayload.rating),
+      };
+
+      try {
+        // Submit the review and get the reviewId
+        const { id: reviewId } = await mutateAsync(reviewData);
+
+        // Upload images with the reviewId
+        if (selectedFiles.length > 0) {
+          if (!triggerUpload) {
+            console.error("triggerUpload function is not available");
+            toast.error("Unable to upload images. Please try again.");
+            setIsUploading(false);
+            return;
+          }
+          try {
+            await triggerUpload(reviewId);
+          } catch (error) {
+            console.error("Error uploading images:", error);
+            toast.error(LL.submitReview.imageUploadError());
+            setIsUploading(false);
+            return;
+          }
         }
-      );
-      onClose();
-      reset();
-      setSelectedFiles([]);
-      setExistingImageUrls([]);
-    } catch (error: any) {
-      console.error("Error submitting review:", error);
-      toast.error(
-        `There was an error submitting your review: ${error.message}. Please try again.`
-      );
-      setIsUploading(false);
-    }
-  };
+
+        setIsUploading(false);
+
+        // Success toast and reset form
+        toast.success(
+          isUpdating
+            ? LL.submitReview.reviewUpdated()
+            : LL.submitReview.reviewSubmitted(),
+          {
+            description: isUpdating
+              ? LL.submitReview.updateSuccess()
+              : LL.submitReview.submitSuccess(),
+            position: "top-center",
+          }
+        );
+        onClose();
+        reset();
+        setSelectedFiles([]);
+        setExistingImageUrls([]);
+      } catch (error: any) {
+        console.error("Error submitting review:", error);
+        toast.error(
+          `There was an error submitting your review: ${error.message}. Please try again.`
+        );
+        setIsUploading(false);
+      }
+    },
+    [imageUploadRef, loggedInUser, cafeDetailedInfo, sessionInfo, selectedFiles]
+  );
 
   if (!loggedInUser) {
     return (
@@ -340,7 +352,7 @@ export function MobileSubmitReview({
                   ref={imageUploadRef}
                   onFilesSelected={handleFilesSelected}
                   sessionInfo={sessionInfo}
-                  placeId={cafeDetailedInfo?.place_id!}
+                  placeId={cafeDetailedInfo.place_id!}
                 />
               )}
               {existingImageUrls.length > 0 && (
@@ -451,30 +463,32 @@ export function MobileSubmitReview({
             </button>
           </div>
         )}
-        {/* Uppy StatusBar */}
-        {imageUploadRef.current?.uppy && (
-          <StatusBar
-            uppy={imageUploadRef.current.uppy}
-            hideAfterFinish={false}
-            showProgressDetails={true}
-            hideUploadButton={true}
-            hideRetryButton={false}
-            hidePauseResumeButton={false}
-            hideCancelButton={false}
-          />
-        )}
-        <div className="flex z-[10000]">
-          <Button plain onClick={onClose} className="grow dark:text-white">
-            {LL.submitReview.cancel()}
-          </Button>
-          <Button
-            type="submit"
-            color="emerald"
-            className="cursor-pointer grow"
-            disabled={isUploading}
-          >
-            {isUpdating ? LL.submitReview.update() : LL.submitReview.submit()}
-          </Button>
+        <div className="flex flex-col z-[10000]">
+          {/* Uppy StatusBar */}
+          {imageUploadRef.current?.uppy && (
+            <StatusBar
+              uppy={imageUploadRef.current.uppy}
+              hideAfterFinish={false}
+              showProgressDetails={true}
+              hideUploadButton={true}
+              hideRetryButton={false}
+              hidePauseResumeButton={false}
+              hideCancelButton={false}
+            />
+          )}
+          <div className="flex">
+            <Button plain onClick={onClose} className="grow dark:text-white">
+              {LL.submitReview.cancel()}
+            </Button>
+            <Button
+              type="submit"
+              color="emerald"
+              className="cursor-pointer grow"
+              disabled={isUploading}
+            >
+              {isUpdating ? LL.submitReview.update() : LL.submitReview.submit()}
+            </Button>
+          </div>
         </div>
       </div>
     </form>

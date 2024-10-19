@@ -208,7 +208,7 @@ export default function MobileView({
 							inputRef={inputRef}
 						/>
 					)}
-					{openSubmitReviewDialog && (
+					{openSubmitReviewDialog && cafeDetailedInfo && (
 						<MobileSubmitReview
 							cafeDetailedInfo={cafeDetailedInfo}
 							userReview={userReview}

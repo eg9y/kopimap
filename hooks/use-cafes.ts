@@ -148,7 +148,7 @@ export const useCafes = (
 						const reviewImages = reviewImageMap.get(cafe.id);
 						if (gmapsImages || reviewImages) {
 							const images = [
-								...(reviewImages?.url ? [reviewImages.url] : []),
+								...(reviewImages?.url ? [transformImageUrl(reviewImages.url)] : []),
 								...((gmapsImages?.hosted_gmaps_images as string[])
 									? (gmapsImages?.hosted_gmaps_images as string[]).map(
 											transformImageUrl,
