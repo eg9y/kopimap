@@ -36,7 +36,7 @@ const transformImageUrl = (url: string) => {
   const imagePath = url.split("/storage/v1/object/public/")[1];
   if (!imagePath) return url;
 
-  return `https://kopimap-cdn.b-cdn.net/${imagePath}?width=346&sharpen=true`;
+  return `https://kopimap-cdn.b-cdn.net/${imagePath}?height=300&sharpen=true`;
 };
 const isInstagramLink = (url: string) => {
   return url.includes("instagram.com") || url.includes("www.instagram.com");
