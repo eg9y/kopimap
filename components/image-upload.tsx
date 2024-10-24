@@ -42,6 +42,8 @@ const supabase = createClient<Database>(
 type ExtendedMetadata = {
   classification?: string;
   placeId: string;
+  reviewId?: string;
+  label?: string;
 };
 
 type ExtendedUppyFile = UppyFile<ExtendedMetadata, any>;
@@ -66,7 +68,7 @@ export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(
         },
         fieldName: "file",
         formData: true,
-        allowedMetaFields: ["placeId"],
+        allowedMetaFields: ["placeId", "reviewId", "label", "classification"],
         limit: 1,
       })
     );
@@ -212,40 +214,31 @@ export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(
       toast.error("An error occurred during upload. Please try again.");
     });
 
-    useImperativeHandle(ref, () => ({
-      triggerUpload: async (reviewId: string) => {
-        if (!uppy) return;
+    useImperativeHandle(
+      ref,
+      () => ({
+        triggerUpload: async (reviewId: string) => {
+          if (!uppy) return;
 
-        const result = await uppy.upload();
-        if (!result?.successful) {
-          return;
-        }
-
-        for (const file of result.successful) {
-          if (file.response?.body?.url) {
-            const imageUrl = file.response.body.url;
+          // If you need to set a label for each file individually
+          uppy.getFiles().forEach((file) => {
             const classification = file.meta.classification;
+            uppy.setFileMeta(file.id, {
+              label: classification,
+              placeId,
+              reviewId,
+            });
+          });
 
-            const { error: insertError } = await supabase
-              .from("images")
-              .insert({
-                url: imageUrl,
-                label: classification,
-                review_id: reviewId,
-                place_id: placeId,
-              });
-
-            if (insertError) {
-              console.error("Error inserting image:", insertError);
-              toast.error(
-                `Failed to save image information: ${insertError.message}`
-              );
-            }
+          const result = await uppy.upload();
+          if (!result?.successful) {
+            return;
           }
-        }
-      },
-      uppy,
-    }), [uppy]);
+        },
+        uppy,
+      }),
+      [uppy]
+    );
 
     // Handle file input change
     const handleFileInputChange = (

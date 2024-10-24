@@ -34,7 +34,7 @@ export default function CafeList({ searchInput }: CafeListProps) {
 
   const parentRef = useRef<HTMLDivElement>(null);
 
-  const allCafes = data?.pages.flatMap((page) => page.cafes) ?? [];
+  const allCafes = data?.pages.flatMap((page) => (page as any).cafes) ?? [];
 
   const rowVirtualizer = useVirtualizer({
     count: hasNextPage ? allCafes.length + 1 : allCafes.length,

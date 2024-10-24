@@ -27,9 +27,8 @@ import { reviewAttributes } from "./lib/review-attributes";
 import { cn } from "./lib/utils";
 import { StatusBar } from "@uppy/react";
 
-import '@uppy/core/dist/style.min.css';
-import '@uppy/status-bar/dist/style.min.css';
-
+import "@uppy/core/dist/style.min.css";
+import "@uppy/status-bar/dist/style.min.css";
 
 const CUSTOM_ITEM_LABELS = ["Bad", "Poor", "Average", "Great", "Excellent"];
 
@@ -118,7 +117,6 @@ export function SubmitReviewDialog({
     setExistingImageUrls([]);
   };
 
-
   const { mutateAsync } = useSubmitReview(
     onSuccess,
     cafeDetailedInfo ? cafeDetailedInfo.place_id : null,
@@ -138,15 +136,14 @@ export function SubmitReviewDialog({
 
     const payload = { ...data };
 
-	const finalPayload = {
-		...payload,
-	};
+    const finalPayload = {
+      ...payload,
+    };
 
     delete finalPayload.image_urls;
 
     const reviewData: ReviewInsert = {
       ...finalPayload,
-      cafe_id: cafeDetailedInfo.id,
       cafe_place_id: cafeDetailedInfo.place_id,
       user_id: loggedInUser.id,
       rating:
@@ -157,12 +154,12 @@ export function SubmitReviewDialog({
 
     try {
       // Submit the review and get the reviewId
-        const { id: reviewId } = await mutateAsync(reviewData);
+      const { id: reviewId } = await mutateAsync(reviewData);
 
       // Upload images with the reviewId
       if (selectedFiles.length > 0 && imageUploadRef.current) {
         try {
-            await imageUploadRef.current.triggerUpload(reviewId);
+          await imageUploadRef.current.triggerUpload(reviewId);
         } catch (error) {
           console.error("Error uploading images:", error);
           toast.error(LL.submitReview.imageUploadError());
@@ -484,23 +481,19 @@ export function SubmitReviewDialog({
           )}
         </DialogBody>
         <DialogActions>
-			  {/* Uppy StatusBar */}
-			  {imageUploadRef.current?.uppy && (
-			  <StatusBar
-				uppy={imageUploadRef.current?.uppy}
-				hideAfterFinish={false}
-				showProgressDetails={true}
-				hideUploadButton={true}
-				hideRetryButton={false}
-				hidePauseResumeButton={false}
-				hideCancelButton={false}
-				/>
-			  )}
-          <Button
-            plain
-            onClick={handleClose}
-            className="dark:text-gray-300"
-          >
+          {/* Uppy StatusBar */}
+          {imageUploadRef.current?.uppy && (
+            <StatusBar
+              uppy={imageUploadRef.current?.uppy}
+              hideAfterFinish={false}
+              showProgressDetails={true}
+              hideUploadButton={true}
+              hideRetryButton={false}
+              hidePauseResumeButton={false}
+              hideCancelButton={false}
+            />
+          )}
+          <Button plain onClick={handleClose} className="dark:text-gray-300">
             {LL.submitReview.cancel()}
           </Button>
           <Button

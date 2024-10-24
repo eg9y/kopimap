@@ -1,27 +1,14 @@
-import { createClient } from "@supabase/supabase-js";
 import { useQuery } from "@tanstack/react-query";
-import type { Database } from "../components/lib/database.types";
 import type { CafeDetailedInfo } from "../types";
-
-const supabase = createClient<Database>(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
 
 const fetchCafeDetailedInfo = async (
   cafeId: string
 ): Promise<CafeDetailedInfo> => {
-  const { data, error } = await supabase
-    .from("cafe_location_view")
-    .select("*")
-    .eq("place_id", cafeId)
-    .single();
-
-  if (error) {
-    throw error;
+  const response = await fetch(`${import.meta.env.VITE_MEILISEARCH_URL}/api/cafe-detailed-info/${cafeId}`);
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
   }
-
-  return data;
+  return response.json();
 };
 
 export const useCafeDetailedInfo = (cafeId: string | null) => {

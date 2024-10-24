@@ -1,65 +1,11 @@
 // useSubmitReview.ts
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createClient } from "@supabase/supabase-js";
 import { toast } from "sonner";
 import { Database } from "../components/lib/database.types";
 import { useUser } from "./use-user";
 
-const supabase = createClient<Database>(
-  import.meta.env.VITE_SUPABASE_URL!,
-  import.meta.env.VITE_SUPABASE_ANON_KEY!
-);
 
-const checkAchievement = async (userId: string) => {
-  // Check if this is the user's first review
-  const { count: reviewCount, error: countError } = await supabase
-    .from("reviews")
-    .select("id", { count: "exact", head: true })
-    .eq("user_id", userId);
-
-  if (countError) {
-    throw new Error(countError.message);
-  }
-
-  if (reviewCount && reviewCount === 1) {
-    // This is the user's first review, update achievements
-    const { error: achievementError } = await supabase
-      .from("achievements")
-      .upsert(
-        {
-          user_profile_id: userId,
-          first_review: true,
-        },
-        { onConflict: "user_profile_id" }
-      );
-
-    if (achievementError) {
-      throw new Error(achievementError.message);
-    }
-  }
-};
-
-const submitReview = async (
-  reviewData: Omit<
-    Database["public"]["Tables"]["reviews"]["Insert"],
-    "id" | "created_at"
-  >
-): Promise<{ id: string }> => {
-  const { data: reviewResponse, error: reviewError } = await supabase
-    .from("reviews")
-    .upsert(reviewData, { onConflict: "user_id,cafe_id" })
-    .select("id")
-    .single();
-
-  if (reviewError) {
-    throw new Error(reviewError.message);
-  }
-
-  await checkAchievement(reviewData.user_id!);
-
-  return { id: reviewResponse.id };
-};
 
 export const useSubmitReview = (
   onSuccess: () => void,
@@ -67,13 +13,36 @@ export const useSubmitReview = (
   userId: string | null
 ) => {
   const queryClient = useQueryClient();
-  const { loggedInUser } = useUser();
+  const { loggedInUser, sessionInfo } = useUser();
 
-  return useMutation({
-    mutationFn: (reviewData: Omit<
+  const submitReview = async (
+    reviewData: Omit<
       Database["public"]["Tables"]["reviews"]["Insert"],
       "id" | "created_at"
-    >) => submitReview(reviewData),
+    >
+  ): Promise<{ id: string }> => {
+    const response = await fetch(
+      `${import.meta.env.VITE_MEILISEARCH_URL!}/api/review`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${sessionInfo?.access_token}`,
+        },
+        body: JSON.stringify(reviewData),
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+    }
+
+    return response.json();
+  };
+
+  return useMutation({
+    mutationFn: submitReview,
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["cafeAggregatedReview", placeId],

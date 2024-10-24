@@ -136,7 +136,6 @@ export function MobileSubmitReview({
 
       const reviewData: ReviewInsert = {
         ...finalPayload,
-        cafe_id: cafeDetailedInfo.id,
         cafe_place_id: cafeDetailedInfo.place_id,
         user_id: loggedInUser.id,
         rating:

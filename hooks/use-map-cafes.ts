@@ -20,6 +20,7 @@ export const useMapCafes = (lat: number, lng: number) => {
     return `${latCluster},${longCluster}`;
   }, [lat, lng]);
 
+
   const fetchMapCafes = useCallback(async () => {
     const filterParams = new URLSearchParams();
 
@@ -40,7 +41,8 @@ export const useMapCafes = (lat: number, lng: number) => {
 
 
     const response = await fetch(
-      `${import.meta.env.VITE_MEILISEARCH_URL!}/api/search?${filterParams.toString()}`
+      `${import.meta.env.VITE_MEILISEARCH_URL!}/api/search?${filterParams.toString()}`,
+     
     );
 
     if (!response.ok) {
