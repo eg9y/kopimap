@@ -249,7 +249,7 @@ export const MobileCafeList: React.FC<CafeListProps> = ({
                       className="flex flex-col gap-2 justify-between p-4 border-b grab border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 active:bg-gray-100 dark:active:bg-gray-600 transition-colors cursor-pointer"
                     >
                       <div className="flex gap-2 overflow-scroll scrollbar-hide">
-                        {cafe.images.slice(0, 4).map((image) => (
+                        {cafe?.images.slice(0, 4).map((image) => (
                           <img
                             key={image}
                             src={image}

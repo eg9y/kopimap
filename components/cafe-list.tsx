@@ -34,7 +34,7 @@ export default function CafeList({ searchInput }: CafeListProps) {
 
   const parentRef = useRef<HTMLDivElement>(null);
 
-  const allCafes = data?.pages.flatMap((page) => (page as any).cafes) ?? [];
+  const allCafes = data?.pages.flatMap((page) => page.hits) ?? [];
 
   const rowVirtualizer = useVirtualizer({
     count: hasNextPage ? allCafes.length + 1 : allCafes.length,
@@ -141,6 +141,12 @@ export default function CafeList({ searchInput }: CafeListProps) {
           {rowVirtualizer.getVirtualItems().map((virtualRow) => {
             const cafe = allCafes[virtualRow.index];
             const isLoaderRow = virtualRow.index > allCafes.length - 1;
+
+            if (!cafe) {
+              console.log(allCafes);
+              return null;
+            }
+
             return (
               <div
                 key={virtualRow.index}
