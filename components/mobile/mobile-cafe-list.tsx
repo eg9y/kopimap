@@ -200,6 +200,40 @@ const CafeListItem: React.FC<CafeListItemProps> = memo(
       { key: "parking_options", icon: CarIcon, color: "red" },
     ];
 
+    const imageRefs = useRef<(HTMLDivElement | null)[]>([]);
+    const [loadedImages, setLoadedImages] = useState<boolean[]>([]);
+
+    useEffect(() => {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const index = imageRefs.current.indexOf(entry.target as HTMLDivElement);
+              if (index !== -1) {
+                console.log(`Image at index ${index} is now in view and will be loaded.`);
+                setLoadedImages((prev) => {
+                  const newLoadedImages = [...prev];
+                  newLoadedImages[index] = true;
+                  return newLoadedImages;
+                });
+              }
+            }
+          });
+        },
+        { root: null, rootMargin: "0px", threshold: 0.1 }
+      );
+
+      imageRefs.current.forEach((ref) => {
+        if (ref) {
+          observer.observe(ref);
+        }
+      });
+
+      return () => {
+        observer.disconnect();
+      };
+    }, []);
+
     return (
       <div
         onClick={() => handleCafeClick(cafe)}
@@ -208,24 +242,33 @@ const CafeListItem: React.FC<CafeListItemProps> = memo(
         <div className="overflow-x-auto scrollbar-hide">
           <div className="grid grid-rows-[auto_min-content] gap-y-2 auto-cols-max grid-flow-col">
             <div className="flex gap-2">
-              {cafe?.images.slice(0, 4).map((image) => (
-                <div key={image} className="w-24 h-24 flex-shrink-0">
-                  <img
-                    src={image}
-                    className="w-full h-full object-cover rounded-md shadow-sm"
-                    alt={cafe.name}
-                  />
+              {cafe?.images.map((image, index) => (
+                <div
+                  key={image}
+                  ref={(el) => (imageRefs.current[index] = el)}
+                  className="w-24 h-24 flex-shrink-0"
+                >
+                  {loadedImages[index] && (
+                    <img
+                      src={image}
+                      className="w-full h-full object-cover rounded-md shadow-sm"
+                      alt={cafe.name}
+                    />
+                  )}
                 </div>
               ))}
             </div>
             <div className="flex gap-2 items-start">
-            {attributes.map((attr, index) => {
+              {attributes.map((attr, index) => {
                 const key = `${attr.key}_mode` as keyof MeiliSearchCafe;
                 const value = cafe[key];
                 if (value) {
-                  const mappedValue = typeof value === 'string' && attr.key in attributeMapping
-                    ? attributeMapping[attr.key][value as keyof (typeof attributeMapping)[typeof attr.key]] || value
-                    : value;
+                  const mappedValue =
+                    typeof value === "string" && attr.key in attributeMapping
+                      ? attributeMapping[attr.key][
+                          value as keyof (typeof attributeMapping)[typeof attr.key]
+                        ] || value
+                      : value;
                   return (
                     <AttributeBadge
                       key={attr.key}
