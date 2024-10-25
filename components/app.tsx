@@ -3,7 +3,7 @@ import { StatusBar, Style } from "@capacitor/status-bar";
 import { addProtocol, removeProtocol } from "maplibre-gl";
 import * as pmtiles from "pmtiles";
 import { Suspense, lazy, useEffect, useState } from "react";
-import useMedia from "react-use/esm/useMedia";
+import { useMedia, useIsomorphicLayoutEffect } from "react-use";
 import { Toaster } from "sonner";
 import { useData } from "vike-react/useData";
 
@@ -19,8 +19,13 @@ const MobileView = lazy(() => import("./mobile/mobile-view"));
 export const App = () => {
   const { openFilters, selectCafe, selectedCafe, setOpenFilters } = useStore();
   const [pmTilesReady, setPmTilesReady] = useState(false);
-  const isWide = useMedia("(min-width: 640px)", true);
+  const [hasMounted, setHasMounted] = useState(false);
+  const isWide = useMedia("(min-width: 640px)", false);
   const data = useData<undefined | { cafeToSelect?: MeiliSearchCafe }>();
+
+  useIsomorphicLayoutEffect(() => {
+    setHasMounted(true);
+  }, []);
 
   useEffect(() => {
     if (data?.cafeToSelect) {
@@ -55,6 +60,10 @@ export const App = () => {
       StatusBar.setOverlaysWebView({ overlay: false });
     }
   }, []);
+
+  if (!hasMounted) {
+    return null; // or a loading spinner
+  }
 
   return (
     <>

@@ -75,9 +75,13 @@ import {
 		}
   
 		for (const [key, value] of Object.entries(searchFilters)) {
-		  if (value) {
-			searchParams.append(key, value.toString());
-		  }
+			if (value) {
+				if (key === "gmaps_rating" || key === "gmaps_total_reviews") {
+					searchParams.append(key, value);
+				} else {
+					searchParams.append(`${key}_mode`, value);
+				}
+			}
 		}
   
 		const response = await fetch(`${import.meta.env.VITE_MEILISEARCH_URL}/api/search?${searchParams.toString()}`);
