@@ -83,9 +83,17 @@ export default function MobileView({
     [searchInput]
   );
 
-  const handleSnap = (index: number) => {
+  const handleSnap = useCallback((index: number) => {
     setSnapPoint(index);
-  };
+  }, []);
+
+  const handleSheetClose = useCallback(() => {
+    if (snapPoint === 1) {
+      selectCafe(null);
+    } else if (snapPoint === 0) {
+      sheetRef.current?.snapTo(1);
+    }
+  }, [snapPoint, selectCafe]);
 
   useEffect(() => {
     if (selectedCafe) {
@@ -125,9 +133,7 @@ export default function MobileView({
           <Sheet
             ref={sheetRef}
             isOpen={true}
-            onClose={() => {
-              selectCafe(null);
-            }}
+            onClose={handleSheetClose}
             detent="full-height"
             snapPoints={[height - 80 - 56, 200]}
             initialSnap={1}
