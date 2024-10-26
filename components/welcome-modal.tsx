@@ -1,45 +1,52 @@
-import React, { useState, useEffect } from 'react';
-import { Dialog, DialogActions, DialogBody, DialogDescription, DialogTitle } from './catalyst/dialog';
-import { Button } from './catalyst/button';
-import { useI18nContext } from '@/src/i18n/i18n-react';
+import React, { useState, useEffect } from "react";
+import {
+  Dialog,
+  DialogActions,
+  DialogBody,
+  DialogDescription,
+  DialogTitle,
+} from "./catalyst/dialog";
+import { Button } from "./catalyst/button";
 
 export const WelcomeModal: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { LL } = useI18nContext();
 
   useEffect(() => {
-    const checkAndShowModal = () => {
-      const lastVisit = localStorage.getItem('lastVisit');
-      const today = new Date().toDateString();
+    const lastVisit = localStorage.getItem("lastVisit");
+    const today = new Date().toDateString();
 
-      if (!lastVisit || lastVisit !== today) {
-        setIsOpen(true);
-        localStorage.setItem('lastVisit', today);
-      }
-    };
-
-    checkAndShowModal();
+    if (!lastVisit || lastVisit !== today) {
+      setIsOpen(true);
+      localStorage.setItem("lastVisit", today);
+    }
   }, []);
 
   const handleClose = () => setIsOpen(false);
 
   return (
-
-    <Dialog open={isOpen} onClose={setIsOpen} className='md:pb-10'>
-      <DialogTitle className="text-2xl font-bold text-center">{LL.welcomeModal.title()}</DialogTitle>
-      <DialogDescription className="text-center">{LL.welcomeModal.description()}</DialogDescription>
-      <DialogBody className='overflow-y-scroll max-h-[55dvh]'>
+      <Dialog open={isOpen} onClose={setIsOpen} className='md:pb-10'>
+      <DialogTitle className="text-2xl font-bold text-center">
+        Selamat Datang di Kopimap! ☕️🗺️
+      </DialogTitle>
+      <DialogDescription className="text-center">
+        Temukan kafe terbaik di Jakarta untuk ngopi, kerja, atau bersantai.
+      </DialogDescription>
+      <DialogBody className="overflow-y-scroll max-h-[55dvh]">
         <ul className="list-disc pl-5 space-y-2 mb-4">
-          {Object.keys(LL.welcomeModal.features).map((key) => (
-            <li key={key}>{LL.welcomeModal.features[key as keyof typeof LL.welcomeModal.features]()}</li>
-          ))}
+          <li>Jelajahi peta interaktif kafe Jakarta</li>
+          <li>Baca ulasan dari komunitas</li>
+          <li>Bagikan pengalaman kafe Anda</li>
         </ul>
-        <p className="text-sm text-gray-600 mb-2">{LL.welcomeModal.passionProject()}</p>
-        <p className="text-sm italic mb-4">{LL.welcomeModal.personalNote()}</p>
-        <p className="text-base font-medium text-center">{LL.welcomeModal.thankYou()}</p>
+        <p className="text-sm text-gray-600 mb-4">
+          Kopimap adalah proyek yang dibuat dengan sepenuh hati oleh satu
+          developer. Terima kasih telah bergabung dalam perjalanan kopi ini di
+          Jakarta!
+        </p>
       </DialogBody>
       <DialogActions>
-        <Button color='orange' onClick={handleClose} className="w-full">{LL.welcomeModal.closeButton()}</Button>
+        <Button color="orange" onClick={handleClose} className="w-full">
+          Mulai Petualangan Kopi Anda
+        </Button>
       </DialogActions>
     </Dialog>
   );
