@@ -5,7 +5,6 @@ import {
   UmbrellaIcon,
   WifiIcon,
   HeartIcon,
-  XIcon,
   ArmchairIcon,
   PlugIcon,
   CoffeeIcon,
@@ -423,23 +422,14 @@ export const MobileCafeList: React.FC<CafeListProps> = ({
 
   return (
     <div className="z-30 pointer-events-auto absolute inset-x-0 top-16 bottom-14 flex flex-col p-4">
-      <div className="size-full max-w-md rounded-xl bg-white dark:bg-gray-800 shadow-xl max-h-full flex flex-col">
+      <div className="size-full max-w-md rounded-xl bg-white dark:bg-gray-800 shadow-xl max-h-full flex flex-col relative">
         {/* Updated Header with Scrollable Filters */}
         <div className="p-4 border-b border-gray-200 dark:border-gray-700">
           <MobileSearchFilters />
         </div>
 
-        {/* Close button */}
-        <button
-          onClick={handleClose}
-          className="absolute top-2 right-2 p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 bg-white dark:bg-gray-800 rounded-full shadow-md transition-all duration-200 ease-in-out"
-          aria-label="Close cafe list"
-        >
-          <XIcon className="h-8 w-8" />
-        </button>
-
         {/* Cafe List */}
-        <div ref={parentRef} className="flex-grow overflow-y-auto">
+        <div ref={parentRef} className="flex-grow overflow-y-auto pb-16">
           {searchInput && (
             <div className="p-4 bg-blue-50 dark:bg-blue-900 border-b border-blue-100 dark:border-blue-800">
               <p className="text-sm text-blue-700 dark:text-blue-200">

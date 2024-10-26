@@ -2,7 +2,13 @@ import { useCafeDetailedInfo } from "@/hooks/use-cafe-detailed-info";
 import { useUserReview } from "@/hooks/use-user-review";
 import { useI18nContext } from "@/src/i18n/i18n-react";
 import { createClient } from "@supabase/supabase-js";
-import { CircleXIcon, SearchIcon, ArrowLeftIcon } from "lucide-react";
+import {
+  CircleXIcon,
+  SearchIcon,
+  ArrowLeftIcon,
+  ListIcon,
+  XIcon,
+} from "lucide-react";
 import React, {
   useState,
   useRef,
@@ -178,7 +184,7 @@ export default function MobileView({
             </Sheet>
             <button
               onClick={handleBackToList}
-              className="fixed left-4 bottom-[68px] z-[10000000] p-3 bg-white dark:bg-gray-800 rounded-full shadow-lg"
+              className="fixed left-4 bottom-[68px] z-[10000000] p-3 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-full shadow-lg"
               aria-label="Back to list"
             >
               <ArrowLeftIcon className="h-6 w-6 text-gray-600 dark:text-gray-300" />
@@ -243,6 +249,29 @@ export default function MobileView({
               }}
             />
           )}
+
+          {/* New floating button for opening/closing the list */}
+          <div className="absolute bottom-20 left-0 right-0 flex justify-center pointer-events-none">
+            <button
+              onClick={() => setIsListDialogOpen(!isListDialogOpen)}
+              className="px-4 py-2 z-[1000000] bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-full shadow-md transition-all duration-200 ease-in-out flex items-center justify-center space-x-2 pointer-events-auto"
+              aria-label={
+                isListDialogOpen ? "Tutup daftar kafe" : "Buka daftar kafe"
+              }
+            >
+              {isListDialogOpen ? (
+                <>
+                  <XIcon className="h-5 w-5" />
+                  <span>Tutup</span>
+                </>
+              ) : (
+                <>
+                  <ListIcon className="h-5 w-5" />
+                  <span>Lihat Daftar Kafe</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </div>
