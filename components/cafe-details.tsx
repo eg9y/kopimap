@@ -9,11 +9,11 @@ import React, {
 } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { useImage } from "react-image";
-import Carousel from "react-multi-carousel";
-import "react-multi-carousel/lib/styles.css";
 
 import { CafeDetailedInfo } from "@/types";
 import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
   EditIcon,
   ImageIcon,
   Loader2Icon,
@@ -21,7 +21,6 @@ import {
   PlusIcon,
   XIcon,
 } from "lucide-react";
-import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { siInstagram } from "simple-icons";
 import { useCafeAggregatedReview } from "../hooks/use-cafe-aggregated-review";
 import { useStore } from "../store";
@@ -53,15 +52,19 @@ const ImageWithSuspense = ({
   src,
   alt,
   className,
+  onClick,
 }: {
   src: string;
   alt: string;
   className: string;
+  onClick: () => void;
 }) => {
   const { src: loadedSrc } = useImage({
     srcList: [src],
   });
-  return <img src={loadedSrc} alt={alt} className={className} />;
+  return (
+    <img src={loadedSrc} alt={alt} className={className} onClick={onClick} />
+  );
 };
 
 const ImageError = () => (
@@ -371,41 +374,33 @@ interface CustomCarouselProps {
 }
 
 const CustomCarousel: React.FC<CustomCarouselProps> = ({ images }) => {
-  const [isSwipingHorizontally, setIsSwipingHorizontally] =
-    useState<boolean>(false);
-  const touchStartY = useRef<number>(0);
-
-  const handleTouchStart = useCallback(
-    (e: React.TouchEvent<HTMLDivElement>) => {
-      touchStartY.current = e.touches[0].clientY;
-    },
-    []
-  );
-
-  const handleTouchMove = useCallback(
-    (e: React.TouchEvent<HTMLDivElement>) => {
-      if (isSwipingHorizontally) {
-        e.preventDefault();
-      } else {
-        const touchCurrentY = e.touches[0].clientY;
-        const deltaY = Math.abs(touchCurrentY - touchStartY.current);
-        if (deltaY > 10) {
-          setIsSwipingHorizontally(false);
-        } else {
-          setIsSwipingHorizontally(true);
-        }
-      }
-    },
-    [isSwipingHorizontally]
-  );
-
-  const handleTouchEnd = useCallback(() => {
-    setIsSwipingHorizontally(false);
-  }, []);
-
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(
     null
   );
+  const [imageDimensions, setImageDimensions] = useState<
+    { width: number; height: number }[]
+  >([]);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const loadImageDimensions = async () => {
+      const dimensions = await Promise.all(
+        images.map(
+          (image) =>
+            new Promise<{ width: number; height: number }>((resolve) => {
+              const img = new Image();
+              img.onload = () => {
+                resolve({ width: img.width, height: img.height });
+              };
+              img.src = transformImageUrl(image);
+            })
+        )
+      );
+      setImageDimensions(dimensions);
+    };
+
+    loadImageDimensions();
+  }, [images]);
 
   const openModal = (index: number) => {
     setSelectedImageIndex(index);
@@ -424,28 +419,73 @@ const CustomCarousel: React.FC<CustomCarouselProps> = ({ images }) => {
     setSelectedImageIndex(newIndex);
   };
 
+  const scrollCarousel = useCallback((direction: "left" | "right") => {
+    if (scrollContainerRef.current) {
+      const container = scrollContainerRef.current;
+      const scrollAmount =
+        direction === "left" ? -container.offsetWidth : container.offsetWidth;
+      const targetScrollPosition = container.scrollLeft + scrollAmount;
+
+      container.scrollTo({
+        left: targetScrollPosition,
+        behavior: "smooth",
+      });
+    }
+  }, []);
+
+  const containerHeight = 250; // Fixed container height
+
   return (
-    <div
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-    >
-      <Carousel responsive={responsive} swipeable={true} draggable={false}>
-        {images.map((image, index) => (
-          <ErrorBoundary fallback={<ImageError />} key={image}>
-            <Suspense fallback={<ImageLoader />}>
-              <a onClick={() => openModal(index)}>
-                <ImageWithSuspense
-                  key={index}
-                  src={transformImageUrl(image)}
-                  alt={`Cafe Image ${index + 1}`}
-                  className="object-cover w-full h-[250px] cursor-pointer"
-                />
-              </a>
-            </Suspense>
-          </ErrorBoundary>
-        ))}
-      </Carousel>
+    <div className="relative">
+      <div
+        ref={scrollContainerRef}
+        className="flex overflow-x-auto scrollbar-hide snap-x snap-mandatory"
+        style={{
+          scrollSnapType: "x mandatory",
+          height: `${containerHeight}px`,
+        }}
+      >
+        {images.map((image, index) => {
+          const aspectRatio = imageDimensions[index]
+            ? imageDimensions[index].width / imageDimensions[index].height
+            : 1;
+          const imageWidth = containerHeight * aspectRatio;
+
+          return (
+            <div
+              key={image}
+              className="flex-shrink-0 snap-center p-2"
+              style={{
+                height: `${containerHeight}px`,
+                width: `${imageWidth}px`,
+              }}
+            >
+              <ErrorBoundary fallback={<ImageError />}>
+                <Suspense fallback={<ImageLoader />}>
+                  <ImageWithSuspense
+                    src={transformImageUrl(image)}
+                    alt={`Cafe Image ${index + 1}`}
+                    className="h-full w-full object-cover cursor-pointer rounded-lg"
+                    onClick={() => openModal(index)}
+                  />
+                </Suspense>
+              </ErrorBoundary>
+            </div>
+          );
+        })}
+      </div>
+      <button
+        className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white rounded-full p-2"
+        onClick={() => scrollCarousel("left")}
+      >
+        <ChevronLeftIcon size={24} />
+      </button>
+      <button
+        className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white rounded-full p-2"
+        onClick={() => scrollCarousel("right")}
+      >
+        <ChevronRightIcon size={24} />
+      </button>
 
       {selectedImageIndex !== null && (
         <div

@@ -114,6 +114,7 @@ export const MobileToolbar: React.FC = () => {
 							href: "/feed",
 						}}
 						onClick={() => {
+							selectCafe(null);
 							setIsListDialogOpen(false);
 						}}
 						icon={<NewspaperIcon className="w-6 h-6" />}
@@ -123,9 +124,6 @@ export const MobileToolbar: React.FC = () => {
 						active={isActive("/")}
 						onClick={async () => {
 							if (isActive("/")) {
-								if (isListDialogOpen) {
-									selectCafe(null);
-								}
 								setIsListDialogOpen(!isListDialogOpen);
 								setSearchInput("");
 							} else {

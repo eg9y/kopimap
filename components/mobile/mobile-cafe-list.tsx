@@ -205,9 +205,13 @@ const CafeListItem: React.FC<CafeListItemProps> = memo(
         (entries) => {
           entries.forEach((entry) => {
             if (entry.isIntersecting) {
-              const index = imageRefs.current.indexOf(entry.target as HTMLDivElement);
+              const index = imageRefs.current.indexOf(
+                entry.target as HTMLDivElement
+              );
               if (index !== -1) {
-                console.log(`Image at index ${index} is now in view and will be loaded.`);
+                console.log(
+                  `Image at index ${index} is now in view and will be loaded.`
+                );
                 setLoadedImages((prev) => {
                   const newLoadedImages = [...prev];
                   newLoadedImages[index] = true;
@@ -413,23 +417,6 @@ export const MobileCafeList: React.FC<CafeListProps> = ({
     },
   ];
 
-  const handleFilterToggle = (filter: { name: string; values: string[] }) => {
-    const { name, values } = filter;
-    const currentValues = searchFilters[name]?.split(",") || [];
-    if (currentValues.length === values.length) {
-      // If all values are selected, remove the filter
-      const newFilters = { ...searchFilters };
-      delete newFilters[name];
-      setSearchFilters(newFilters);
-    } else {
-      // Otherwise, add all values
-      setSearchFilters({
-        ...searchFilters,
-        [name]: values.join(","),
-      });
-    }
-  };
-
   if (!isOpen) {
     return null;
   }
@@ -439,7 +426,7 @@ export const MobileCafeList: React.FC<CafeListProps> = ({
       <div className="size-full max-w-md rounded-xl bg-white dark:bg-gray-800 shadow-xl max-h-full flex flex-col">
         {/* Updated Header with Scrollable Filters */}
         <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-         <MobileSearchFilters />
+          <MobileSearchFilters />
         </div>
 
         {/* Close button */}
