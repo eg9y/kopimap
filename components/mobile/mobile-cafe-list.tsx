@@ -6,8 +6,6 @@ import {
   WifiIcon,
   HeartIcon,
   XIcon,
-  ChevronDownIcon,
-  ChevronUpIcon,
   ArmchairIcon,
   PlugIcon,
   CoffeeIcon,
@@ -23,14 +21,13 @@ import React, {
   useEffect,
   useRef,
   memo,
-  ForwardRefExoticComponent,
-  RefAttributes,
 } from "react";
 import useMedia from "react-use/esm/useMedia";
 import { useStore } from "../../store";
 import { MeiliSearchCafe } from "../../types";
 import { Badge, BadgeProps } from "../catalyst/badge";
 import { MapRef } from "react-map-gl";
+import { MobileSearchFilters } from "./mobile-search-filters";
 
 interface CafeListProps {
   searchInput: string;
@@ -325,7 +322,6 @@ export const MobileCafeList: React.FC<CafeListProps> = ({
 
   const isWide = useMedia("(min-width: 640px)");
   const parentRef = useRef<HTMLDivElement>(null);
-  const [showFilters, setShowFilters] = useState(false); // Toggle filter visibility
 
   const {
     data,
@@ -443,37 +439,7 @@ export const MobileCafeList: React.FC<CafeListProps> = ({
       <div className="size-full max-w-md rounded-xl bg-white dark:bg-gray-800 shadow-xl max-h-full flex flex-col">
         {/* Updated Header with Scrollable Filters */}
         <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-          <div className="flex-grow overflow-x-auto scrollbar-hide">
-            <div className="flex space-x-3">
-              {filterButtons.map((button) => {
-                const isActive = searchFilters[button.filter.name];
-                const Icon = button.icon;
-                return (
-                  <button
-                    key={button.label}
-                    onClick={() => handleFilterToggle(button.filter)}
-                    className={`flex items-center space-x-2 rounded-lg py-2 px-3 text-sm font-medium shadow-md transition-all duration-200 ease-in-out ${
-                      isActive
-                        ? `${
-                            button.activeColor
-                          } ring-2 ring-offset-2 ring-offset-white dark:ring-offset-gray-800 ${button.activeColor.replace(
-                            "bg-",
-                            "ring-"
-                          )}`
-                        : `${button.color} hover:bg-opacity-80`
-                    } transform active:translate-y-0`}
-                  >
-                    <Icon
-                      className={`h-5 w-5 ${isActive ? "animate-pulse" : ""}`}
-                    />
-                    <span className="font-medium whitespace-nowrap">
-                      {button.label}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+         <MobileSearchFilters />
         </div>
 
         {/* Close button */}

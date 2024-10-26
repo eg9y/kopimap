@@ -19,6 +19,7 @@ import { useStore } from "../../store";
 import CafeDetails from "../cafe-details";
 import { MobileCafeList } from "./mobile-cafe-list";
 import { MobileSubmitReview } from "./mobile-submit-review";
+import { MobileSearchFilters } from "./mobile-search-filters";
 
 const MapComponent = lazy(() => import("../map-component"));
 
@@ -186,7 +187,7 @@ export default function MobileView({
         )}
         <div className="absolute top-0 left-0 right-0 bottom-0 z-[1000] p-4 w-full h-[100dvh] flex flex-col pointer-events-none">
           <div
-            className={`relative z-[1000] rounded-full pointer-events-auto shadow-md transition-all duration-300 ${
+            className={`relative z-[1000] rounded-lg pointer-events-auto shadow-md transition-all duration-300 ${
               isListDialogOpen
                 ? "bg-white dark:bg-gray-800 ring-2 ring-blue-500 dark:ring-blue-400"
                 : "bg-gray-100 dark:bg-gray-700"
@@ -208,7 +209,7 @@ export default function MobileView({
                 }
               }}
               value={searchInput}
-              className="w-full py-3 pl-12 pr-10 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 bg-transparent rounded-full focus:outline-none"
+              className="w-full py-3 pl-12 pr-10 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 bg-transparent rounded-lg focus:outline-none"
             />
             <SearchIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-300" />
             {searchInput && (
@@ -220,6 +221,11 @@ export default function MobileView({
               </button>
             )}
           </div>
+          {!selectedCafe && !isListDialogOpen && (
+            <div className="mt-2 pointer-events-auto rounded-lg overflow-hidden">
+              <MobileSearchFilters />
+            </div>
+          )}
           {!selectedCafe && (
             <MobileCafeList
               searchInput={searchInput}
