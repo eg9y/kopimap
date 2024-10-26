@@ -246,12 +246,12 @@ const CafeListItem: React.FC<CafeListItemProps> = memo(
                 <div
                   key={image}
                   ref={(el) => (imageRefs.current[index] = el)}
-                  className="w-24 h-24 flex-shrink-0"
+                  className=" h-24 flex-shrink-0"
                 >
                   {loadedImages[index] && (
                     <img
                       src={image}
-                      className="w-full h-full object-cover rounded-md shadow-sm"
+                      className="w-full h-full rounded-md shadow-sm"
                       alt={cafe.name}
                     />
                   )}

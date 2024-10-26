@@ -33,7 +33,7 @@ import {
 	const imagePath = url.split("/storage/v1/object/public/")[1];
 	if (!imagePath) return url;
   
-	return `https://kopimap-cdn.b-cdn.net/${imagePath}?height=300&sharpen=true`;
+	return `https://kopimap-cdn.b-cdn.net/${imagePath}?height=100&sharpen=true`;
   };
 
   

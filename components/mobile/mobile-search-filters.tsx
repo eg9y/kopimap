@@ -5,6 +5,7 @@ import {
   HeartIcon,
   BriefcaseIcon,
   UsersIcon,
+  MoonIcon
 } from "lucide-react";
 import { useStore } from "../../store";
 import {
@@ -59,6 +60,14 @@ export const MobileSearchFilters: React.FC = () => {
       color: "bg-amber-100 hover:bg-amber-200",
       activeColor: "bg-amber-600",
       textColor: "text-amber-700",
+    },
+    {
+      label: "Ada Musolla",
+      filter: { name: "has_musholla", values: ["Yes"] },
+      icon: MoonIcon,
+      color: "bg-emerald-100 hover:bg-emerald-200",
+      activeColor: "bg-emerald-600",
+      textColor: "text-emerald-700",
     },
   ];
 
