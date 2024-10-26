@@ -2,7 +2,7 @@ import { useCafeDetailedInfo } from "@/hooks/use-cafe-detailed-info";
 import { useUserReview } from "@/hooks/use-user-review";
 import { useI18nContext } from "@/src/i18n/i18n-react";
 import { createClient } from "@supabase/supabase-js";
-import { CircleXIcon, SearchIcon } from "lucide-react";
+import { CircleXIcon, SearchIcon, ArrowLeftIcon } from "lucide-react";
 import React, {
   useState,
   useRef,
@@ -125,38 +125,33 @@ export default function MobileView({
     }
   }, [mapRef]);
 
+  const handleBackToList = useCallback(() => {
+    selectCafe(null);
+    setIsListDialogOpen(true);
+  }, [selectCafe, setIsListDialogOpen]);
+
   return (
     <div className="flex flex-col overflow-hidden h-full">
       <div className="flex-grow relative">
         {pmTilesReady && <MapComponent />}
         {selectedCafe && !openSubmitReviewDialog && (
-          <Sheet
-            ref={sheetRef}
-            isOpen={true}
-            onClose={handleSheetClose}
-            detent="full-height"
-            snapPoints={[height - 80 - 56, 200]}
-            initialSnap={1}
-            onSnap={handleSnap}
-            className="!bottom-[56px]"
-          >
-            <Sheet.Container className="!bg-white dark:!bg-gray-800">
-              <Sheet.Header />
-              <Sheet.Content
-                className="!bg-white dark:!bg-gray-800"
-                style={{ paddingBottom: sheetRef.current?.y }}
-              >
-                {snapPoint === 1 && (
-                  <Suspense fallback={<CafeDetailsLoader />}>
-                    <CafeDetails
-                      cafeDetailedInfo={cafeDetailedInfo}
-                      setOpenSubmitReviewDialog={setOpenSubmitReviewDialog}
-                      userReview={userReview}
-                    />
-                  </Suspense>
-                )}
-                {snapPoint === 0 && (
-                  <Sheet.Scroller draggableAt="both">
+          <>
+            <Sheet
+              ref={sheetRef}
+              isOpen={true}
+              onClose={handleSheetClose}
+              detent="full-height"
+              snapPoints={[height - 80 - 56, 200]}
+              initialSnap={1}
+              onSnap={handleSnap}
+              className="!bottom-[56px]"
+            >
+              <Sheet.Container className="!bg-white dark:!bg-gray-800">
+                <Sheet.Content
+                  className="!bg-white dark:!bg-gray-800"
+                  style={{ paddingBottom: sheetRef.current?.y }}
+                >
+                  {snapPoint === 1 && (
                     <Suspense fallback={<CafeDetailsLoader />}>
                       <CafeDetails
                         cafeDetailedInfo={cafeDetailedInfo}
@@ -164,12 +159,30 @@ export default function MobileView({
                         userReview={userReview}
                       />
                     </Suspense>
-                  </Sheet.Scroller>
-                )}
-              </Sheet.Content>
-            </Sheet.Container>
-            <Sheet.Backdrop />
-          </Sheet>
+                  )}
+                  {snapPoint === 0 && (
+                    <Sheet.Scroller draggableAt="both">
+                      <Suspense fallback={<CafeDetailsLoader />}>
+                        <CafeDetails
+                          cafeDetailedInfo={cafeDetailedInfo}
+                          setOpenSubmitReviewDialog={setOpenSubmitReviewDialog}
+                          userReview={userReview}
+                        />
+                      </Suspense>
+                    </Sheet.Scroller>
+                  )}
+                </Sheet.Content>
+              </Sheet.Container>
+              <Sheet.Backdrop />
+            </Sheet>
+            <button
+              onClick={handleBackToList}
+              className="fixed left-4 bottom-[68px] z-[10000000] p-3 bg-white dark:bg-gray-800 rounded-full shadow-lg"
+              aria-label="Back to list"
+            >
+              <ArrowLeftIcon className="h-6 w-6 text-gray-600 dark:text-gray-300" />
+            </button>
+          </>
         )}
         <div className="absolute top-0 left-0 right-0 bottom-0 z-[1000] p-4 w-full h-[100dvh] flex flex-col pointer-events-none">
           <div
