@@ -59,7 +59,7 @@ export default function MobileView({
   const { height } = useWindowSize();
 
   const { data: userReview } = useUserReview(
-    loggedInUser?.id || null,
+    loggedInUser ? loggedInUser.id : null,
     selectedCafe?.id || null
   );
 

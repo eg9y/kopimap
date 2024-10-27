@@ -41,7 +41,7 @@ export default function DesktopView({
   const [openSubmitReviewDialog, setOpenSubmitReviewDialog] = useState(false);
 
   const { data: userReview } = useUserReview(
-    loggedInUser?.id || null,
+    loggedInUser ? loggedInUser.id : null,
     selectedCafe?.id || null
   );
 
