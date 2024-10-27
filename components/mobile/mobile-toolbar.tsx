@@ -32,7 +32,6 @@ export const MobileToolbar: React.FC = () => {
     isListDialogOpen,
     setIsListDialogOpen,
     selectCafe,
-    setSearchInput,
     openSubmitReviewDialog,
   } = useStore();
   const pageContext = usePageContext();
@@ -55,6 +54,7 @@ export const MobileToolbar: React.FC = () => {
     if (loggedInUser) {
       setIsUserSheetOpen(true);
       setIsListDialogOpen(false);
+      selectCafe(null);
     } else {
       handleSignIn();
     }
@@ -65,7 +65,7 @@ export const MobileToolbar: React.FC = () => {
   return (
     <>
       <Sheet
-        className="pb-safe w-full"
+        className="pb-safe w-full z-[1000]"
         opened={isUserSheetOpen}
         onBackdropClick={() => setIsUserSheetOpen(false)}
       >
@@ -127,11 +127,11 @@ export const MobileToolbar: React.FC = () => {
                 return;
               }
               const navigationPromise = navigate("/");
-                console.log(
-                  "The URL changed but the new page hasn't rendered yet."
-                );
-                await navigationPromise;
-                console.log("The new page has finished rendering.");
+              console.log(
+                "The URL changed but the new page hasn't rendered yet."
+              );
+              await navigationPromise;
+              console.log("The new page has finished rendering.");
             }}
             icon={<MapIcon className="w-6 h-6" />}
             label={"Peta"}

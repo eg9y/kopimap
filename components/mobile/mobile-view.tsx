@@ -1,7 +1,6 @@
 import { useCafeDetailedInfo } from "@/hooks/use-cafe-detailed-info";
 import { useUserReview } from "@/hooks/use-user-review";
 import { useI18nContext } from "@/src/i18n/i18n-react";
-import { createClient } from "@supabase/supabase-js";
 import {
   CircleXIcon,
   SearchIcon,
@@ -28,11 +27,6 @@ import { MobileSubmitReview } from "./mobile-submit-review";
 import { MobileSearchFilters } from "./mobile-search-filters";
 
 const MapComponent = lazy(() => import("../map-component"));
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
 
 const CafeDetailsLoader = () => (
   <div className="w-full h-full bg-gray-100 dark:bg-gray-800 animate-pulse">
