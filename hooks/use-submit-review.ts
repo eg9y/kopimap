@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Database } from "../components/lib/database.types";
 import { useUser } from "./use-user";
+import { ReviewWithStringMusholla } from "@/types";
 
 
 
@@ -16,11 +17,15 @@ export const useSubmitReview = (
   const { loggedInUser, sessionInfo } = useUser();
 
   const submitReview = async (
-    reviewData: Omit<
-      Database["public"]["Tables"]["reviews"]["Insert"],
-      "id" | "created_at"
-    >
+    reviewData: any
   ): Promise<{ id: string }> => {
+    console.log('reviewData', reviewData);
+    const finalReviewData: any = { ...reviewData };  
+    if (reviewData.has_musholla === 'Yes') {
+      finalReviewData.has_musholla = true;
+    } else if (reviewData.has_musholla === 'No') {
+      finalReviewData.has_musholla = false;
+    }
     const response = await fetch(
       `${import.meta.env.VITE_MEILISEARCH_URL!}/api/review`,
       {

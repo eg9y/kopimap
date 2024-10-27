@@ -20,7 +20,6 @@ import { StatusBar } from "@uppy/react";
 
 import "@uppy/core/dist/style.min.css";
 import "@uppy/status-bar/dist/style.min.css";
-import { Dialog, DialogBody } from "../catalyst/dialog";
 
 const CUSTOM_ITEM_LABELS = ["Bad", "Poor", "Average", "Great", "Excellent"];
 
