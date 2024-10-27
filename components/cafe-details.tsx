@@ -1,5 +1,4 @@
 import { useI18nContext } from "@/src/i18n/i18n-react";
-import { ClockIcon, PhoneIcon, StarIcon } from "@heroicons/react/20/solid";
 import React, {
   useRef,
   Suspense,
@@ -14,11 +13,14 @@ import { CafeDetailedInfo } from "@/types";
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
+  ClockIcon,
   EditIcon,
   ImageIcon,
   Loader2Icon,
   MapPinIcon,
+  PhoneIcon,
   PlusIcon,
+  StarIcon,
   XIcon,
 } from "lucide-react";
 import { siInstagram } from "simple-icons";

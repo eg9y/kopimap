@@ -1,5 +1,4 @@
 import React, { lazy, Suspense, useState } from "react";
-import { XMarkIcon } from "@heroicons/react/24/outline";
 
 import {
   Dropdown,
@@ -10,8 +9,6 @@ import {
 import { Input, InputGroup } from "./catalyst/input";
 
 import { useI18nContext } from "@/src/i18n/i18n-react";
-import { ChevronDownIcon } from "@heroicons/react/16/solid";
-import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
 
 import useDebounce from "react-use/esm/useDebounce";
 import { useStore } from "../store";
@@ -32,7 +29,7 @@ import {
   SidebarSpacer,
 } from "./catalyst/sidebar";
 import { Text } from "./catalyst/text";
-import { FilterIcon } from "lucide-react";
+import { ChevronDownIcon, FilterIcon, SearchIcon, XIcon } from "lucide-react";
 
 const CafeList = lazy(() => import("../components/cafe-list"));
 const CafeListSkeleton = lazy(() => import("../components/cafe-list-skeleton"));
@@ -100,7 +97,7 @@ export default function MainSidebar({ children }: MainSidebarProps) {
             <div className="flex flex-col gap-1">
               <div className="flex gap-2 w-full">
                 <InputGroup className="w-full">
-                  <MagnifyingGlassIcon />
+                  <SearchIcon />
                   <Input
                     name="search"
                     placeholder={LL.searchCafes()}
@@ -121,7 +118,7 @@ export default function MainSidebar({ children }: MainSidebarProps) {
                       setDebouncedSearchTerm("");
                     }}
                   >
-                    <XMarkIcon className="h-5 w-5" />
+                    <XIcon className="h-5 w-5" />
                   </Button>
                 )}
               </div>

@@ -14,7 +14,7 @@ import {
   DropdownItem,
   DropdownMenu,
 } from "../catalyst/dropdown";
-import { ChevronDownIcon } from "@heroicons/react/16/solid";
+import { ChevronDownIcon } from "lucide-react";
 
 interface FilterButton {
   label: string;

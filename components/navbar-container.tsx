@@ -14,10 +14,6 @@ import {
   NavbarSpacer,
 } from "@/components/catalyst/navbar";
 import { StackedLayout } from "@/components/catalyst/stacked-layout";
-import {
-  ArrowRightStartOnRectangleIcon,
-  UserIcon,
-} from "@heroicons/react/16/solid";
 import { createClient } from "@supabase/supabase-js";
 import { useUser } from "../hooks/use-user";
 import { useI18nContext } from "@/src/i18n/i18n-react";
@@ -25,6 +21,7 @@ import { LanguageSwitcher } from "./language-switcher";
 import { siInstagram, siTiktok } from "simple-icons";
 import { ThemeToggle } from "./theme-toggle";
 import { useTheme } from "./theme-provider";
+import { ArrowRightFromLine, UserIcon } from "lucide-react";
 
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
@@ -118,7 +115,7 @@ export function NavbarContainer({ children }: { children: React.ReactNode }) {
                         window.location.reload();
                       }}
                     >
-                      <ArrowRightStartOnRectangleIcon />
+                      <ArrowRightFromLine />
                       <DropdownLabel>{LL.signOut()}</DropdownLabel>
                     </DropdownItem>
                   </>
@@ -133,7 +130,7 @@ export function NavbarContainer({ children }: { children: React.ReactNode }) {
                       });
                     }}
                   >
-                    <ArrowRightStartOnRectangleIcon />
+                    <ArrowRightFromLine />
                     <DropdownLabel>{LL.signIn()}</DropdownLabel>
                   </DropdownItem>
                 )}

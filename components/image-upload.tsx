@@ -17,10 +17,12 @@ import "@tensorflow/tfjs-backend-wasm";
 import { setWasmPaths } from "@tensorflow/tfjs-backend-wasm";
 import { createClient } from "@supabase/supabase-js";
 import { Database } from "./lib/database.types";
+import Pica from "pica";
 
 import "@uppy/core/dist/style.min.css";
 
-const CLASS_NAMES = ["Food & Drinks", "Menu", "Vibes"];
+const MAX_WIDTH = 1200; // Maximum width for resized images
+const MAX_HEIGHT = 1200; // Maximum height for resized images
 
 interface ImageUploadProps {
   onFilesSelected: (files: any[]) => void;
@@ -72,6 +74,8 @@ export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(
         limit: 1,
       })
     );
+
+    const [pica] = useState(() => new Pica());
 
     const [modelLoading, setModelLoading] = useState(true);
     const workerRef = useRef<Worker | null>(null);
@@ -185,6 +189,42 @@ export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(
       });
     };
 
+    const resizeImage = async (file: File): Promise<Blob> => {
+      const img = new Image();
+      img.src = URL.createObjectURL(file);
+      await new Promise((resolve) => (img.onload = resolve));
+
+      const aspectRatio = img.width / img.height;
+      let newWidth = img.width;
+      let newHeight = img.height;
+
+      if (newWidth > MAX_WIDTH) {
+        newWidth = MAX_WIDTH;
+        newHeight = newWidth / aspectRatio;
+      }
+
+      if (newHeight > MAX_HEIGHT) {
+        newHeight = MAX_HEIGHT;
+        newWidth = newHeight * aspectRatio;
+      }
+
+      const canvas = document.createElement("canvas");
+      canvas.width = newWidth;
+      canvas.height = newHeight;
+
+      await pica.resize(img, canvas, {
+        unsharpAmount: 160,
+        unsharpRadius: 0.6,
+        unsharpThreshold: 1,
+      });
+
+      return new Promise((resolve) => {
+        canvas.toBlob((blob) => {
+          resolve(blob!);
+        }, file.type);
+      });
+    };
+
     useUppyEvent(uppy, "file-added", async (file: ExtendedUppyFile) => {
       let prediction;
       if (!modelLoading) {
@@ -241,24 +281,26 @@ export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(
     );
 
     // Handle file input change
-    const handleFileInputChange = (
+    const handleFileInputChange = async (
       event: React.ChangeEvent<HTMLInputElement>
     ) => {
       const files = event.target.files;
       if (files) {
-        Array.from(files).forEach((file) => {
+        for (const file of Array.from(files)) {
           try {
+            const resizedBlob = await resizeImage(file);
+            console.log("Resized blob:", resizedBlob);
             uppy.addFile({
               name: file.name,
               type: file.type,
-              data: file,
+              data: resizedBlob,
               meta: { placeId },
             });
           } catch (err) {
             console.error(err);
             toast.error(`Failed to add file: ${file.name}`);
           }
-        });
+        }
       }
     };
 
