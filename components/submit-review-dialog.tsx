@@ -1,6 +1,6 @@
 // SubmitReviewDialog.tsx
 
-import { XIcon } from "lucide-react";
+import { LoaderCircle, XIcon } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { Controller, FieldValues, useForm } from "react-hook-form";
 import { Rating } from "react-simple-star-rating";
@@ -58,7 +58,7 @@ export function SubmitReviewDialog({
     setValue,
     formState: { errors },
   } = useForm<FieldValues>();
-  const { loggedInUser } = useUser();
+  const { loggedInUser, loadingUser } = useUser();
   const [selectedFiles, setSelectedFiles] = useState<any[]>([]);
   const [existingImageUrls, setExistingImageUrls] = useState<string[]>([]);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -120,7 +120,7 @@ export function SubmitReviewDialog({
   const { mutateAsync } = useSubmitReview(
     onSuccess,
     cafeDetailedInfo ? cafeDetailedInfo.place_id : null,
-    loggedInUser?.id ?? null
+    loggedInUser ? loggedInUser.id : null
   );
 
   const onSubmit = async (data: FieldValues) => {
@@ -205,7 +205,21 @@ export function SubmitReviewDialog({
     }
   };
 
-  if (!loggedInUser) {
+  if (loadingUser) {
+    return (
+      <Dialog
+        open={isOpen && !!cafeDetailedInfo}
+        onClose={() => setIsOpen(false)}
+        className="z-50"
+      >
+        <DialogBody className="flex justify-center items-center">
+          <LoaderCircle size={32} className="animate-spin" />
+        </DialogBody>
+      </Dialog>
+    );
+  }
+
+  if (loggedInUser === false) {
     return (
       <Dialog
         open={isOpen && !!cafeDetailedInfo}

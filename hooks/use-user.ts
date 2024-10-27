@@ -9,28 +9,30 @@ const supabase = createClient(
 );
 
 export function useUser() {
-  const [loggedInUser, setLoggedInUser] = useState(null as null | User);
+  const [loggedInUser, setLoggedInUser] = useState<User | null | false>(null);
   const [sessionInfo, setSessionInfo] = useState<Session | null>(null);
+  const [loadingUser, setLoadingUser] = useState(true);
 
   useEffect(() => {
     async function fetchUser() {
-      const {
-        data: { user },
-        error,
-      } = await supabase.auth.getUser();
-      if (error) {
-        return;
+      try {
+        setLoadingUser(true);
+        const { data: { user }, error } = await supabase.auth.getUser();
+        if (error) throw error;
+
+        const { data: { session } } = await supabase.auth.getSession();
+
+        setSessionInfo(session);
+        setLoggedInUser(user || false);
+      } catch (error) {
+        console.error("Error fetching user:", error);
+        setLoggedInUser(false);
+      } finally {
+        setLoadingUser(false);
       }
-
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      setSessionInfo(session);
-      setLoggedInUser(user);
     }
     fetchUser();
   }, []);
 
-  return { loggedInUser, setLoggedInUser, sessionInfo, setSessionInfo };
+  return { loggedInUser, setLoggedInUser, sessionInfo, setSessionInfo, loadingUser };
 }

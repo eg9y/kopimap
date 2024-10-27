@@ -1,7 +1,7 @@
 import { useI18nContext } from "@/src/i18n/i18n-react";
 import { useStore } from "@/store";
 import { Session, createClient } from "@supabase/supabase-js";
-import { XIcon } from "lucide-react";
+import { LoaderCircle, XIcon } from "lucide-react";
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { Controller, FieldValues, useForm } from "react-hook-form";
 import { Rating } from "react-simple-star-rating";
@@ -20,6 +20,7 @@ import { StatusBar } from "@uppy/react";
 
 import "@uppy/core/dist/style.min.css";
 import "@uppy/status-bar/dist/style.min.css";
+import { Dialog, DialogBody } from "../catalyst/dialog";
 
 const CUSTOM_ITEM_LABELS = ["Bad", "Poor", "Average", "Great", "Excellent"];
 
@@ -48,7 +49,7 @@ export function MobileSubmitReview({
     setValue,
     formState: { errors },
   } = useForm<FieldValues>();
-  const { loggedInUser } = useUser();
+  const { loggedInUser, loadingUser } = useUser();
   const [selectedFiles, setSelectedFiles] = useState<any[]>([]);
   const [existingImageUrls, setExistingImageUrls] = useState<string[]>([]);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -106,7 +107,7 @@ export function MobileSubmitReview({
   const { mutateAsync } = useSubmitReview(
     onSuccess,
     cafeDetailedInfo ? cafeDetailedInfo.place_id : null,
-    loggedInUser?.id ?? null
+    loggedInUser ? loggedInUser.id : null
   );
 
   useEffect(() => {
@@ -194,6 +195,14 @@ export function MobileSubmitReview({
     },
     [imageUploadRef, loggedInUser, cafeDetailedInfo, sessionInfo, selectedFiles]
   );
+
+  if (loadingUser) {
+    return (
+      <div className="pointer-events-auto z-[10000] dark:bg-slate-800 mx-2 p-4 flex flex-col items-center rounded-xl bg-white shadow-xl top-[40%] absolute inset-x-0 max-w-md">
+        <LoaderCircle size={32} className="animate-spin" />
+      </div>
+    );
+  }
 
   if (!loggedInUser) {
     return (
