@@ -298,8 +298,6 @@ export function SubmitReviewDialog({
                               "#f1b345",
                               "#f1d045",
                             ]}
-                            onPointerEnter={() => console.log("Enter")}
-                            onPointerLeave={() => console.log("Leave")}
                             SVGclassName={`inline-block`}
                           />
                         </div>

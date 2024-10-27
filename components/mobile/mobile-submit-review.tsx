@@ -110,14 +110,14 @@ export function MobileSubmitReview({
     loggedInUser ? loggedInUser.id : null
   );
 
-  useEffect(() => {
-    if (imageUploadRef.current) {
-      console.log("ImageUpload ref is available");
-      console.log("imageUploadRef", imageUploadRef);
-    } else {
-      console.log("ImageUpload ref is not available");
-    }
-  }, [imageUploadRef.current]);
+  // useEffect(() => {
+  //   if (imageUploadRef.current) {
+  //     console.log("ImageUpload ref is available");
+  //     console.log("imageUploadRef", imageUploadRef);
+  //   } else {
+  //     console.log("ImageUpload ref is not available");
+  //   }
+  // }, [imageUploadRef.current]);
 
   const onSubmit = useCallback(
     async (data: FieldValues) => {

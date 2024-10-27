@@ -143,7 +143,6 @@ export default function CafeList({ searchInput }: CafeListProps) {
             const isLoaderRow = virtualRow.index > allCafes.length - 1;
 
             if (!cafe) {
-              console.log(allCafes);
               return null;
             }
 

@@ -208,9 +208,9 @@ const CafeListItem: React.FC<CafeListItemProps> = memo(
                 entry.target as HTMLDivElement
               );
               if (index !== -1) {
-                console.log(
-                  `Image at index ${index} is now in view and will be loaded.`
-                );
+                // console.log(
+                //   `Image at index ${index} is now in view and will be loaded.`
+                // );
                 setLoadedImages((prev) => {
                   const newLoadedImages = [...prev];
                   newLoadedImages[index] = true;
