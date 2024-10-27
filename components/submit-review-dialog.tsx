@@ -25,7 +25,7 @@ import { ImageUpload, ImageUploadRef } from "./image-upload";
 import { Database } from "./lib/database.types";
 import { reviewAttributes } from "./lib/review-attributes";
 import { cn } from "./lib/utils";
-import { StatusBar } from "@uppy/react";
+import StatusBar from "@uppy/react/lib/StatusBar";
 
 import "@uppy/core/dist/style.min.css";
 import "@uppy/status-bar/dist/style.min.css";

@@ -2,7 +2,7 @@
 
 import { Session } from "@supabase/supabase-js";
 import Uppy, { UppyFile } from "@uppy/core";
-import { useUppyEvent } from "@uppy/react";
+import useUppyEvent from "@uppy/react/lib/useUppyEvent";
 import XHRUpload from "@uppy/xhr-upload";
 import {
   forwardRef,

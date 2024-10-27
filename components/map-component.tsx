@@ -14,7 +14,7 @@ import { GeolocateResultEvent } from "react-map-gl/dist/esm/types";
 interface MapComponentProps {}
 
 export default function MapComponent({}: MapComponentProps) {
-  const { selectCafe, setMapRef, mapRef, mapCenter, setMapCenter } = useStore();
+  const { setMapRef, mapRef, mapCenter, setMapCenter } = useStore();
   const [popupInfo, setPopupInfo] = useState<any>(null);
   const popupTimeoutRef = useRef<number | null>(null);
   const isHoveringPopupRef = useRef<boolean>(false);
