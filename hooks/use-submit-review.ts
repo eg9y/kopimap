@@ -19,13 +19,6 @@ export const useSubmitReview = (
   const submitReview = async (
     reviewData: any
   ): Promise<{ id: string }> => {
-    console.log('reviewData', reviewData);
-    const finalReviewData: any = { ...reviewData };  
-    if (reviewData.has_musholla === 'Yes') {
-      finalReviewData.has_musholla = true;
-    } else if (reviewData.has_musholla === 'No') {
-      finalReviewData.has_musholla = false;
-    }
     const response = await fetch(
       `${import.meta.env.VITE_MEILISEARCH_URL!}/api/review`,
       {
