@@ -12,6 +12,8 @@ import {
   ScaleIcon,
   CarIcon,
   LucideProps,
+  ImageIcon,
+  Loader2Icon,
 } from "lucide-react";
 import React, {
   useCallback,
@@ -20,6 +22,7 @@ import React, {
   useEffect,
   useRef,
   memo,
+  Suspense,
 } from "react";
 import useMedia from "react-use/esm/useMedia";
 import { useStore } from "../../store";
@@ -27,6 +30,8 @@ import { MeiliSearchCafe } from "../../types";
 import { Badge, BadgeProps } from "../catalyst/badge";
 import { MapRef } from "react-map-gl";
 import { MobileSearchFilters } from "./mobile-search-filters";
+import { useImage } from "react-image";
+import { ErrorBoundary } from "react-error-boundary";
 
 interface CafeListProps {
   searchInput: string;
@@ -178,6 +183,42 @@ const AttributeBadge: React.FC<{
   </Badge>
 );
 
+// Add these new components and functions
+const ImageWithSuspense = ({
+  src,
+  alt,
+  className,
+}: {
+  src: string;
+  alt: string;
+  className: string;
+}) => {
+  const { src: loadedSrc } = useImage({
+    srcList: [src],
+  });
+  return <img src={loadedSrc} alt={alt} className={className} />;
+};
+
+const ImageError = () => (
+  <div className="flex flex-col items-center justify-center h-full w-full bg-gray-200 text-gray-400">
+    <ImageIcon size={24} />
+    <p className="mt-2 text-xs">Failed to load image</p>
+  </div>
+);
+
+const ImageLoader = () => (
+  <div className="flex items-center justify-center h-full w-full bg-gray-200">
+    <Loader2Icon className="animate-spin text-gray-400" size={24} />
+  </div>
+);
+
+const transformImageUrl = (url: string) => {
+  const imagePath = url.split("/storage/v1/object/public/")[1];
+  if (!imagePath) return url;
+
+  return `https://kopimap-cdn.b-cdn.net/${imagePath}?height=96&sharpen=true`;
+};
+
 // Update the CafeListItem component
 const CafeListItem: React.FC<CafeListItemProps> = memo(
   ({ cafe, handleCafeClick }) => {
@@ -198,6 +239,9 @@ const CafeListItem: React.FC<CafeListItemProps> = memo(
 
     const imageRefs = useRef<(HTMLDivElement | null)[]>([]);
     const [loadedImages, setLoadedImages] = useState<boolean[]>([]);
+    const [imageDimensions, setImageDimensions] = useState<
+      { width: number; height: number }[]
+    >([]);
 
     useEffect(() => {
       const observer = new IntersectionObserver(
@@ -208,9 +252,6 @@ const CafeListItem: React.FC<CafeListItemProps> = memo(
                 entry.target as HTMLDivElement
               );
               if (index !== -1) {
-                // console.log(
-                //   `Image at index ${index} is now in view and will be loaded.`
-                // );
                 setLoadedImages((prev) => {
                   const newLoadedImages = [...prev];
                   newLoadedImages[index] = true;
@@ -234,6 +275,28 @@ const CafeListItem: React.FC<CafeListItemProps> = memo(
       };
     }, []);
 
+    useEffect(() => {
+      const loadImageDimensions = async () => {
+        const dimensions = await Promise.all(
+          cafe.images.map(
+            (image) =>
+              new Promise<{ width: number; height: number }>((resolve) => {
+                const img = new Image();
+                img.onload = () => {
+                  resolve({ width: img.width, height: img.height });
+                };
+                img.src = transformImageUrl(image);
+              })
+          )
+        );
+        setImageDimensions(dimensions);
+      };
+
+      loadImageDimensions();
+    }, [cafe.images]);
+
+    const containerHeight = 96; // Fixed container height
+
     return (
       <div
         onClick={() => handleCafeClick(cafe)}
@@ -242,21 +305,36 @@ const CafeListItem: React.FC<CafeListItemProps> = memo(
         <div className="overflow-x-auto scrollbar-hide">
           <div className="grid grid-rows-[auto_min-content] gap-y-2 auto-cols-max grid-flow-col">
             <div className="flex gap-2">
-              {cafe?.images.map((image, index) => (
-                <div
-                  key={image}
-                  ref={(el) => (imageRefs.current[index] = el)}
-                  className=" h-24 flex-shrink-0"
-                >
-                  {loadedImages[index] && (
-                    <img
-                      src={image}
-                      className="w-full h-full rounded-md shadow-sm"
-                      alt={cafe.name}
-                    />
-                  )}
-                </div>
-              ))}
+              {cafe.images.map((image, index) => {
+                const aspectRatio = imageDimensions[index]
+                  ? imageDimensions[index].width / imageDimensions[index].height
+                  : 1;
+                const imageWidth = containerHeight * aspectRatio;
+
+                return (
+                  <div
+                    key={image}
+                    ref={(el) => (imageRefs.current[index] = el)}
+                    className="flex-shrink-0"
+                    style={{
+                      height: `${containerHeight}px`,
+                      width: `${imageWidth}px`,
+                    }}
+                  >
+                    {loadedImages[index] && (
+                      <ErrorBoundary fallback={<ImageError />}>
+                        <Suspense fallback={<ImageLoader />}>
+                          <ImageWithSuspense
+                            src={transformImageUrl(image)}
+                            alt={cafe.name}
+                            className="w-full h-full object-cover rounded-md shadow-sm"
+                          />
+                        </Suspense>
+                      </ErrorBoundary>
+                    )}
+                  </div>
+                );
+              })}
             </div>
             <div className="flex gap-2 items-start">
               {attributes.map((attr, index) => {
