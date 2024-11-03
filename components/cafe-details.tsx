@@ -230,8 +230,8 @@ export default function CafeDetails({
               {cafeDetailedInfo.gmaps_reviews_per_rating && (
                 <div className="mt-2 w-full max-w-[200px]">
                   {[5, 4, 3, 2, 1].map((rating) => {
-                    const reviewCount = JSON.parse(
-                      cafeDetailedInfo.gmaps_reviews_per_rating as string
+                    const reviewCount = (
+                      cafeDetailedInfo.gmaps_reviews_per_rating as any
                     )[rating.toString()];
                     const percentage =
                       (reviewCount / cafeDetailedInfo.gmaps_total_reviews!) *
