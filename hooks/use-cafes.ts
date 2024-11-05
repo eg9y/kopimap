@@ -102,7 +102,10 @@ import {
 
 		data.hits = data.hits.map((cafe: MeiliSearchCafe) => ({
 			...cafe,
-			images: cafe.images.map((imageUrl: string) => transformImageUrl(imageUrl)),
+			images: cafe.images.map((image: { url: string, label: string }) => ({
+				url: transformImageUrl(image.url),
+				label: image.label,
+			})),
 		}));
 		return data;
 	  },

@@ -172,7 +172,7 @@ export default function CafeList({ searchInput }: CafeListProps) {
                     className="flex gap-2"
                   >
                     <img
-                      src={cafe.images[0]}
+                      src={cafe.images[0].url}
                       className="w-16 h-16 object-cover rounded-md shadow-sm flex-shrink-0"
                       alt={cafe.name}
                     />

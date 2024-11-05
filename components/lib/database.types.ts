@@ -555,7 +555,7 @@ export type Database = {
             | null
           address: string | null
           aggregated_reviews_last_updated: string | null
-          all_image_urls: string[] | null
+          all_image_urls: { url: string; label: string | null }[] | null
           avg_rating: number | null
           cleanliness_mode: Database["public"]["Enums"]["cleanliness"] | null
           closed_on: string | null

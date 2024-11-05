@@ -1,4 +1,7 @@
-import type { GeolocateControl as GeolocateControlType } from "maplibre-gl";
+import type {
+  GeolocateControl as GeolocateControlType,
+  LngLat,
+} from "maplibre-gl";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { GeolocateControl, Map as Mapgl, Popup } from "react-map-gl/maplibre";
 import useMedia from "react-use/esm/useMedia";
@@ -30,10 +33,14 @@ export default function MapComponent({}: MapComponentProps) {
   });
 
   const maxBounds: LngLatBoundsLike = [
-    106.626998 - 0.1,
-    -6.426709 - 0.1,
-    107.052031 + 0.1,
-    -6.121617 + 0.1,
+    {
+      lng: 106.626998 - 0.1,
+      lat: -6.426709 - 0.1,
+    },
+    {
+      lng: 107.052031 + 0.1,
+      lat: -6.121617 + 0.1,
+    },
   ];
 
   const { data: mapCafesData, refetch: refetchMapCafes } = useMapCafes(
@@ -49,27 +56,17 @@ export default function MapComponent({}: MapComponentProps) {
     return () => clearTimeout(debounceTimer);
   }, [mapCenter, refetchMapCafes]);
 
-  const handlePopupMouseEnter = () => {
-    isHoveringPopupRef.current = true;
-    if (popupTimeoutRef.current !== null) {
-      clearTimeout(popupTimeoutRef.current);
-      popupTimeoutRef.current = null;
-    }
-  };
-
-  const handlePopupMouseLeave = () => {
-    isHoveringPopupRef.current = false;
-    popupTimeoutRef.current = window.setTimeout(() => {
-      setPopupInfo(null);
-      popupTimeoutRef.current = null;
-    }, 300);
-  };
-
   const handleGeolocate = useCallback(
     (e: GeolocateResultEvent<maplibregl.GeolocateControl>) => {
       if (mapRef && mapRef.current) {
+        if (e.coords.latitude < -90 || e.coords.latitude > 90) {
+          return;
+        }
         mapRef.current.flyTo({
-          center: [e.coords.longitude, e.coords.latitude],
+          center: {
+            lat: e.coords.latitude,
+            lng: e.coords.longitude,
+          },
           zoom: 14,
           essential: true,
         });
@@ -81,7 +78,9 @@ export default function MapComponent({}: MapComponentProps) {
   const handleFlyTo = useCallback(
     (lat: number, lng: number) => {
       if (mapRef && mapRef.current && !isNaN(lat) && !isNaN(lng)) {
-        // zoom to 14
+        if (lat < -90 || lat > 90) {
+          return;
+        }
         mapRef.current.flyTo({
           zoom: 15,
           center: {
@@ -99,6 +98,11 @@ export default function MapComponent({}: MapComponentProps) {
     if (mapRef && mapRef.current) {
       const center = mapRef.current.getCenter();
       if (center) {
+        // check if lat is >= -90 and <= 90
+        if (center.lat < -90 || center.lat > 90) {
+          return;
+        }
+        console.log("geolocate", center.lat, center.lng);
         setMapCenter({ lat: center.lat, long: center.lng });
         setViewport((prev) => ({
           ...prev,
@@ -112,8 +116,10 @@ export default function MapComponent({}: MapComponentProps) {
 
   const handleOutOfMaxBounds = useCallback(() => {
     if (mapRef && mapRef.current) {
-      const centerLat = (maxBounds[1] + maxBounds[3]) / 2;
-      const centerLng = (maxBounds[0] + maxBounds[2]) / 2;
+      const centerLat =
+        ((maxBounds[0] as LngLat).lat + (maxBounds[1] as LngLat).lat) / 2;
+      const centerLng =
+        ((maxBounds[0] as LngLat).lng + (maxBounds[1] as LngLat).lng) / 2;
       mapRef.current.flyTo({
         center: [centerLng, centerLat],
         zoom: 10,
@@ -132,6 +138,10 @@ export default function MapComponent({}: MapComponentProps) {
       }}
       onLoad={(evt) => {
         const center = evt.target.getCenter();
+        console.log(center.lat, center.lng);
+        if (center.lat < -90 || center.lat > 90) {
+          return;
+        }
         setMapCenter({
           lat: center.lat,
           long: center.lng,

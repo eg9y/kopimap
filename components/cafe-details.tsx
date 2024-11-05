@@ -33,14 +33,15 @@ import { Heading } from "./catalyst/heading";
 import { Rate } from "./rate";
 import { UserReview } from "./user-review";
 
+const isInstagramLink = (url: string) => {
+  return url.includes("instagram.com") || url.includes("www.instagram.com");
+};
+
 const transformImageUrl = (url: string) => {
   const imagePath = url.split("/storage/v1/object/public/")[1];
   if (!imagePath) return url;
 
   return `https://kopimap-cdn.b-cdn.net/${imagePath}?height=300&sharpen=true`;
-};
-const isInstagramLink = (url: string) => {
-  return url.includes("instagram.com") || url.includes("www.instagram.com");
 };
 
 const transformImageUrlFull = (url: string) => {
@@ -125,10 +126,7 @@ export default function CafeDetails({
     setOpenSubmitReviewDialog(true);
   };
 
-  const carouselImages = [
-    ...(cafeDetailedInfo?.all_image_urls ?? []),
-    ...((cafeDetailedInfo?.hosted_gmaps_images as string[]) ?? []),
-  ];
+  const carouselImages = cafeDetailedInfo?.all_image_urls ?? [];
 
   // Remove duplicates from carouselImages
   const uniqueCarouselImages = Array.from(new Set(carouselImages));
@@ -230,9 +228,12 @@ export default function CafeDetails({
               {cafeDetailedInfo.gmaps_reviews_per_rating && (
                 <div className="mt-2 w-full max-w-[200px]">
                   {[5, 4, 3, 2, 1].map((rating) => {
-                    const reviewCount = (
-                      cafeDetailedInfo.gmaps_reviews_per_rating as any
-                    )[rating.toString()];
+                    let reviewCount = 0;
+                    try {
+                      reviewCount = JSON.parse(
+                        cafeDetailedInfo.gmaps_reviews_per_rating as any
+                      )[rating.toString()];
+                    } catch (error) {}
                     const percentage =
                       (reviewCount / cafeDetailedInfo.gmaps_total_reviews!) *
                       100;
@@ -372,7 +373,7 @@ export default function CafeDetails({
 }
 
 interface CustomCarouselProps {
-  images: string[];
+  images: { url: string; label: string | null }[];
 }
 
 const CustomCarousel: React.FC<CustomCarouselProps> = ({ images }) => {
@@ -394,7 +395,7 @@ const CustomCarousel: React.FC<CustomCarouselProps> = ({ images }) => {
               img.onload = () => {
                 resolve({ width: img.width, height: img.height });
               };
-              img.src = transformImageUrl(image);
+              img.src = transformImageUrl(image.url);
             })
         )
       );
@@ -455,7 +456,7 @@ const CustomCarousel: React.FC<CustomCarouselProps> = ({ images }) => {
 
           return (
             <div
-              key={image}
+              key={image.url}
               className="flex-shrink-0 snap-center p-2"
               style={{
                 height: `${containerHeight}px`,
@@ -465,7 +466,7 @@ const CustomCarousel: React.FC<CustomCarouselProps> = ({ images }) => {
               <ErrorBoundary fallback={<ImageError />}>
                 <Suspense fallback={<ImageLoader />}>
                   <ImageWithSuspense
-                    src={transformImageUrl(image)}
+                    src={transformImageUrl(image.url)}
                     alt={`Cafe Image ${index + 1}`}
                     className="h-full w-full object-cover cursor-pointer rounded-lg"
                     onClick={() => openModal(index)}
@@ -496,7 +497,7 @@ const CustomCarousel: React.FC<CustomCarouselProps> = ({ images }) => {
         >
           <div className="w-[90vw] h-[90vh] max-w-4xl max-h-[80vh] relative bg-black flex items-center justify-center">
             <img
-              src={transformImageUrlFull(images[selectedImageIndex])}
+              src={transformImageUrlFull(images[selectedImageIndex].url)}
               alt="Expanded view"
               className="max-w-full max-h-full object-contain"
               onClick={(e) => e.stopPropagation()}
