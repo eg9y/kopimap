@@ -6,13 +6,6 @@ import { MeiliSearchCafe } from "../types";
 const CLUSTER_SIZE = 0.05;
 const DECIMAL_PLACES = 4;
 
-const transformImageUrl = (url: string) => {
-  const imagePath = url.split("/storage/v1/object/public/")[1];
-  if (!imagePath) return url;
-
-  return `https://kopimap-cdn.b-cdn.net/${imagePath}?height=300&sharpen=true`;
-};
-
 export const useMapCafes = (lat: number, lng: number) => {
   const { searchFilters } = useStore();
   const allCafesRef = useRef<Map<string, MeiliSearchCafe>>(new Map());
@@ -64,7 +57,12 @@ export const useMapCafes = (lat: number, lng: number) => {
       longitude: cafe._geo.lng,
       distance: cafe._geoDistance,
       ...cafe,
-        images: cafe.images.map((imageUrl: string) => transformImageUrl(imageUrl)),
+        images: cafe.images.map((imageUrl) => {
+          return {
+            url: `${imageUrl}?height=300&sharpen=true`,
+            label: null,
+          };
+        }),
     }));
   }, [lat, lng, searchFilters]);
 

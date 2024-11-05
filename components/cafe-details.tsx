@@ -37,20 +37,6 @@ const isInstagramLink = (url: string) => {
   return url.includes("instagram.com") || url.includes("www.instagram.com");
 };
 
-const transformImageUrl = (url: string) => {
-  const imagePath = url.split("/storage/v1/object/public/")[1];
-  if (!imagePath) return url;
-
-  return `https://kopimap-cdn.b-cdn.net/${imagePath}?height=300&sharpen=true`;
-};
-
-const transformImageUrlFull = (url: string) => {
-  const imagePath = url.split("/storage/v1/object/public/")[1];
-  if (!imagePath) return url;
-
-  return `https://kopimap-cdn.b-cdn.net/${imagePath}?width=346&sharpen=true`;
-};
-
 const ImageWithSuspense = ({
   src,
   alt,
@@ -395,7 +381,7 @@ const CustomCarousel: React.FC<CustomCarouselProps> = ({ images }) => {
               img.onload = () => {
                 resolve({ width: img.width, height: img.height });
               };
-              img.src = transformImageUrl(image.url);
+              img.src = `${image.url}?height=300&sharpen=true`;
             })
         )
       );
@@ -466,7 +452,7 @@ const CustomCarousel: React.FC<CustomCarouselProps> = ({ images }) => {
               <ErrorBoundary fallback={<ImageError />}>
                 <Suspense fallback={<ImageLoader />}>
                   <ImageWithSuspense
-                    src={transformImageUrl(image.url)}
+                    src={`${image.url}?height=300&sharpen=true`}
                     alt={`Cafe Image ${index + 1}`}
                     className="h-full w-full object-cover cursor-pointer rounded-lg"
                     onClick={() => openModal(index)}
@@ -497,7 +483,7 @@ const CustomCarousel: React.FC<CustomCarouselProps> = ({ images }) => {
         >
           <div className="w-[90vw] h-[90vh] max-w-4xl max-h-[80vh] relative bg-black flex items-center justify-center">
             <img
-              src={transformImageUrlFull(images[selectedImageIndex].url)}
+              src={`${images[selectedImageIndex].url}?width=346&sharpen=true`}
               alt="Expanded view"
               className="max-w-full max-h-full object-contain"
               onClick={(e) => e.stopPropagation()}

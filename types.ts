@@ -47,7 +47,7 @@ export type MeiliSearchCafe = {
   _geoDistance: number;
   avg_rating: number;
   review_count: number;
-  images: { url: string; label: string }[];
+  images: { url: string; label: string | null }[];
 } & CafeAttributes;
 
 export type Cafe = {

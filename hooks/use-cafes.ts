@@ -29,14 +29,6 @@ import {
 	boolean,
   ];
   
-  const transformImageUrl = (url: string) => {
-	const imagePath = url.split("/storage/v1/object/public/")[1];
-	if (!imagePath) return url;
-  
-	return `https://kopimap-cdn.b-cdn.net/${imagePath}?height=100&sharpen=true`;
-  };
-
-  
   export const useCafes = (
 	lat: number,
 	lng: number,
@@ -102,8 +94,8 @@ import {
 
 		data.hits = data.hits.map((cafe: MeiliSearchCafe) => ({
 			...cafe,
-			images: cafe.images.map((image: { url: string, label: string }) => ({
-				url: transformImageUrl(image.url),
+			images: cafe.images.map((image: { url: string, label: string | null }) => ({
+				url: image.url,
 				label: image.label,
 			})),
 		}));

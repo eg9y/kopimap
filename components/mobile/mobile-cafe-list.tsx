@@ -140,7 +140,6 @@ const attributeMapping = {
 
 // Add these type definitions
 type AttributeKey = keyof typeof attributeMapping;
-type AttributeValue = string;
 
 interface Attribute {
   key: AttributeKey;
@@ -212,13 +211,6 @@ const ImageLoader = () => (
   </div>
 );
 
-const transformImageUrl = (url: string) => {
-  const imagePath = url.split("/storage/v1/object/public/")[1];
-  if (!imagePath) return url;
-
-  return `https://kopimap-cdn.b-cdn.net/${imagePath}?height=96&sharpen=true`;
-};
-
 // Update the CafeListItem component
 const CafeListItem: React.FC<CafeListItemProps> = memo(
   ({ cafe, handleCafeClick }) => {
@@ -285,7 +277,7 @@ const CafeListItem: React.FC<CafeListItemProps> = memo(
                 img.onload = () => {
                   resolve({ width: img.width, height: img.height });
                 };
-                img.src = transformImageUrl(image);
+                img.src = `${image}?height=96&sharpen=true`;
               })
           )
         );
@@ -313,7 +305,7 @@ const CafeListItem: React.FC<CafeListItemProps> = memo(
 
                 return (
                   <div
-                    key={image}
+                    key={image.url}
                     ref={(el) => (imageRefs.current[index] = el)}
                     className="flex-shrink-0"
                     style={{
@@ -325,7 +317,7 @@ const CafeListItem: React.FC<CafeListItemProps> = memo(
                       <ErrorBoundary fallback={<ImageError />}>
                         <Suspense fallback={<ImageLoader />}>
                           <ImageWithSuspense
-                            src={transformImageUrl(image)}
+                            src={`${image.url}?height=96&sharpen=true`}
                             alt={cafe.name}
                             className="w-full h-full object-cover rounded-md shadow-sm"
                           />
