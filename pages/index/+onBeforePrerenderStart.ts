@@ -24,7 +24,7 @@ export const onBeforePrerenderStart: OnBeforePrerenderStartAsync =
       id: number | null;
       name: string | null;
       place_id: string | null;
-      all_image_urls: string[] | null;
+      all_image_urls: { url: string; label: string | null }[] | null;
       gmaps_featured_image: string | null;
       website: string | null;
       phone: string | null;

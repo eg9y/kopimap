@@ -91,14 +91,6 @@ import {
 		}
   
 		const data: CafesResponse = await response.json();
-
-		data.hits = data.hits.map((cafe: MeiliSearchCafe) => ({
-			...cafe,
-			images: cafe.images.map((image: { url: string, label: string | null }) => ({
-				url: image.url,
-				label: image.label,
-			})),
-		}));
 		return data;
 	  },
 	  [lat, lng, searchTerm, searchFilters, isIncludeDetails],

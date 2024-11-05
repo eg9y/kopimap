@@ -108,10 +108,10 @@ function AdminPage() {
               </TableCell>
               <TableCell>
                 <div className="grid grid-cols-3 gap-2 max-w-[300px]">
-                  {cafe.all_image_urls?.map((url, index) => (
+                  {cafe.all_image_urls?.map((image, index) => (
                     <img
                       key={index}
-                      src={url}
+                      src={image.url}
                       alt={`${cafe.name} image ${index + 1}`}
                       className="w-full h-20 object-cover rounded"
                     />
