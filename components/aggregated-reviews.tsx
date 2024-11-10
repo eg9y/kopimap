@@ -1,12 +1,11 @@
 import { useI18nContext } from "@/src/i18n/i18n-react";
 import { MinusIcon } from "lucide-react";
-import type { aggregatedReview } from "../types";
 import { Badge } from "./catalyst/badge";
 import { reviewAttributes } from "./lib/review-attributes";
 import { cn } from "./lib/utils";
 
 interface AggregatedReviewsProps {
-  aggregatedReview: aggregatedReview | null;
+  aggregatedReview: any | null;
 }
 
 export const AggregatedReviews: React.FC<AggregatedReviewsProps> = ({
@@ -53,7 +52,7 @@ export const AggregatedReviews: React.FC<AggregatedReviewsProps> = ({
           <div className="flex flex-col gap-2">
             {category.attributes.map((attr) => {
               const modeKey =
-                `${attr.name.toLowerCase()}_mode` as keyof aggregatedReview;
+                `${attr.name.toLowerCase()}_mode` as keyof any;
               const value = aggregatedReview[modeKey] as string;
               const attrName = attr.name as keyof typeof LL.attributes;
 
