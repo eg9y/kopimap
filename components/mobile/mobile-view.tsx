@@ -25,6 +25,8 @@ import CafeDetails from "../cafe-details";
 import { MobileCafeList } from "./mobile-cafe-list";
 import { MobileSubmitReview } from "./mobile-submit-review";
 import { MobileSearchFilters } from "./mobile-search-filters";
+import { createClient, Session } from "@supabase/supabase-js";
+import { Database } from "../lib/database.types";
 
 const MapComponent = lazy(() => import("../map-component"));
 
@@ -32,6 +34,11 @@ const CafeDetailsLoader = () => (
   <div className="w-full h-full bg-gray-100 dark:bg-gray-800 animate-pulse">
     Loading Cafe Details...
   </div>
+);
+
+const supabase = createClient<Database>(
+  import.meta.env.VITE_SUPABASE_URL!,
+  import.meta.env.VITE_SUPABASE_ANON_KEY!
 );
 
 export default function MobileView({
@@ -57,6 +64,7 @@ export default function MobileView({
   const sheetRef = useRef<SheetRef>();
   const { loggedInUser } = useUser();
   const { height } = useWindowSize();
+  const [sessionInfo, setSessionInfo] = useState<Session | null>(null);
 
   const { data: userReview } = useUserReview(
     loggedInUser ? loggedInUser.id : null,
@@ -125,6 +133,15 @@ export default function MobileView({
       };
     }
   }, [mapRef]);
+
+  useEffect(() => {
+    (async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      setSessionInfo(session);
+    })();
+  }, []);
 
   const handleBackToList = useCallback(() => {
     selectCafe(null);
@@ -234,13 +251,14 @@ export default function MobileView({
               inputRef={inputRef}
             />
           )}
-          {openSubmitReviewDialog && cafeDetailedInfo && (
+          {openSubmitReviewDialog && cafeDetailedInfo && sessionInfo && (
             <MobileSubmitReview
               cafeDetailedInfo={cafeDetailedInfo}
               userReview={userReview}
               onClose={() => {
                 setOpenSubmitReviewDialog(false);
               }}
+              sessionInfo={sessionInfo}
             />
           )}
 
