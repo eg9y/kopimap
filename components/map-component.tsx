@@ -3,7 +3,7 @@ import type {
   LngLat,
 } from "maplibre-gl";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
-import { GeolocateControl, Map as Mapgl, Popup } from "react-map-gl/maplibre";
+import { GeolocateControl, Map as Mapgl } from "react-map-gl/maplibre";
 import useMedia from "react-use/esm/useMedia";
 import { darkMapStyle, mapStyle } from "../config";
 import { useMapCafes } from "../hooks/use-map-cafes";
@@ -27,8 +27,8 @@ export default function MapComponent({}: MapComponentProps) {
   const { theme } = useTheme();
 
   const [viewport, setViewport] = useState({
-    latitude: -6.274163,
-    longitude: 106.789514505,
+    latitude: mapCenter.lat,
+    longitude: mapCenter.long,
     zoom: 14,
   });
 
