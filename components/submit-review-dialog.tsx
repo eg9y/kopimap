@@ -1,7 +1,7 @@
 // SubmitReviewDialog.tsx
 
 import { LoaderCircle, XIcon } from "lucide-react";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { Controller, FieldValues, useForm } from "react-hook-form";
 import { Rating } from "react-simple-star-rating";
 import { toast } from "sonner";
@@ -21,7 +21,7 @@ import {
   DialogTitle,
 } from "./catalyst/dialog";
 import { Field, Label } from "./catalyst/fieldset";
-import { ImageUpload, ImageUploadRef } from "./image-upload";
+import { ExtendedMetadata, ImageUpload, useImageUpload } from "./image-upload";
 import { Database } from "./lib/database.types";
 import { reviewAttributes } from "./lib/review-attributes";
 import { cn } from "./lib/utils";
@@ -29,10 +29,12 @@ import StatusBar from "@uppy/react/lib/StatusBar";
 
 import "@uppy/core/dist/style.min.css";
 import "@uppy/status-bar/dist/style.min.css";
+import { Uppy } from "@uppy/core";
+import XHRUpload from "@uppy/xhr-upload";
 
 const CUSTOM_ITEM_LABELS = ["Bad", "Poor", "Average", "Great", "Excellent"];
 
-type ReviewInsert = Database["public"]["Tables"]["reviews"]["Insert"];
+type ReviewInsert = any;
 
 const supabase = createClient<Database>(
   import.meta.env.VITE_SUPABASE_URL!,
@@ -63,9 +65,31 @@ export function SubmitReviewDialog({
   const [existingImageUrls, setExistingImageUrls] = useState<string[]>([]);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const imageUploadRef = useRef<ImageUploadRef>(null);
-  const [sessionInfo, setSessionInfo] = useState<Session | null>(null);
   const [showErrorMessage, setShowErrorMessage] = useState(false);
+  const [sessionInfo, setSessionInfo] = useState<Session | null>(null);
+  const [uppy] = useState(() =>
+    new Uppy<ExtendedMetadata>({
+      id: "imageUploader",
+      autoProceed: false,
+      restrictions: {
+        maxNumberOfFiles: 4,
+        allowedFileTypes: ["image/*"],
+      },
+      meta: {
+        placeId: cafeDetailedInfo?.place_id!,
+      },
+    }).use(XHRUpload, {
+      endpoint: `${import.meta.env.VITE_MEILISEARCH_URL}/api/upload-image`,
+      headers: {
+        authorization: `Bearer ${sessionInfo?.access_token}`,
+      },
+      fieldName: "file",
+      formData: true,
+      allowedMetaFields: ["placeId", "reviewId", "label", "classification"],
+      limit: 1,
+    })
+  );
+  const { startUpload, getSelectedFiles } = useImageUpload(uppy!);
 
   useEffect(() => {
     (async () => {
@@ -79,11 +103,9 @@ export function SubmitReviewDialog({
   useEffect(() => {
     if (userReview) {
       setIsUpdating(true);
-      // Pre-fill the form with existing review data
       Object.entries(userReview).forEach(([key, value]) => {
         setValue(key, value);
       });
-      // Set existing images if any
       if (userReview.image_urls) {
         setExistingImageUrls(userReview.image_urls);
       }
@@ -95,11 +117,15 @@ export function SubmitReviewDialog({
     setSelectedFiles([]);
   }, [userReview, setValue, reset]);
 
-  const handleFilesSelected = (files: any[]) => {
-    setSelectedFiles(files);
+  const handleClose = () => {
+    setIsOpen(false);
+    reset();
+    setSelectedFiles([]);
+    setExistingImageUrls([]);
   };
 
-  const onSuccess = () => {
+  const handleUploadComplete = () => {
+    setIsUploading(false);
     toast.success(
       isUpdating
         ? LL.submitReview.reviewUpdated()
@@ -111,10 +137,11 @@ export function SubmitReviewDialog({
         position: "top-right",
       }
     );
-    setIsOpen(false);
-    reset();
-    setSelectedFiles([]);
-    setExistingImageUrls([]);
+    handleClose();
+  };
+
+  const onSuccess = () => {
+    handleClose();
   };
 
   const { mutateAsync } = useSubmitReview(
@@ -123,87 +150,48 @@ export function SubmitReviewDialog({
     loggedInUser ? loggedInUser.id : null
   );
 
-  const onSubmit = async (data: FieldValues) => {
-    if (!loggedInUser || !cafeDetailedInfo) {
-      toast.warning(LL.submitReview.unableToSubmit(), {
-        description: LL.submitReview.ensureLoginAndCafe(),
-        position: "top-right",
-      });
-      return;
-    }
-
-    setIsUploading(true);
-
-    const payload = { ...data };
-
-    const finalPayload = {
-      ...payload,
-    };
-
-    delete finalPayload.image_urls;
-
-    const reviewData: ReviewInsert = {
-      ...finalPayload,
-      cafe_place_id: cafeDetailedInfo.place_id,
-      user_id: loggedInUser.id,
-      rating:
-        typeof finalPayload.rating === "number"
-          ? finalPayload.rating
-          : parseFloat(finalPayload.rating),
-    };
-
-    try {
-      // Submit the review and get the reviewId
-      const { id: reviewId } = await mutateAsync(reviewData);
-
-      // Upload images with the reviewId
-      if (selectedFiles.length > 0 && imageUploadRef.current) {
-        try {
-          await imageUploadRef.current.triggerUpload(reviewId);
-        } catch (error) {
-          console.error("Error uploading images:", error);
-          toast.error(LL.submitReview.imageUploadError());
-          setIsUploading(false);
-          return;
-        }
+  const onSubmit = useCallback(
+    async (data: FieldValues) => {
+      if (!loggedInUser || !cafeDetailedInfo || !sessionInfo) {
+        toast.warning(LL.submitReview.unableToSubmit(), {
+          description: LL.submitReview.ensureLoginAndCafe(),
+          position: "top-right",
+        });
+        return;
       }
 
-      setIsUploading(false);
+      const reviewData: ReviewInsert = {
+        ...data,
+        cafe_place_id: cafeDetailedInfo.place_id,
+        user_id: loggedInUser.id,
+        rating:
+          typeof data.rating === "number" ? data.rating : parseFloat(data.rating),
+      };
 
-      // Success toast and reset form
-      toast.success(
-        isUpdating
-          ? LL.submitReview.reviewUpdated()
-          : LL.submitReview.reviewSubmitted(),
-        {
-          description: isUpdating
-            ? LL.submitReview.updateSuccess()
-            : LL.submitReview.submitSuccess(),
-          position: "top-right",
+      try {
+        delete reviewData.image_urls;
+        const { id: reviewId } = await mutateAsync(reviewData);
+
+        const selectedFiles = getSelectedFiles();
+        if (selectedFiles.length > 0) {
+          setIsUploading(true);
+          const result = await startUpload(reviewId);
+          if (result?.successful) {
+            handleUploadComplete();
+          }
+        } else {
+          handleUploadComplete();
         }
-      );
-      setIsOpen(false);
-      reset();
-      setSelectedFiles([]);
-      setExistingImageUrls([]);
-    } catch (error: any) {
-      console.error("Error submitting review:", error);
-      toast.error(
-        `There was an error submitting your review: ${error.message}. Please try again.`
-      );
-      setIsUploading(false);
-    }
-  };
-
-  const handleClose = () => {
-    setIsOpen(false);
-    reset();
-    setSelectedFiles([]);
-    setExistingImageUrls([]);
-    if (imageUploadRef.current) {
-      imageUploadRef.current?.uppy.clear();
-    }
-  };
+      } catch (error: any) {
+        console.error("Error submitting review:", error);
+        toast.error(
+          `There was an error submitting your review: ${error.message}`
+        );
+        setIsUploading(false);
+      }
+    },
+    [mutateAsync, startUpload, getSelectedFiles]
+  );
 
   if (loadingUser) {
     return (
@@ -265,10 +253,7 @@ export function SubmitReviewDialog({
           ? LL.submitReview.modifyingExisting()
           : LL.submitReview.fillOptions()}
       </DialogDescription>
-      <form
-        onSubmit={handleSubmit(onSubmit, () => setShowErrorMessage(true))}
-        className="grow"
-      >
+      <form onSubmit={handleSubmit(onSubmit, () => setShowErrorMessage(true))}>
         <DialogBody className="flex flex-col gap-2 h-[60vh] overflow-scroll">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {/* Overall Rating */}
@@ -367,10 +352,11 @@ export function SubmitReviewDialog({
               </p>
               {sessionInfo && cafeDetailedInfo && (
                 <ImageUpload
-                  ref={imageUploadRef}
-                  onFilesSelected={handleFilesSelected}
                   sessionInfo={sessionInfo}
                   placeId={cafeDetailedInfo.place_id!}
+                  onUploadStart={() => setIsUploading(true)}
+                  onUploadComplete={handleUploadComplete}
+                  uppy={uppy}
                 />
               )}
               {/* Existing images display (if any) */}
@@ -493,18 +479,6 @@ export function SubmitReviewDialog({
           )}
         </DialogBody>
         <DialogActions>
-          {/* Uppy StatusBar */}
-          {imageUploadRef.current?.uppy && (
-            <StatusBar
-              uppy={imageUploadRef.current?.uppy}
-              hideAfterFinish={false}
-              showProgressDetails={true}
-              hideUploadButton={true}
-              hideRetryButton={false}
-              hidePauseResumeButton={false}
-              hideCancelButton={false}
-            />
-          )}
           <Button plain onClick={handleClose} className="dark:text-gray-300">
             {LL.submitReview.cancel()}
           </Button>
