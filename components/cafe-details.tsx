@@ -313,7 +313,9 @@ export default function CafeDetails({
             <Heading className="mb-2 text-xl text-black dark:text-white">
               {LL.ratingsBreakdown()}
             </Heading>
-            <AggregatedReviews cafeDetailedInfo={cafeDetailedInfo} />
+            <AggregatedReviews
+              aggregatedReview={reviewData?.aggregatedReview}
+            />
           </div>
 
           {/* Individual Reviews */}
@@ -518,28 +520,3 @@ const CustomCarousel: React.FC<CustomCarouselProps> = ({ images }) => {
     </div>
   );
 };
-
-// Utility function to generate the resized image URL
-function generateResizedImageUrl(
-  originalUrl: string,
-  sizeSuffix: string
-): string {
-  const lastSlashIndex = originalUrl.lastIndexOf("/");
-  const path = originalUrl.substring(0, lastSlashIndex + 1);
-  const filename = originalUrl.substring(lastSlashIndex + 1);
-
-  const dotIndex = filename.lastIndexOf(".");
-  if (dotIndex === -1) {
-    // No extension, cannot generate resized URL
-    return originalUrl;
-  }
-
-  const name = filename.substring(0, dotIndex);
-  const extension = filename.substring(dotIndex);
-
-  const resizedFilename = `${name}_${sizeSuffix}${extension}`;
-
-  const resizedUrl = `${path}${resizedFilename}`;
-
-  return resizedUrl;
-}

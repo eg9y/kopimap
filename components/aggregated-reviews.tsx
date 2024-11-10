@@ -1,18 +1,20 @@
 import { useI18nContext } from "@/src/i18n/i18n-react";
 import { MinusIcon } from "lucide-react";
-import type { CafeDetailedInfo } from "../types";
+import type { aggregatedReview } from "../types";
 import { Badge } from "./catalyst/badge";
 import { reviewAttributes } from "./lib/review-attributes";
 import { cn } from "./lib/utils";
 
 interface AggregatedReviewsProps {
-  cafeDetailedInfo: CafeDetailedInfo | null;
+  aggregatedReview: aggregatedReview | null;
 }
 
-export const AggregatedReviews: React.FC<AggregatedReviewsProps> = ({ cafeDetailedInfo }) => {
+export const AggregatedReviews: React.FC<AggregatedReviewsProps> = ({
+  aggregatedReview,
+}) => {
   const { LL } = useI18nContext();
 
-  if (!cafeDetailedInfo) return null;
+  if (!aggregatedReview) return null;
 
   return (
     <div className="grid grid-cols-2 gap-2">
@@ -28,7 +30,9 @@ export const AggregatedReviews: React.FC<AggregatedReviewsProps> = ({ cafeDetail
             category.color === "yellow" && "bg-yellow-100",
             category.color === "fuchsia" && "bg-fuchsia-100",
             category.color === "lime" && "bg-lime-100",
-            index === reviewAttributes.length - 1 && reviewAttributes.length % 2 !== 0 && "col-span-2"
+            index === reviewAttributes.length - 1 &&
+              reviewAttributes.length % 2 !== 0 &&
+              "col-span-2"
           )}
         >
           {/* Rest of the component remains the same */}
@@ -41,15 +45,16 @@ export const AggregatedReviews: React.FC<AggregatedReviewsProps> = ({ cafeDetail
               category.color === "purple" && "text-purple-800",
               category.color === "yellow" && "text-yellow-800",
               category.color === "fuchsia" && "text-fuchsia-800",
-              category.color === "lime" && "text-lime-800",
+              category.color === "lime" && "text-lime-800"
             )}
           >
             {LL.categories[category.category as keyof typeof LL.categories]()}
           </p>
           <div className="flex flex-col gap-2">
             {category.attributes.map((attr) => {
-              const modeKey = `${attr.name.toLowerCase()}_mode` as keyof CafeDetailedInfo;
-              const value = cafeDetailedInfo[modeKey] as string;
+              const modeKey =
+                `${attr.name.toLowerCase()}_mode` as keyof aggregatedReview;
+              const value = aggregatedReview[modeKey] as string;
               const attrName = attr.name as keyof typeof LL.attributes;
 
               let translation = value;
@@ -63,11 +68,11 @@ export const AggregatedReviews: React.FC<AggregatedReviewsProps> = ({ cafeDetail
                   () => string
                 >;
                 Object.entries(options).forEach(([key, translationFn]) => {
-                  if (modeKey === 'has_musholla_mode') {
+                  if (modeKey === "has_musholla_mode") {
                     if (key.toLowerCase() === "yes" && !!value) {
-                      translation = "Yes"
+                      translation = "Yes";
                     } else if (key.toLowerCase() === "no" && !value) {
-                      translation = "No"
+                      translation = "No";
                     }
                   } else if (key.toLowerCase() === value.toLowerCase()) {
                     translation = translationFn();
@@ -89,7 +94,7 @@ export const AggregatedReviews: React.FC<AggregatedReviewsProps> = ({ cafeDetail
                             category.color === "purple" && "text-purple-500",
                             category.color === "yellow" && "text-yellow-500",
                             category.color === "fuchsia" && "text-fuchsia-500",
-                            category.color === "lime" && "text-lime-500",
+                            category.color === "lime" && "text-lime-500"
                           )}
                         />
                       )}
@@ -102,10 +107,12 @@ export const AggregatedReviews: React.FC<AggregatedReviewsProps> = ({ cafeDetail
                           category.color === "purple" && "text-purple-500",
                           category.color === "yellow" && "text-yellow-500",
                           category.color === "fuchsia" && "text-fuchsia-500",
-                          category.color === "lime" && "text-lime-500",
+                          category.color === "lime" && "text-lime-500"
                         )}
                       >
-                        {LL.attributes[attr.name as keyof typeof LL.attributes].name()}
+                        {LL.attributes[
+                          attr.name as keyof typeof LL.attributes
+                        ].name()}
                       </p>
                     </div>
                     <div className="pl-0 flex items-center gap-1 flex-wrap">

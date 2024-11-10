@@ -102,7 +102,6 @@ export default function MapComponent({}: MapComponentProps) {
         if (center.lat < -90 || center.lat > 90) {
           return;
         }
-        console.log("geolocate", center.lat, center.lng);
         setMapCenter({ lat: center.lat, long: center.lng });
         setViewport((prev) => ({
           ...prev,
@@ -138,7 +137,6 @@ export default function MapComponent({}: MapComponentProps) {
       }}
       onLoad={(evt) => {
         const center = evt.target.getCenter();
-        console.log(center.lat, center.lng);
         if (center.lat < -90 || center.lat > 90) {
           return;
         }

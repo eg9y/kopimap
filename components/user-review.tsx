@@ -125,7 +125,6 @@ export const UserReview: React.FC<UserReviewProps> = ({
     label: string;
     classification: string;
   }) => {
-    console.log(image);
     const imagePath = image.url.split("/storage/v1/object/public/")[1];
     if (!imagePath) return image.url;
 
