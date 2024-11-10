@@ -1,7 +1,7 @@
 // SubmitReviewDialog.tsx
 
 import { LoaderCircle, XIcon } from "lucide-react";
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Controller, FieldValues, useForm } from "react-hook-form";
 import { Rating } from "react-simple-star-rating";
 import { toast } from "sonner";
@@ -165,7 +165,9 @@ export function SubmitReviewDialog({
         cafe_place_id: cafeDetailedInfo.place_id,
         user_id: loggedInUser.id,
         rating:
-          typeof data.rating === "number" ? data.rating : parseFloat(data.rating),
+          typeof data.rating === "number"
+            ? data.rating
+            : parseFloat(data.rating),
       };
 
       try {

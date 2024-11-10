@@ -35,7 +35,11 @@ interface UserReviewProps {
   rating: number;
   reviewText?: string;
   createdAt: string;
-  imageUrls?: string[];
+  imageUrls?: {
+    url: string;
+    label: string;
+    classification: string;
+  }[];
   showCafeInfo?: boolean;
   metadata: ReviewMetadata;
   cafeGmapsRating?: string;
@@ -116,9 +120,14 @@ export const UserReview: React.FC<UserReviewProps> = ({
     },
   ];
 
-  const transformImageUrl = (url: string) => {
-    const imagePath = url.split("/storage/v1/object/public/")[1];
-    if (!imagePath) return url;
+  const transformImageUrl = (image: {
+    url: string;
+    label: string;
+    classification: string;
+  }) => {
+    console.log(image);
+    const imagePath = image.url.split("/storage/v1/object/public/")[1];
+    if (!imagePath) return image.url;
 
     return `https://kopimap-cdn.b-cdn.net/${imagePath}?width=346&sharpen=true`;
   };
@@ -201,10 +210,10 @@ export const UserReview: React.FC<UserReviewProps> = ({
       <div className="grow flex flex-col justify-end mt-2">
         {imageUrls && imageUrls.length > 0 && (
           <div className="grid grid-cols-2 gap-2 mt-2 ">
-            {imageUrls.map((url, index) => (
+            {imageUrls.map((image, index) => (
               <img
                 key={index}
-                src={transformImageUrl(url)}
+                src={transformImageUrl(image)}
                 alt={`Review image ${index + 1}`}
                 className="object-contain"
               />
