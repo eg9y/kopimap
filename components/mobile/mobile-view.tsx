@@ -65,6 +65,7 @@ export default function MobileView({
   const { loggedInUser } = useUser();
   const { height } = useWindowSize();
   const [sessionInfo, setSessionInfo] = useState<Session | null>(null);
+  const listContainerRef = useRef<HTMLDivElement>(null);
 
   const { data: userReview } = useUserReview(
     loggedInUser ? loggedInUser.id : null,
@@ -87,6 +88,9 @@ export default function MobileView({
   useDebounce(
     () => {
       setDebouncedSearchTerm(searchInput);
+      if (listContainerRef.current) {
+        listContainerRef.current.scrollTo({ top: 0, behavior: "smooth" });
+      }
     },
     300,
     [searchInput]
@@ -245,10 +249,11 @@ export default function MobileView({
           )}
           {!selectedCafe && (
             <MobileCafeList
-              searchInput={searchInput}
+              searchInput={debouncedSearchTerm}
               setIsOpen={setIsListDialogOpen}
               isOpen={isListDialogOpen}
               inputRef={inputRef}
+              containerRef={listContainerRef}
             />
           )}
           {openSubmitReviewDialog && cafeDetailedInfo && sessionInfo && (

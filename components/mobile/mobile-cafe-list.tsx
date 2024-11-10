@@ -38,6 +38,7 @@ interface CafeListProps {
   setIsOpen: (x: boolean) => void;
   isOpen: boolean;
   inputRef: RefObject<HTMLInputElement>;
+  containerRef?: RefObject<HTMLDivElement>;
 }
 
 const attributeMapping = {
@@ -382,6 +383,7 @@ export const MobileCafeList: React.FC<CafeListProps> = ({
   setIsOpen,
   isOpen,
   inputRef,
+  containerRef,
 }) => {
   // Update the useStore hook to include proper types
   const { selectCafe, mapRef, mapCenter, searchFilters, setSearchFilters } =
@@ -394,7 +396,8 @@ export const MobileCafeList: React.FC<CafeListProps> = ({
     }));
 
   const isWide = useMedia("(min-width: 640px)");
-  const parentRef = useRef<HTMLDivElement>(null);
+  const localParentRef = useRef<HTMLDivElement>(null);
+  const parentRef = containerRef || localParentRef;
 
   const {
     data,
