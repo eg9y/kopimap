@@ -11,10 +11,10 @@ import "@smastrom/react-rating/style.css";
 
 import type { MeiliSearchCafe } from "@/types";
 import { useStore } from "../store";
+import MobileView from "./mobile/mobile-view";
 
 // Lazy load components
 const DesktopView = lazy(() => import("./desktop-view"));
-const MobileView = lazy(() => import("./mobile/mobile-view"));
 
 export const App = () => {
   const { openFilters, selectCafe, selectedCafe, setOpenFilters } = useStore();

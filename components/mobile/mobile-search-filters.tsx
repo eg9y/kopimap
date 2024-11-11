@@ -5,7 +5,7 @@ import {
   HeartIcon,
   BriefcaseIcon,
   UsersIcon,
-  MoonIcon
+  MoonIcon,
 } from "lucide-react";
 import { useStore } from "../../store";
 import {
@@ -111,7 +111,7 @@ export const MobileSearchFilters: React.FC = () => {
   };
 
   return (
-    <div className="flex-grow overflow-x-auto scrollbar-hide">
+    <div className="flex-grow overflow-x-auto scrollbar-hide touch-pan-x">
       <div className="flex space-x-3">
         {/* Rating filter */}
         <Dropdown>

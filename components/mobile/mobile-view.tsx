@@ -36,6 +36,15 @@ const CafeDetailsLoader = () => (
   </div>
 );
 
+const MapLoader = () => (
+  <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800 transition-opacity duration-300">
+    <div className="flex flex-col items-center space-y-4">
+      <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+      <p className="text-gray-600 dark:text-gray-300">Loading map...</p>
+    </div>
+  </div>
+);
+
 const supabase = createClient<Database>(
   import.meta.env.VITE_SUPABASE_URL!,
   import.meta.env.VITE_SUPABASE_ANON_KEY!
@@ -155,6 +164,7 @@ export default function MobileView({
   return (
     <div className="flex flex-col overflow-hidden h-full">
       <div className="flex-grow relative">
+        {!pmTilesReady && <MapLoader />}
         {pmTilesReady && <MapComponent />}
         {selectedCafe && !openSubmitReviewDialog && (
           <>
