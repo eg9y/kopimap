@@ -184,39 +184,7 @@ export function MobileSubmitReview({
   }
 
   if (!loggedInUser) {
-    return (
-      <div className="pointer-events-auto z-[10000] dark:bg-slate-800 mx-2 p-4 flex flex-col items-center rounded-xl bg-white shadow-xl top-[40%] absolute inset-x-0 max-w-md">
-        <h2 className="text-xl font-bold mb-2">
-          {LL.submitReview.createReview()}
-        </h2>
-        <p className="mb-4">{LL.submitReview.pleaseLogin()}</p>
-        <div className="flex gap-2">
-          <Button
-            onClick={async () => {
-              await supabase.auth.signInWithOAuth({
-                provider: "google",
-                options: {
-                  redirectTo: import.meta.env.VITE_URL,
-                },
-              });
-            }}
-            color="green"
-            className="cursor-pointer"
-          >
-            {LL.submitReview.login()}
-          </Button>
-          <Button
-            onClick={async () => {
-              setOpenSubmitReviewDialog(false);
-            }}
-            plain
-            className="cursor-pointer"
-          >
-            Cancel
-          </Button>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   return (

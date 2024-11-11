@@ -430,7 +430,7 @@ const CustomCarousel: React.FC<CustomCarouselProps> = ({ images }) => {
     <div className="relative">
       <div
         ref={scrollContainerRef}
-        className="flex overflow-x-auto scrollbar-hide snap-x snap-mandatory touch-pan-x"
+        className="flex overflow-x-auto scrollbar-hide snap-x snap-mandatory"
         style={{
           scrollSnapType: "x mandatory",
           height: `${containerHeight}px`,

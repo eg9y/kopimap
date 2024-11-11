@@ -21,11 +21,6 @@ export default defineConfig({
 				description:
 					"Jelajahi cafe terdekat di Jakarta dengan Kopimap. Temukan tempat sempurna untuk ngopi, kerja, atau bersantai dengan peta interaktif dan ulasan detail kami.",
 				theme_color: "#000",
-				background_color: "#ffffff",
-				display: "standalone",
-				scope: "/",
-				start_url: "/",
-				orientation: "portrait",
 				icons: [
 					{
 						src: "https://map-assets.kopimap.com/favicon/android-icon-192x192.png",
@@ -36,13 +31,10 @@ export default defineConfig({
 						src: "https://map-assets.kopimap.com/favicon/android-icon-192x192.png",
 						sizes: "512x512",
 						type: "image/png",
-						purpose: "any maskable",
 					},
 				],
 			},
 			workbox: {
-				maximumFileSizeToCacheInBytes: 4 * 1024 * 1024, // 4MB
-				globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
 				runtimeCaching: [
 					{
 						urlPattern: /^https:\/\/worker\.kopimap\.com\/jakarta\/.*/i,
@@ -84,10 +76,6 @@ export default defineConfig({
 						},
 					},
 				],
-			},
-			devOptions: {
-				enabled: true,
-				type: "module",
 			},
 		}),
 	],
