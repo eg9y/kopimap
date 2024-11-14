@@ -8,6 +8,7 @@ import React, {
 } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { useImage } from "react-image";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/popover";
 
 import { CafeDetailedInfo } from "@/types";
 import {
@@ -22,6 +23,8 @@ import {
   PlusIcon,
   StarIcon,
   XIcon,
+  ListChecksIcon,
+  InfoIcon,
 } from "lucide-react";
 import { siInstagram } from "simple-icons";
 import { useCafeAggregatedReview } from "../hooks/use-cafe-aggregated-review";
@@ -86,6 +89,44 @@ const responsive = {
     breakpoint: { max: 464, min: 0 },
     items: 1,
   },
+};
+
+const parseReviewSummaries = (summariesString: string): string[] => {
+  try {
+    return JSON.parse(summariesString);
+  } catch {
+    return [];
+  }
+};
+
+const ReviewSummaries = ({ summaries }: { summaries: string[] }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  if (summaries.length === 0) return null;
+
+  const displayedSummaries = isExpanded ? summaries : summaries.slice(0, 2);
+
+  return (
+    <div className="space-y-2">
+      {displayedSummaries.map((summary, index) => (
+        <p
+          key={index}
+          className="text-xs dark:text-slate-300 p-2 bg-gray-100 dark:bg-slate-800 rounded-md"
+        >
+          {summary}
+        </p>
+      ))}
+      {summaries.length > 2 && (
+        <Button
+          plain
+          className="text-xs w-full"
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          {isExpanded ? "Show Less" : `Show ${summaries.length - 2} More`}
+        </Button>
+      )}
+    </div>
+  );
 };
 
 export default function CafeDetails({
@@ -242,6 +283,31 @@ export default function CafeDetails({
                 </div>
               )}
             </div>
+            {cafeDetailedInfo.parsedReviewSummaries.length > 0 && (
+              <div className="flex flex-col gap-1 col-span-2">
+                <div className="flex justify-between">
+                  <p
+                    className="text-sm text-slate-500 dark:text-slate-300 flex items-center gap-1 cursor-help"
+                    title="Ringkasan ulasan dibuat menggunakan AI berdasarkan ulasan-ulasan di Google Maps dan KopiMap"
+                  >
+                    <ListChecksIcon className="size-4" />
+                    Ringkasan Ulasan
+                  </p>
+                  <Popover>
+                    <PopoverTrigger>
+                      <InfoIcon className="size-4" />
+                    </PopoverTrigger>
+                    <PopoverContent>
+                      Ringkasan ulasan dibuat menggunakan AI berdasarkan
+                      ulasan-ulasan di Google Maps dan KopiMap
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                <ReviewSummaries
+                  summaries={cafeDetailedInfo.parsedReviewSummaries}
+                />
+              </div>
+            )}
           </div>
 
           {/* Image and User Reviews Grid */}
