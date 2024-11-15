@@ -79,20 +79,20 @@ export function NavbarContainer({ children }: { children: React.ReactNode }) {
               href="https://www.instagram.com/kopimap/"
               target="_blank"
             >
-              <svg viewBox="0 0 24 24" className="w-4 h-4 fill-pink-600 dark:fill-pink-400">
+              <svg
+                viewBox="0 0 24 24"
+                className="w-4 h-4 fill-pink-600 dark:fill-pink-400"
+              >
                 <path d={siInstagram.path} />
               </svg>
             </NavbarItem>
-            <NavbarItem
-              href="https://www.tiktok.com/@kopimap"
-              target="_blank"
-            >
-              <svg viewBox="0 0 24 24" className="w-4 h-4 fill-black dark:fill-white">
+            <NavbarItem href="https://www.tiktok.com/@kopimap" target="_blank">
+              <svg
+                viewBox="0 0 24 24"
+                className="w-4 h-4 fill-black dark:fill-white"
+              >
                 <path d={siTiktok.path} />
               </svg>
-            </NavbarItem>
-            <NavbarItem href="https://www.nihbuatjajan.com/egan">
-              Donasi
             </NavbarItem>
 
             <Dropdown>

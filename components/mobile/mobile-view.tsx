@@ -67,6 +67,8 @@ export default function MobileView({
     setIsListDialogOpen,
     openSubmitReviewDialog,
     setOpenSubmitReviewDialog,
+    selectedImageModalIndex,
+    setSelectedImageModalIndex,
   } = useStore();
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [snapPoint, setSnapPoint] = useState(0);
@@ -158,9 +160,14 @@ export default function MobileView({
   }, []);
 
   const handleBackToList = useCallback(() => {
+    if (selectedImageModalIndex !== null) {
+      setSelectedImageModalIndex(null);
+      return;
+    }
+
     selectCafe(null);
     setIsListDialogOpen(true);
-  }, [selectCafe, setIsListDialogOpen]);
+  }, [selectCafe, setIsListDialogOpen, selectedImageModalIndex]);
 
   return (
     <div className="flex flex-col overflow-hidden h-full">

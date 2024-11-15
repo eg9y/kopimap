@@ -72,33 +72,6 @@ const ImageLoader = () => (
   </div>
 );
 
-const responsive = {
-  superLargeDesktop: {
-    breakpoint: { max: 4000, min: 3000 },
-    items: 5,
-  },
-  desktop: {
-    breakpoint: { max: 3000, min: 1024 },
-    items: 1,
-  },
-  tablet: {
-    breakpoint: { max: 1024, min: 464 },
-    items: 2,
-  },
-  mobile: {
-    breakpoint: { max: 464, min: 0 },
-    items: 1,
-  },
-};
-
-const parseReviewSummaries = (summariesString: string): string[] => {
-  try {
-    return JSON.parse(summariesString);
-  } catch {
-    return [];
-  }
-};
-
 const ReviewSummaries = ({ summaries }: { summaries: string[] }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -431,9 +404,7 @@ interface CustomCarouselProps {
 }
 
 const CustomCarousel: React.FC<CustomCarouselProps> = ({ images }) => {
-  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(
-    null
-  );
+  const { selectedImageModalIndex, setSelectedImageModalIndex } = useStore();
   const [imageDimensions, setImageDimensions] = useState<
     { width: number; height: number }[]
   >([]);
@@ -459,21 +430,38 @@ const CustomCarousel: React.FC<CustomCarouselProps> = ({ images }) => {
     loadImageDimensions();
   }, [images]);
 
+  useEffect(() => {
+    if (selectedImageModalIndex === null) return;
+
+    // Preload previous and next images
+    const preloadImage = (url: string) => {
+      const img = new Image();
+      img.src = `${url}?width=1024&sharpen=true`; // Increased width for better quality
+    };
+
+    const prevIndex =
+      (selectedImageModalIndex - 1 + images.length) % images.length;
+    const nextIndex = (selectedImageModalIndex + 1) % images.length;
+
+    preloadImage(images[prevIndex].url);
+    preloadImage(images[nextIndex].url);
+  }, [selectedImageModalIndex, images]);
+
   const openModal = (index: number) => {
-    setSelectedImageIndex(index);
+    setSelectedImageModalIndex(index);
   };
 
   const closeModal = () => {
-    setSelectedImageIndex(null);
+    setSelectedImageModalIndex(null);
   };
 
   const navigateImage = (direction: "prev" | "next") => {
-    if (selectedImageIndex === null) return;
+    if (selectedImageModalIndex === null) return;
     const newIndex =
       direction === "prev"
-        ? (selectedImageIndex - 1 + images.length) % images.length
-        : (selectedImageIndex + 1) % images.length;
-    setSelectedImageIndex(newIndex);
+        ? (selectedImageModalIndex - 1 + images.length) % images.length
+        : (selectedImageModalIndex + 1) % images.length;
+    setSelectedImageModalIndex(newIndex);
   };
 
   const scrollCarousel = useCallback((direction: "left" | "right") => {
@@ -544,17 +532,18 @@ const CustomCarousel: React.FC<CustomCarouselProps> = ({ images }) => {
         <ChevronRightIcon size={24} />
       </button>
 
-      {selectedImageIndex !== null && (
+      {selectedImageModalIndex !== null && (
         <div
           className="fixed top-0 left-0 z-[1000] w-full h-full bg-black bg-opacity-75 flex items-center justify-center"
           onClick={closeModal}
         >
           <div className="w-[90vw] h-[90vh] max-w-4xl max-h-[80vh] relative bg-black flex items-center justify-center">
             <img
-              src={`${images[selectedImageIndex].url}?width=346&sharpen=true`}
+              src={`${images[selectedImageModalIndex].url}?width=1024&sharpen=true`}
               alt="Expanded view"
               className="max-w-full max-h-full object-contain"
               onClick={(e) => e.stopPropagation()}
+              loading="eager"
             />
             <button
               className="absolute top-4 right-4 text-white bg-black bg-opacity-50 rounded-full p-2"
