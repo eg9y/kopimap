@@ -182,7 +182,7 @@ export default function MobileView({
               onClose={handleSheetClose}
               detent="full-height"
               snapPoints={[height - 80 - 56, 200]}
-              initialSnap={1}
+              initialSnap={0}
               onSnap={handleSnap}
               className="!bottom-[56px]"
             >
@@ -215,13 +215,16 @@ export default function MobileView({
               </Sheet.Container>
               <Sheet.Backdrop />
             </Sheet>
-            <button
-              onClick={handleBackToList}
-              className="fixed left-4 bottom-[68px] z-[10000000] p-3 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-full shadow-lg"
-              aria-label="Back to list"
-            >
-              <ArrowLeftIcon className="h-6 w-6 text-gray-600 dark:text-gray-300" />
-            </button>
+            <div className="fixed left-0 right-0 bottom-20 z-[10000000] flex justify-center">
+              <button
+                onClick={handleBackToList}
+                className="px-4 py-2 border drop-shadow-lg border-yellow-500 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-slate-300 rounded-full shadow-md transition-all duration-200 ease-in-out flex items-center justify-center space-x-2 font-bold"
+                aria-label="Back to list"
+              >
+                <ArrowLeftIcon className="h-5 w-5" />
+                <span>Kembali</span>
+              </button>
+            </div>
           </>
         )}
         <div className="absolute top-0 left-0 right-0 bottom-0 z-[1000] p-4 w-full h-[100dvh] flex flex-col pointer-events-none">
@@ -322,7 +325,7 @@ export default function MobileView({
           <div className="absolute bottom-20 left-0 right-0 flex justify-center pointer-events-none">
             <button
               onClick={() => setIsListDialogOpen(!isListDialogOpen)}
-              className="px-4 py-2 z-[1000000] bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-full shadow-md transition-all duration-200 ease-in-out flex items-center justify-center space-x-2 pointer-events-auto"
+              className="px-4 py-2 drop-shadow-lg border border-yellow-500 z-[1000000] bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-slate-300 font-bold rounded-full shadow-md transition-all duration-200 ease-in-out flex items-center justify-center space-x-2 pointer-events-auto"
               aria-label={
                 isListDialogOpen ? "Tutup daftar kafe" : "Buka daftar kafe"
               }
@@ -335,7 +338,7 @@ export default function MobileView({
               ) : (
                 <>
                   <ListIcon className="h-5 w-5" />
-                  <span>Lihat Daftar Kafe</span>
+                  <span>Daftar Kafe</span>
                 </>
               )}
             </button>

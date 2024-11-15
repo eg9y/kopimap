@@ -7,18 +7,19 @@ export const Rate = ({ rating = 0 }: { rating: number }) => {
   const { LL } = useI18nContext();
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-row gap-2 items-center">
       <Rating
         value={rating}
         readOnly
         itemStyles={{
           itemShapes: RoundedStar,
           activeFillColor: "#ffb700",
-          inactiveFillColor: "#fbf1a9",
+          inactiveFillColor: "rgba(171, 140, 5, 0.3)", //make darker
         }}
         halfFillMode="svg"
+        style={{ maxWidth: 100 }}
       />
-      <span className="text-lg font-semibold mt-2">
+      <span className={`text-sm font-semibold`}>
         {rating.toFixed(1)} -{" "}
         {rating === 0
           ? LL.noReviews()

@@ -22,13 +22,13 @@ export const AggregatedReviews: React.FC<AggregatedReviewsProps> = ({
           key={category.category}
           className={cn(
             "flex flex-col rounded-md p-2 gap-2",
-            category.color === "orange" && "bg-orange-100",
-            category.color === "blue" && "bg-blue-100",
-            category.color === "emerald" && "bg-emerald-100",
-            category.color === "purple" && "bg-purple-100",
-            category.color === "yellow" && "bg-yellow-100",
-            category.color === "fuchsia" && "bg-fuchsia-100",
-            category.color === "lime" && "bg-lime-100",
+            category.color === "orange" && "bg-orange-400/10",
+            category.color === "blue" && "bg-blue-400/10",
+            category.color === "emerald" && "bg-emerald-400/10",
+            category.color === "purple" && "bg-purple-400/10",
+            category.color === "yellow" && "bg-yellow-400/10",
+            category.color === "fuchsia" && "bg-fuchsia-400/10",
+            category.color === "lime" && "bg-lime-400/10",
             index === reviewAttributes.length - 1 &&
               reviewAttributes.length % 2 !== 0 &&
               "col-span-2"
@@ -38,21 +38,20 @@ export const AggregatedReviews: React.FC<AggregatedReviewsProps> = ({
           <p
             className={cn(
               "text-base font-bold letter leading-4 text-nowrap",
-              category.color === "orange" && "text-orange-800",
-              category.color === "blue" && "text-blue-800",
-              category.color === "emerald" && "text-emerald-800",
-              category.color === "purple" && "text-purple-800",
-              category.color === "yellow" && "text-yellow-800",
-              category.color === "fuchsia" && "text-fuchsia-800",
-              category.color === "lime" && "text-lime-800"
+              category.color === "orange" && "text-orange-400",
+              category.color === "blue" && "text-blue-400",
+              category.color === "emerald" && "text-emerald-400",
+              category.color === "purple" && "text-purple-400",
+              category.color === "yellow" && "text-yellow-400",
+              category.color === "fuchsia" && "text-fuchsia-400",
+              category.color === "lime" && "text-lime-400"
             )}
           >
             {LL.categories[category.category as keyof typeof LL.categories]()}
           </p>
           <div className="flex flex-col gap-2">
             {category.attributes.map((attr) => {
-              const modeKey =
-                `${attr.name.toLowerCase()}_mode` as keyof any;
+              const modeKey = `${attr.name.toLowerCase()}_mode` as keyof any;
               const value = aggregatedReview[modeKey] as string;
               const attrName = attr.name as keyof typeof LL.attributes;
 
