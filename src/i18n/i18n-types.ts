@@ -70,7 +70,7 @@ type RootTranslation = {
 	 */
 	loginToReview: string
 	/**
-	 * S​e​a​r​c​h​.​.​.
+	 * S​e​a​r​c​h​ ​K​o​p​i​m​a​p​.​.​.
 	 */
 	searchCafes: string
 	categories: {
@@ -591,7 +591,7 @@ type RootTranslation = {
 		 */
 		reviewTextPlaceholder: string
 		/**
-		 * R​e​v​i​e​w​ ​t​e​x​t​ ​m​u​s​t​ ​b​e​ ​2​8​0​ ​c​h​a​r​a​c​t​e​r​s​ ​o​r​ ​l​e​s​s
+		 * R​e​v​i​e​w​ ​t​e​x​t​ ​m​u​s​t​ ​b​e​ ​5​0​0​ ​c​h​a​r​a​c​t​e​r​s​ ​o​r​ ​l​e​s​s
 		 */
 		reviewTextTooLong: string
 	}
@@ -654,7 +654,7 @@ type RootTranslation = {
 			 */
 			'3': string
 			/**
-			 * U​n​c​o​v​e​r​ ​n​e​a​r​b​y​ ​'​c​a​f​e​ ​t​e​r​d​e​k​a​t​'​ ​f​o​r​ ​s​p​o​n​t​a​n​e​o​u​s​ ​c​o​f​f​e​e​ ​r​u​n​s
+			 * U​n​c​o​v​e​r​ ​n​e​a​r​b​y​ ​c​a​f​e​s​ ​f​o​r​ ​s​p​o​n​t​a​n​e​o​u​s​ ​c​o​f​f​e​e​ ​r​u​n​s
 			 */
 			'4': string
 		}
@@ -733,7 +733,7 @@ export type TranslationFunctions = {
 	 */
 	loginToReview: () => LocalizedString
 	/**
-	 * Search...
+	 * Search Kopimap...
 	 */
 	searchCafes: () => LocalizedString
 	categories: {
@@ -1254,7 +1254,7 @@ export type TranslationFunctions = {
 		 */
 		reviewTextPlaceholder: () => LocalizedString
 		/**
-		 * Review text must be 280 characters or less
+		 * Review text must be 500 characters or less
 		 */
 		reviewTextTooLong: () => LocalizedString
 	}
@@ -1317,7 +1317,7 @@ export type TranslationFunctions = {
 			 */
 			'3': () => LocalizedString
 			/**
-			 * Uncover nearby 'cafe terdekat' for spontaneous coffee runs
+			 * Uncover nearby cafes for spontaneous coffee runs
 			 */
 			'4': () => LocalizedString
 		}

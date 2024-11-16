@@ -18,9 +18,6 @@ interface MapComponentProps {}
 
 export default function MapComponent({}: MapComponentProps) {
   const { setMapRef, mapRef, mapCenter, setMapCenter } = useStore();
-  const [popupInfo, setPopupInfo] = useState<any>(null);
-  const popupTimeoutRef = useRef<number | null>(null);
-  const isHoveringPopupRef = useRef<boolean>(false);
   const geoControlRef = useRef<GeolocateControlType>();
   const clustersRef = useRef<ClustersRef>(null);
   const isWide = useMedia("(min-width: 640px)");
@@ -164,13 +161,11 @@ export default function MapComponent({}: MapComponentProps) {
         }
       }}
       onMouseMove={(e) => clustersRef.current?.onMouseEnter(e)}
-      onMouseLeave={() => clustersRef.current?.onMouseLeave()}
     >
       <Clusters
         ref={clustersRef}
         mapCenter={mapCenter}
         handleFlyTo={handleFlyTo}
-        setPopupInfo={setPopupInfo}
         cafes={mapCafesData?.visibleCafes || []}
       />
 

@@ -253,7 +253,11 @@ export default function MobileView({
               value={searchInput}
               className="w-full py-3 pl-12 pr-10 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 bg-transparent rounded-lg focus:outline-none"
             />
-            <SearchIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-300" />
+            <img
+              src="https://map-assets.kopimap.com/favicon/apple-icon-60x60.png"
+              alt="logo kopimap"
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6"
+            />
             {searchInput && (
               <button
                 onClick={handleClearSearch}

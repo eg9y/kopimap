@@ -14,7 +14,6 @@ import { StarIcon } from "lucide-react";
 import { motion, Variants } from "framer-motion";
 // import useMedia from "react-use/lib/useMedia";
 
-
 import { useStore } from "../store";
 import { MeiliSearchCafe } from "../types";
 import { useTheme } from "../components/theme-provider";
@@ -38,13 +37,11 @@ export interface ClustersRef {
   onClick: (e: maplibregl.MapMouseEvent) => void;
   onClickSingle: (e: maplibregl.MapMouseEvent) => void;
   onMouseEnter: (e: maplibregl.MapMouseEvent) => void;
-  onMouseLeave: () => void;
 }
 
 interface ClustersProps {
   mapCenter: { lat: number; long: number };
   handleFlyTo: (lat: number, lng: number) => void;
-  setPopupInfo: React.Dispatch<React.SetStateAction<any>>;
   cafes: MeiliSearchCafe[] | undefined;
 }
 
@@ -157,9 +154,8 @@ const cafeNameLayer: LayerSpecification = {
   },
 };
 
-
 const Clusters = forwardRef<ClustersRef, ClustersProps>(
-  ({ handleFlyTo, setPopupInfo, cafes }, ref) => {
+  ({ handleFlyTo, cafes }, ref) => {
     const { current: map } = useMap() as { current: MapRef };
     const { selectCafe, selectedCafe } = useStore();
     const [visibleCafes, setVisibleCafes] = useState<MeiliSearchCafe[]>([]);
@@ -275,29 +271,14 @@ const Clusters = forwardRef<ClustersRef, ClustersProps>(
         const features = map.queryRenderedFeatures(event.point, {
           layers: ["unclustered-point"],
         });
-
-        if (features.length > 0) {
-          const feature = features[0];
-          const properties = feature.properties;
-          if (properties) {
-            setPopupInfo({
-              ...properties,
-            });
-          }
-        }
       },
-      [map, setPopupInfo]
+      [map]
     );
-
-    const onMouseLeave = useCallback(() => {
-      setPopupInfo(null);
-    }, [setPopupInfo]);
 
     useImperativeHandle(ref, () => ({
       onClick,
       onClickSingle,
       onMouseEnter,
-      onMouseLeave,
     }));
 
     return (
@@ -314,7 +295,7 @@ const Clusters = forwardRef<ClustersRef, ClustersProps>(
           <Layer {...clusterLayer} />
           <Layer {...clusterCountLayer} />
           <Layer {...unclusteredPointLayer} />
-          <Layer {...getCafeNameLayer(theme === 'dark')} />
+          <Layer {...getCafeNameLayer(theme === "dark")} />
         </Source>
         {selectedCafe && (
           <Marker
