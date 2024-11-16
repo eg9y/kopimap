@@ -170,66 +170,19 @@ export default function MobileView({
   }, [selectCafe, setIsListDialogOpen, selectedImageModalIndex]);
 
   return (
-    <div className="flex flex-col overflow-hidden h-full">
-      <div className="flex-grow relative">
+    <>
+      {/* Map container that covers full screen including safe areas */}
+      <div className="absolute inset-0 bottom-[calc(56px+var(--safe-area-bottom))] z-[1000]">
         {!pmTilesReady && <MapLoader />}
         {pmTilesReady && <MapComponent />}
-        {selectedCafe && !openSubmitReviewDialog && (
-          <>
-            <Sheet
-              ref={sheetRef}
-              isOpen={true}
-              onClose={handleSheetClose}
-              detent="full-height"
-              snapPoints={[height - 80 - 56, 200]}
-              initialSnap={0}
-              onSnap={handleSnap}
-              className="!bottom-[56px]"
-            >
-              <Sheet.Container className="!bg-white dark:!bg-gray-800">
-                <Sheet.Content
-                  className="!bg-white dark:!bg-gray-800"
-                  style={{ paddingBottom: sheetRef.current?.y }}
-                >
-                  {snapPoint === 1 && (
-                    <Suspense fallback={<CafeDetailsLoader />}>
-                      <CafeDetails
-                        cafeDetailedInfo={cafeDetailedInfo}
-                        setOpenSubmitReviewDialog={setOpenSubmitReviewDialog}
-                        userReview={userReview}
-                      />
-                    </Suspense>
-                  )}
-                  {snapPoint === 0 && (
-                    <Sheet.Scroller draggableAt="both">
-                      <Suspense fallback={<CafeDetailsLoader />}>
-                        <CafeDetails
-                          cafeDetailedInfo={cafeDetailedInfo}
-                          setOpenSubmitReviewDialog={setOpenSubmitReviewDialog}
-                          userReview={userReview}
-                        />
-                      </Suspense>
-                    </Sheet.Scroller>
-                  )}
-                </Sheet.Content>
-              </Sheet.Container>
-              <Sheet.Backdrop />
-            </Sheet>
-            <div className="fixed left-0 right-0 bottom-20 z-[10000000] flex justify-center">
-              <button
-                onClick={handleBackToList}
-                className="px-4 py-2 border drop-shadow-lg border-yellow-500 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-slate-300 rounded-full shadow-md transition-all duration-200 ease-in-out flex items-center justify-center space-x-2 font-bold"
-                aria-label="Back to list"
-              >
-                <ArrowLeftIcon className="h-5 w-5" />
-                <span>Kembali</span>
-              </button>
-            </div>
-          </>
-        )}
-        <div className="absolute top-0 left-0 right-0 bottom-0 z-[1000] p-4 w-full h-[100dvh] flex flex-col pointer-events-none">
+      </div>
+
+      {/* UI Layer that respects safe areas */}
+      <div className="absolute inset-0 pt-[var(--safe-area-top)] pb-[calc(56px+var(--safe-area-bottom))] flex flex-col pointer-events-none">
+        {/* Search and filters container */}
+        <div className="px-4 z-[1000]">
           <div
-            className={`relative z-[1000] rounded-lg pointer-events-auto shadow-md transition-all duration-300 ${
+            className={`relative rounded-lg pointer-events-auto shadow-md transition-all duration-300 ${
               isListDialogOpen
                 ? "bg-white dark:bg-gray-800 ring-2 ring-blue-500 dark:ring-blue-400"
                 : "bg-gray-100 dark:bg-gray-700"
@@ -267,11 +220,16 @@ export default function MobileView({
               </button>
             )}
           </div>
+
           {!selectedCafe && !isListDialogOpen && (
             <div className="mt-2 pointer-events-auto rounded-lg overflow-hidden">
               <MobileSearchFilters />
             </div>
           )}
+        </div>
+
+        {/* List and other UI components - enable pointer events */}
+        <div className="flex-1 pointer-events-auto">
           {!selectedCafe && (
             <MobileCafeList
               searchInput={debouncedSearchTerm}
@@ -280,6 +238,62 @@ export default function MobileView({
               inputRef={inputRef}
               containerRef={listContainerRef}
             />
+          )}
+
+          {selectedCafe && !openSubmitReviewDialog && (
+            <>
+              <Sheet
+                ref={sheetRef}
+                isOpen={true}
+                onClose={handleSheetClose}
+                detent="full-height"
+                snapPoints={[height - 80 - 56, 200]}
+                initialSnap={0}
+                onSnap={handleSnap}
+                className="!bottom-[56px] pointer-events-auto"
+              >
+                <Sheet.Container className="!bg-white dark:!bg-gray-800">
+                  <Sheet.Content
+                    className="!bg-white dark:!bg-gray-800"
+                    style={{ paddingBottom: sheetRef.current?.y }}
+                  >
+                    {snapPoint === 1 && (
+                      <Suspense fallback={<CafeDetailsLoader />}>
+                        <CafeDetails
+                          cafeDetailedInfo={cafeDetailedInfo}
+                          setOpenSubmitReviewDialog={setOpenSubmitReviewDialog}
+                          userReview={userReview}
+                        />
+                      </Suspense>
+                    )}
+                    {snapPoint === 0 && (
+                      <Sheet.Scroller draggableAt="both">
+                        <Suspense fallback={<CafeDetailsLoader />}>
+                          <CafeDetails
+                            cafeDetailedInfo={cafeDetailedInfo}
+                            setOpenSubmitReviewDialog={
+                              setOpenSubmitReviewDialog
+                            }
+                            userReview={userReview}
+                          />
+                        </Suspense>
+                      </Sheet.Scroller>
+                    )}
+                  </Sheet.Content>
+                </Sheet.Container>
+                <Sheet.Backdrop />
+              </Sheet>
+              <div className="fixed left-0 right-0 bottom-[calc(76px+var(--safe-area-bottom))] z-[10000000] flex justify-center pointer-events-auto">
+                <button
+                  onClick={handleBackToList}
+                  className="px-4 py-2 border drop-shadow-lg border-yellow-500 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-slate-300 rounded-full shadow-md transition-all duration-200 ease-in-out flex items-center justify-center space-x-2 font-bold"
+                  aria-label="Back to list"
+                >
+                  <ArrowLeftIcon className="h-5 w-5" />
+                  <span>Kembali</span>
+                </button>
+              </div>
+            </>
           )}
           {openSubmitReviewDialog && cafeDetailedInfo && sessionInfo && (
             <MobileSubmitReview
@@ -324,31 +338,31 @@ export default function MobileView({
               </div>
             </div>
           )}
+        </div>
 
-          {/* New floating button for opening/closing the list */}
-          <div className="absolute bottom-20 left-0 right-0 flex justify-center pointer-events-none">
-            <button
-              onClick={() => setIsListDialogOpen(!isListDialogOpen)}
-              className="px-4 py-2 drop-shadow-lg border border-yellow-500 z-[1000000] bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-slate-300 font-bold rounded-full shadow-md transition-all duration-200 ease-in-out flex items-center justify-center space-x-2 pointer-events-auto"
-              aria-label={
-                isListDialogOpen ? "Tutup daftar kafe" : "Buka daftar kafe"
-              }
-            >
-              {isListDialogOpen ? (
-                <>
-                  <XIcon className="h-5 w-5" />
-                  <span>Tutup</span>
-                </>
-              ) : (
-                <>
-                  <ListIcon className="h-5 w-5" />
-                  <span>Daftar Kafe</span>
-                </>
-              )}
-            </button>
-          </div>
+        {/* Floating buttons container */}
+        <div className="absolute bottom-[calc(76px+var(--safe-area-bottom))] left-0 right-0 flex justify-center pointer-events-auto">
+          <button
+            onClick={() => setIsListDialogOpen(!isListDialogOpen)}
+            className="px-4 py-2 drop-shadow-lg border border-yellow-500 z-[1000000] bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-slate-300 font-bold rounded-full shadow-md transition-all duration-200 ease-in-out flex items-center justify-center space-x-2"
+            aria-label={
+              isListDialogOpen ? "Tutup daftar kafe" : "Buka daftar kafe"
+            }
+          >
+            {isListDialogOpen ? (
+              <>
+                <XIcon className="h-5 w-5" />
+                <span>Tutup</span>
+              </>
+            ) : (
+              <>
+                <ListIcon className="h-5 w-5" />
+                <span>Daftar Kafe</span>
+              </>
+            )}
+          </button>
         </div>
       </div>
-    </div>
+    </>
   );
 }

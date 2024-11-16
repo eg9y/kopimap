@@ -1,4 +1,5 @@
 .wrangler/
+public/map-assets
 
 # Logs
 logs

@@ -10,9 +10,11 @@ import {
   Toolbar,
 } from "konsta/react";
 import { MapIcon, NewspaperIcon, TrophyIcon, UserIcon } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { usePageContext } from "vike-react/usePageContext";
 import { navigate } from "vike/client/router";
+import { Browser } from "@capacitor/browser";
+import { App } from "@capacitor/app";
 import { useUser } from "../../hooks/use-user";
 import { useStore } from "../../store";
 import { Avatar } from "../catalyst/avatar";
@@ -28,21 +30,77 @@ export const MobileToolbar: React.FC = () => {
   const [isUserSheetOpen, setIsUserSheetOpen] = useState(false);
   const { loggedInUser } = useUser();
   const { LL } = useI18nContext();
-  const {
-    isListDialogOpen,
-    setIsListDialogOpen,
-    selectCafe,
-    openSubmitReviewDialog,
-  } = useStore();
+  const { setIsListDialogOpen, selectCafe, openSubmitReviewDialog } =
+    useStore();
   const pageContext = usePageContext();
 
+  useEffect(() => {
+    const listener = App.addListener("appUrlOpen", async ({ url }) => {
+      console.log("App URL Opened:", url);
+
+      if (url.startsWith("kopimap://login-callback")) {
+        // Close the in-app browser
+        await Browser.close();
+
+        // Extract the fragment part of the URL (after the #)
+        const urlObj = new URL(url);
+        const fragment = urlObj.hash.substring(1); // Remove the '#' at the beginning
+        const params = new URLSearchParams(fragment);
+
+        // Extract tokens
+        const access_token = params.get("access_token");
+        const refresh_token = params.get("refresh_token");
+        const expires_in = params.get("expires_in");
+        const token_type = params.get("token_type");
+
+        console.log("Extracted access_token:", access_token);
+        console.log("Extracted refresh_token:", refresh_token);
+
+        if (access_token && refresh_token) {
+          // Set the session
+          const { data, error } = await supabase.auth.setSession({
+            access_token,
+            refresh_token,
+          });
+
+          console.log("Session data:", data);
+
+          if (error) {
+            console.error("Error setting session:", error);
+            return;
+          }
+
+          // Session is now updated
+          setIsUserSheetOpen(false);
+          // Optionally, update user state here
+        } else {
+          console.error("Access token or refresh token not found in URL");
+        }
+      }
+    });
+
+    return () => {
+      listener.then((handle) => handle.remove());
+    };
+  }, []);
+
   const handleSignIn = async () => {
-    await supabase.auth.signInWithOAuth({
+    const redirectTo = "kopimap://login-callback";
+
+    const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: import.meta.env.VITE_URL,
+        redirectTo,
       },
     });
+
+    if (error) {
+      console.error("Error during sign-in:", error);
+      return;
+    }
+
+    // Open the OAuth sign-in page in the in-app browser
+    await Browser.open({ url: data.url, windowName: "_self" });
   };
 
   const handleSignOut = async () => {
@@ -65,7 +123,7 @@ export const MobileToolbar: React.FC = () => {
   return (
     <>
       <Sheet
-        className="pb-safe w-full z-[1000]"
+        className="w-full z-[1000]"
         opened={isUserSheetOpen}
         onBackdropClick={() => setIsUserSheetOpen(false)}
       >
@@ -107,7 +165,7 @@ export const MobileToolbar: React.FC = () => {
         </Block>
       </Sheet>
       {!openSubmitReviewDialog && (
-        <Tabbar className="flex-shrink-0">
+        <Tabbar className="fixed bottom-[var(--safe-area-bottom)] left-0 right-0 !z-[1000] bg-white dark:bg-black">
           <TabbarLink
             active={isActive("/feed")}
             linkProps={{
