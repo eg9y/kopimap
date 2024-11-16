@@ -1,13 +1,7 @@
 import { useCafeDetailedInfo } from "@/hooks/use-cafe-detailed-info";
 import { useUserReview } from "@/hooks/use-user-review";
 import { useI18nContext } from "@/src/i18n/i18n-react";
-import {
-  CircleXIcon,
-  SearchIcon,
-  ArrowLeftIcon,
-  ListIcon,
-  XIcon,
-} from "lucide-react";
+import { CircleXIcon, ArrowLeftIcon, ListIcon, XIcon } from "lucide-react";
 import React, {
   useState,
   useRef,
@@ -176,7 +170,6 @@ export default function MobileView({
         {!pmTilesReady && <MapLoader />}
         {pmTilesReady && <MapComponent />}
       </div>
-
       {/* UI Layer that respects safe areas */}
       <div className="absolute inset-0 pt-[var(--safe-area-top)] pb-[calc(56px+var(--safe-area-bottom))] flex flex-col pointer-events-none">
         {/* Search and filters container */}
@@ -220,14 +213,12 @@ export default function MobileView({
               </button>
             )}
           </div>
-
           {!selectedCafe && !isListDialogOpen && (
             <div className="mt-2 pointer-events-auto rounded-lg overflow-hidden">
               <MobileSearchFilters />
             </div>
           )}
         </div>
-
         {/* List and other UI components - enable pointer events */}
         <div className="flex-1 pointer-events-auto">
           {!selectedCafe && (
@@ -247,10 +238,10 @@ export default function MobileView({
                 isOpen={true}
                 onClose={handleSheetClose}
                 detent="full-height"
-                snapPoints={[height - 80 - 56, 200]}
+                snapPoints={[height - 80 - 130, 200]}
                 initialSnap={0}
                 onSnap={handleSnap}
-                className="!bottom-[56px] pointer-events-auto"
+                className="!bottom-[calc(56px+var(--safe-area-bottom))] pointer-events-auto"
               >
                 <Sheet.Container className="!bg-white dark:!bg-gray-800">
                   <Sheet.Content
@@ -339,12 +330,11 @@ export default function MobileView({
             </div>
           )}
         </div>
-
-        {/* Floating buttons container */}
+        {/* Floating buttons container - update z-index */}
         <div className="absolute bottom-[calc(76px+var(--safe-area-bottom))] left-0 right-0 flex justify-center pointer-events-auto">
           <button
             onClick={() => setIsListDialogOpen(!isListDialogOpen)}
-            className="px-4 py-2 drop-shadow-lg border border-yellow-500 z-[1000000] bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-slate-300 font-bold rounded-full shadow-md transition-all duration-200 ease-in-out flex items-center justify-center space-x-2"
+            className="px-4 py-2 drop-shadow-lg border border-yellow-500 z-[1000] bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-slate-300 font-bold rounded-full shadow-md transition-all duration-200 ease-in-out flex items-center justify-center space-x-2"
             aria-label={
               isListDialogOpen ? "Tutup daftar kafe" : "Buka daftar kafe"
             }

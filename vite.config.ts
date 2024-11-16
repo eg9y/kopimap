@@ -13,4 +13,8 @@ export default defineConfig({
 			"@": path.resolve(__dirname, "./"),
 		},
 	},
+	server: {
+		host: true, // Add this to allow external connections
+		port: 5173, // Optional: specify port
+	},
 });

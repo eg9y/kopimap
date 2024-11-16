@@ -20,6 +20,9 @@ dependencies:
   '@capacitor/core':
     specifier: ^6.1.1
     version: 6.1.1
+  '@capacitor/filesystem':
+    specifier: ^6.0.1
+    version: 6.0.1(@capacitor/core@6.1.1)
   '@capacitor/ios':
     specifier: ^6.1.1
     version: 6.1.1(@capacitor/core@6.1.1)
@@ -111,8 +114,8 @@ dependencies:
     specifier: ^9.0.1
     version: 9.0.1
   pmtiles:
-    specifier: ^3.0.6
-    version: 3.0.6
+    specifier: 3.2.1
+    version: 3.2.1
   protomaps-themes-base:
     specifier: ^3.0.1
     version: 3.0.1
@@ -658,6 +661,14 @@ packages:
     resolution: {integrity: sha512-b1s4WDMy3Y1/owTG2/XNGCI6G5SDpF2NT1JMAgcShue13fiAuHA+Ans7Wfei6McvR0KdopAE6tMHmDAfL5PM8Q==}
     dependencies:
       tslib: 2.6.3
+    dev: false
+
+  /@capacitor/filesystem@6.0.1(@capacitor/core@6.1.1):
+    resolution: {integrity: sha512-eHhXm6tzBIQhErzFnfOE6eA1U+15DHc2212/COfzzGGRk/dyGympoVV3ct2YPVzvpTSxMEW3xFocORv/xD9gFg==}
+    peerDependencies:
+      '@capacitor/core': ^6.0.0
+    dependencies:
+      '@capacitor/core': 6.1.1
     dev: false
 
   /@capacitor/ios@6.1.1(@capacitor/core@6.1.1):
@@ -4079,8 +4090,8 @@ packages:
       xmlbuilder: 15.1.1
     dev: true
 
-  /pmtiles@3.0.6:
-    resolution: {integrity: sha512-IdeMETd5lBIDVTLul1HFl0Q7l4KLJjzdxgcp+sN7pYvbipaV7o/0u0HiV06kaFCD0IGEN8KtUHyFZpY30WMflw==}
+  /pmtiles@3.2.1:
+    resolution: {integrity: sha512-3R4fBwwoli5mw7a6t1IGwOtfmcSAODq6Okz0zkXhS1zi9sz1ssjjIfslwPvcWw5TNhdjNBUg9fgfPLeqZlH6ng==}
     dependencies:
       '@types/leaflet': 1.9.12
       fflate: 0.8.2

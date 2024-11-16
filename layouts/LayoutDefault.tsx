@@ -64,17 +64,15 @@ export default function LayoutDefault({
             }`}
           >
             {isMobile && (
-              <div
-                className="fixed bottom-0 left-0 right-0 h-[var(--safe-area-bottom)] bg-black dark:bg-black z-[999]"
-              />
+              <div className="fixed bottom-0 left-0 right-0 h-[var(--safe-area-bottom)] bg-black dark:bg-black z-[999]" />
             )}
 
             {isMobile && (
-              <main className="grow overflow-hidden">{children}</main>
+              <main className="grow overflow-y-auto">{children}</main>
             )}
             {!isMobile && (
               <NavbarContainer>
-                <main className="grow overflow-scroll">{children}</main>
+                <main className="grow overflow-y-auto">{children}</main>
               </NavbarContainer>
             )}
             {isMobile && <MobileToolbar />}

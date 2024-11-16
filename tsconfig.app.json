@@ -33,5 +33,5 @@
 		"renderer",
 		"**/*.json"
 	],
-	"exclude": ["node_modules", "dist"]
+	"exclude": ["android/**/*", "ios/**/*", "node_modules", "dist"]
 }

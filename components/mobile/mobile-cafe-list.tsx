@@ -451,50 +451,12 @@ export const MobileCafeList: React.FC<CafeListProps> = ({
     [selectCafe, mapRef, isWide]
   );
 
-  const handleClose = () => {
-    setIsOpen(false);
-    setTimeout(() => {
-      inputRef.current?.blur();
-    }, 100);
-  };
-
-  const filterButtons: FilterButton[] = [
-    {
-      label: "WiFi Cepat",
-      filter: { name: "wifi_quality", values: ["Fast and Reliable"] },
-      icon: WifiIcon,
-      color: "bg-indigo-100 text-indigo-700",
-      activeColor: "bg-indigo-600 text-white",
-    },
-    {
-      label: "Outdoor Luas",
-      filter: { name: "outdoor_seating", values: ["Ample"] },
-      icon: UmbrellaIcon,
-      color: "bg-green-100 text-green-700",
-      activeColor: "bg-green-600 text-white",
-    },
-    {
-      label: "Nyaman",
-      filter: { name: "comfort_level", values: ["Comfortable", "Luxurious"] },
-      icon: HeartIcon,
-      color: "bg-pink-100 text-pink-700",
-      activeColor: "bg-pink-600 text-white",
-    },
-    {
-      label: "WFC enak",
-      filter: { name: "work_suitability", values: ["Good", "Excellent"] },
-      icon: BriefcaseIcon,
-      color: "bg-amber-100 text-amber-700",
-      activeColor: "bg-amber-600 text-white",
-    },
-  ];
-
   if (!isOpen) {
     return null;
   }
 
   return (
-    <div className="z-30 pointer-events-auto absolute inset-x-0 top-16 bottom-14 flex flex-col p-4">
+    <div className="z-[1000] pointer-events-auto absolute inset-x-0 top-[calc(3rem+var(--safe-area-top))] bottom-[calc(3rem+var(--safe-area-bottom))] flex flex-col p-4">
       <div className="size-full max-w-md rounded-xl bg-white dark:bg-gray-800 shadow-xl max-h-full flex flex-col relative">
         {/* Updated Header with Scrollable Filters */}
         <div className="p-4 border-b border-gray-200 dark:border-gray-700">
