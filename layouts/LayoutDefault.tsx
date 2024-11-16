@@ -22,24 +22,24 @@ export default function LayoutDefault({
   const isMobile = width < 768; // Adjust this breakpoint as needed
 
   return (
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider>
-          <LocaleContext>
-            <div className="flex flex-col h-[100dvh] relative">
-              {isMobile && (
-                <main className="grow overflow-scroll">{children}</main>
-              )}
-              {!isMobile && (
-                <NavbarContainer>
-                  <main className="grow overflow-scroll">{children}</main>
-                </NavbarContainer>
-              )}
-              {isMobile && <MobileToolbar />}
-              <UsernamePrompt />
-              <WelcomeModal />
-            </div>
-          </LocaleContext>
-        </ThemeProvider>
-      </QueryClientProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <LocaleContext>
+          <div className="flex flex-col h-[100dvh] relative">
+            {isMobile && (
+              <main className="grow overflow-scroll">{children}</main>
+            )}
+            {!isMobile && (
+              <NavbarContainer>
+                <main className="grow">{children}</main>
+              </NavbarContainer>
+            )}
+            {isMobile && <MobileToolbar />}
+            <UsernamePrompt />
+            <WelcomeModal />
+          </div>
+        </LocaleContext>
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 }
