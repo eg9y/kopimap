@@ -125,10 +125,7 @@ export const UserReview: React.FC<UserReviewProps> = ({
     label: string;
     classification: string;
   }) => {
-    const imagePath = image.url.split("/storage/v1/object/public/")[1];
-    if (!imagePath) return image.url;
-
-    return `https://kopimap-cdn.b-cdn.net/${imagePath}?width=346&sharpen=true`;
+    return `${image.url}?width=200&sharpen=true`;
   };
 
   return (
