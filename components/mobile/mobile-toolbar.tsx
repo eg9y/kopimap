@@ -14,7 +14,8 @@ import React, { useEffect, useState } from "react";
 import { usePageContext } from "vike-react/usePageContext";
 import { navigate } from "vike/client/router";
 import { Browser } from "@capacitor/browser";
-import { App } from "@capacitor/app";
+import { App as CapacitorApp } from "@capacitor/app";
+import { Capacitor } from "@capacitor/core";
 import { useUser } from "../../hooks/use-user";
 import { useStore } from "../../store";
 import { Avatar } from "../catalyst/avatar";
@@ -26,6 +27,15 @@ const supabase = createClient(
   import.meta.env.VITE_SUPABASE_ANON_KEY
 );
 
+const handleNavigation = async (path: string) => {
+  // if (Capacitor.getPlatform() === "android") {
+  //   window.location.href = path;
+  // } else {
+  //   // For web
+  // }
+  await navigate(path);
+};
+
 export const MobileToolbar: React.FC = () => {
   const [isUserSheetOpen, setIsUserSheetOpen] = useState(false);
   const { loggedInUser } = useUser();
@@ -35,7 +45,7 @@ export const MobileToolbar: React.FC = () => {
   const pageContext = usePageContext();
 
   useEffect(() => {
-    const listener = App.addListener("appUrlOpen", async ({ url }) => {
+    const listener = CapacitorApp.addListener("appUrlOpen", async ({ url }) => {
       console.log("App URL Opened:", url);
 
       if (url.startsWith("kopimap://login-callback")) {
@@ -168,12 +178,13 @@ export const MobileToolbar: React.FC = () => {
         <Tabbar className="fixed bottom-[var(--safe-area-bottom)] left-0 right-0 !z-[1000] bg-white dark:bg-black">
           <TabbarLink
             active={isActive("/feed")}
-            linkProps={{
-              href: "/feed",
-            }}
-            onClick={() => {
+            onClick={async () => {
+              if (isActive("/feed")) {
+                return;
+              }
               selectCafe(null);
               setIsListDialogOpen(false);
+              await handleNavigation("/feed");
             }}
             icon={<NewspaperIcon className="w-6 h-6" />}
             label={"Feed"}
@@ -184,12 +195,7 @@ export const MobileToolbar: React.FC = () => {
               if (isActive("/")) {
                 return;
               }
-              const navigationPromise = navigate("/");
-              console.log(
-                "The URL changed but the new page hasn't rendered yet."
-              );
-              await navigationPromise;
-              console.log("The new page has finished rendering.");
+              await handleNavigation("/");
             }}
             icon={<MapIcon className="w-6 h-6" />}
             label={"Peta"}
@@ -197,8 +203,8 @@ export const MobileToolbar: React.FC = () => {
           {loggedInUser && (
             <TabbarLink
               active={isActive("/achievements")}
-              onClick={() => {
-                navigate("/achievements");
+              onClick={async () => {
+                await handleNavigation("/achievements");
               }}
               icon={<TrophyIcon className="w-6 h-6" />}
               label="Achievements"

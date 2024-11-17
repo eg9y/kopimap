@@ -12,6 +12,12 @@ const config: CapacitorConfig = {
 			maxVersions: 2,
 		},
 	},
+	ios: {
+		contentInset: "always",
+	},
+	android: {
+		backgroundColor: "#FFFFFF",
+	},
 };
 
 if (process.env.NODE_ENV === "debug") {
