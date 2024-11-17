@@ -1,0 +1,8 @@
+{
+  "hooks": {
+    "build": {
+      "before": "pnpm install",
+      "run": "pnpm run build"
+    }
+  }
+}
