@@ -2,12 +2,8 @@
   "apps": [
     {
       "appId": "7f02099d",
-      "hooks": {
-        "build": {
-          "before": "pnpm install",
-          "run": "pnpm run build"
-        }
-      }
+      "dependencyInstallCommand": "pnpm install",
+      "webBuildCommand": "pnpm run build:mobile"
     }
   ]
 }
