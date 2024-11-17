@@ -4,10 +4,6 @@ const config: CapacitorConfig = {
 	appId: "7f02099d",
 	appName: "kopimap",
 	webDir: "dist/client",
-	server: {
-		androidScheme: "https",
-		hostname: "kopimap.com",
-	},
 	plugins: {
 		LiveUpdates: {
 			appId: "7f02099d",
@@ -18,7 +14,8 @@ const config: CapacitorConfig = {
 	},
 };
 
-if (process.env.NODE_ENV === "development") {
+if (process.env.NODE_ENV === "debug") {
+	console.log("Building for debug");
 	config.server = {
 		...config.server,
 		url: "http://10.241.7.163:5173",

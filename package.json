@@ -9,7 +9,7 @@
     "lint": "biome lint --error-on-warnings",
     "copy:map-assets:android": "cp -R public/map-assets android/app/src/main/assets/public/",
     "copy:map-assets:ios": "cp -R public/map-assets ios/App/App/public/",
-    "build:mobile": "BUILD_FOR_MOBILE=true tsc -b && vite build --config vite.config.mobile.ts",
+    "build:mobile": "BUILD_FOR_MOBILE=test tsc -b && vite build --config vite.config.mobile.ts",
     "cap:sync": "npx cap sync",
     "cap:run:android": "npx cap run android",
     "cap:run:ios": "npx cap run ios",

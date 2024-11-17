@@ -6,16 +6,17 @@ export const mapStyle: string | StyleSpecification | undefined = {
 	sources: {
 		protomaps: {
 			type: "vector",
-			...(!(window as any).Capacitor?.isNativePlatform()
-				? {
-						tiles: ["https://worker.kopimap.com/jakarta/{z}/{x}/{y}.pbf"],
-					}
-				: {}),
-			...((window as any).Capacitor?.isNativePlatform()
-				? {
-						url: "pmtiles://public/map-assets/jakarta.pmtiles",
-					}
-				: {}),
+			tiles: ["https://worker.kopimap.com/jakarta/{z}/{x}/{y}.pbf"],
+			// ...(!(window as any).Capacitor?.isNativePlatform()
+			// 	? {
+			// 			tiles: ["https://worker.kopimap.com/jakarta/{z}/{x}/{y}.pbf"],
+			// 		}
+			// 	: {}),
+			// ...((window as any).Capacitor?.isNativePlatform()
+			// 	? {
+			// 			url: "pmtiles://public/map-assets/jakarta.pmtiles",
+			// 		}
+			// 	: {}),
 			attribution:
 				'<a href="https://protomaps.com">Protomaps</a> © <a href="https://openstreetmap.org">OpenStreetMap</a>',
 		},

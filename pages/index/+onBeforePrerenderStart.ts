@@ -19,7 +19,9 @@ function createSlug(name: string): string {
 
 export const onBeforePrerenderStart: OnBeforePrerenderStartAsync =
 	async (): ReturnType<OnBeforePrerenderStartAsync> => {
-		if (process.env.BUILD_FOR_MOBILE === "true") {
+		console.log("BUILD_FOR_MOBILE", process.env.BUILD_FOR_MOBILE);
+		if (process.env.BUILD_FOR_MOBILE === "test") {
+			console.log("Building for mobile");
 			// Generate only the root URL or necessary pages for mobile build
 			return [
 				{
