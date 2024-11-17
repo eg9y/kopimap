@@ -1,12 +1,20 @@
 import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-	appId: "com.kopimap.app",
+	appId: "7f02099d",
 	appName: "kopimap",
 	webDir: "dist/client",
 	server: {
 		androidScheme: "https",
 		hostname: "kopimap.com",
+	},
+	plugins: {
+		LiveUpdates: {
+			appId: "7f02099d",
+			channel: "Production",
+			autoUpdateMethod: "background",
+			maxVersions: 2,
+		},
 	},
 };
 
