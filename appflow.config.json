@@ -1,8 +1,13 @@
 {
-  "hooks": {
-    "build": {
-      "before": "pnpm install",
-      "run": "pnpm run build"
+  "apps": [
+    {
+      "appId": "7f02099d",
+      "hooks": {
+        "build": {
+          "before": "pnpm install",
+          "run": "pnpm run build"
+        }
+      }
     }
-  }
+  ]
 }
