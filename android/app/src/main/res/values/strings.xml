@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">kopimap</string>
+    <string name="title_activity_main">kopimap</string>
+    <string name="package_name">com.kopimap.app</string>
+    <string name="custom_url_scheme">com.kopimap.app</string>
+</resources>

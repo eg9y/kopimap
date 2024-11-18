@@ -1,5 +1,3 @@
-// vite.config.ts
-
 import path from "path";
 import react from "@vitejs/plugin-react";
 import { pages } from "vike-cloudflare";
@@ -11,6 +9,19 @@ export default defineConfig({
 	resolve: {
 		alias: {
 			"@": path.resolve(__dirname, "./"),
+		},
+	},
+	build: {
+		rollupOptions: {
+			external: [
+				"@capacitor/core",
+				"@capacitor/app",
+				"@capacitor/browser",
+				"@capacitor/filesystem",
+				"@capacitor/status-bar",
+				"@capacitor/live-updates",
+				"capacitor-plugin-safe-area",
+			],
 		},
 	},
 });

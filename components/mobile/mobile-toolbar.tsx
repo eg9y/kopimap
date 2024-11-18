@@ -10,7 +10,7 @@ import {
   Toolbar,
 } from "konsta/react";
 import { MapIcon, NewspaperIcon, TrophyIcon, UserIcon } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { usePageContext } from "vike-react/usePageContext";
 import { navigate } from "vike/client/router";
 import { useUser } from "../../hooks/use-user";
@@ -18,31 +18,95 @@ import { useStore } from "../../store";
 import { Avatar } from "../catalyst/avatar";
 import { LanguageSwitcher } from "../language-switcher";
 import { ThemeToggle } from "../theme-toggle";
+import { capacitorServices, isPlatform } from "../lib/platform";
 
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
   import.meta.env.VITE_SUPABASE_ANON_KEY
 );
 
+const handleNavigation = async (path: string) => {
+  await navigate(path);
+};
+
 export const MobileToolbar: React.FC = () => {
   const [isUserSheetOpen, setIsUserSheetOpen] = useState(false);
   const { loggedInUser } = useUser();
   const { LL } = useI18nContext();
-  const {
-    isListDialogOpen,
-    setIsListDialogOpen,
-    selectCafe,
-    openSubmitReviewDialog,
-  } = useStore();
+  const { setIsListDialogOpen, selectCafe, openSubmitReviewDialog } =
+    useStore();
   const pageContext = usePageContext();
 
+  useEffect(() => {
+    const setupAppUrlListener = async () => {
+      if (!isPlatform.mobile()) return;
+
+      const app = await capacitorServices.app();
+      if (!app) return;
+
+      const listener = app.addListener("appUrlOpen", async ({ url }) => {
+        console.log("App URL Opened:", url);
+
+        if (url.startsWith("kopimap://login-callback")) {
+          const browser = await capacitorServices.browser();
+          if (browser) {
+            await browser.close();
+          }
+
+          // Extract the fragment part of the URL (after the #)
+          const urlObj = new URL(url);
+          const fragment = urlObj.hash.substring(1);
+          const params = new URLSearchParams(fragment);
+
+          const access_token = params.get("access_token");
+          const refresh_token = params.get("refresh_token");
+
+          if (access_token && refresh_token) {
+            const { data, error } = await supabase.auth.setSession({
+              access_token,
+              refresh_token,
+            });
+
+            if (error) {
+              console.error("Error setting session:", error);
+              return;
+            }
+
+            setIsUserSheetOpen(false);
+          }
+        }
+      });
+
+      return () => {
+        listener.then((handle) => handle.remove());
+      };
+    };
+
+    setupAppUrlListener();
+  }, []);
+
   const handleSignIn = async () => {
-    await supabase.auth.signInWithOAuth({
+    const redirectTo = "kopimap://login-callback";
+
+    const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: import.meta.env.VITE_URL,
+        redirectTo,
       },
     });
+
+    if (error) {
+      console.error("Error during sign-in:", error);
+      return;
+    }
+
+    const browser = await capacitorServices.browser();
+    if (browser) {
+      await browser.open({ url: data.url, windowName: "_self" });
+    } else {
+      // Fallback for web - redirect directly
+      window.location.href = data.url;
+    }
   };
 
   const handleSignOut = async () => {
@@ -65,7 +129,7 @@ export const MobileToolbar: React.FC = () => {
   return (
     <>
       <Sheet
-        className="pb-safe w-full z-[1000]"
+        className="w-full z-[1000]"
         opened={isUserSheetOpen}
         onBackdropClick={() => setIsUserSheetOpen(false)}
       >
@@ -107,15 +171,16 @@ export const MobileToolbar: React.FC = () => {
         </Block>
       </Sheet>
       {!openSubmitReviewDialog && (
-        <Tabbar className="flex-shrink-0">
+        <Tabbar className="fixed bottom-[var(--safe-area-bottom)] left-0 right-0 !z-[1000] bg-white dark:bg-black">
           <TabbarLink
             active={isActive("/feed")}
-            linkProps={{
-              href: "/feed",
-            }}
-            onClick={() => {
+            onClick={async () => {
+              if (isActive("/feed")) {
+                return;
+              }
               selectCafe(null);
               setIsListDialogOpen(false);
+              await handleNavigation("/feed");
             }}
             icon={<NewspaperIcon className="w-6 h-6" />}
             label={"Feed"}
@@ -126,12 +191,7 @@ export const MobileToolbar: React.FC = () => {
               if (isActive("/")) {
                 return;
               }
-              const navigationPromise = navigate("/");
-              console.log(
-                "The URL changed but the new page hasn't rendered yet."
-              );
-              await navigationPromise;
-              console.log("The new page has finished rendering.");
+              await handleNavigation("/");
             }}
             icon={<MapIcon className="w-6 h-6" />}
             label={"Peta"}
@@ -139,8 +199,8 @@ export const MobileToolbar: React.FC = () => {
           {loggedInUser && (
             <TabbarLink
               active={isActive("/achievements")}
-              onClick={() => {
-                navigate("/achievements");
+              onClick={async () => {
+                await handleNavigation("/achievements");
               }}
               icon={<TrophyIcon className="w-6 h-6" />}
               label="Achievements"

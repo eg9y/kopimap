@@ -71,8 +71,8 @@ export default function Feed() {
   if (error) return <div>Error: {error.message}</div>;
 
   return (
-    <div className="flex flex-col h-[calc(100dvh_-_56px-0.5rem)] max-w-6xl mx-auto">
-      <div className="px-6 py-4 gap-4">
+    <div className="flex flex-col h-full overflow-hidden pt-[var(--safe-area-top)]">
+      <div className="px-6 py-4 gap-4 flex-shrink-0">
         <div className="flex items-center gap-1">
           <img
             src="https://map-assets.kopimap.com/favicon/apple-icon-60x60.png"
@@ -83,7 +83,10 @@ export default function Feed() {
         </div>
         <h2 className="text-lg font-medium">What's brewing</h2>
       </div>
-      <div ref={parentRef} className="w-full px-2 sm:px-0">
+      <div
+        ref={parentRef}
+        className="w-full px-2 sm:px-0 flex-grow overflow-auto"
+      >
         <div
           style={{
             height: rowVirtualizer.getTotalSize(),

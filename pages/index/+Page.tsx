@@ -1,7 +1,9 @@
 import { clientOnly } from "vike-react/clientOnly";
 
 function Homepage() {
-  const ClientOnlyApp = clientOnly(() => import('../../components/app').then(module => module.App ));
+  const ClientOnlyApp = clientOnly(() =>
+    import("../../components/app").then((module) => module.App)
+  );
 
   return (
     <>

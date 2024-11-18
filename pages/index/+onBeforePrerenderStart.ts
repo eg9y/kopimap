@@ -6,90 +6,105 @@ import type { OnBeforePrerenderStartAsync } from "vike/types";
 import { convert } from "url-slug";
 
 const supabase = createClient<Database>(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY,
+	import.meta.env.VITE_SUPABASE_URL,
+	import.meta.env.VITE_SUPABASE_ANON_KEY,
 );
 
 const BATCH_SIZE = 1000;
 
 // Replace the createSlug function with this:
 function createSlug(name: string): string {
-  return convert(name);
+	return convert(name);
 }
 
 export const onBeforePrerenderStart: OnBeforePrerenderStartAsync =
-  async (): ReturnType<OnBeforePrerenderStartAsync> => {
-    const locales: ("en" | "id")[] = ["en", "id"];
-    let allCafes: {
-      id: number | null;
-      name: string | null;
-      place_id: string | null;
-      all_image_urls: { url: string; label: string | null }[] | null;
-      gmaps_featured_image: string | null;
-      website: string | null;
-      phone: string | null;
-    }[] = [];
+	async (): ReturnType<OnBeforePrerenderStartAsync> => {
+		console.log("BUILD_FOR_MOBILE", process.env.BUILD_FOR_MOBILE);
+		if (process.env.BUILD_FOR_MOBILE === "test") {
+			console.log("Building for mobile");
+			// Generate only the root URL or necessary pages for mobile build
+			return [
+				{
+					url: "/",
+					pageContext: {
+						locale: "en", // or your default locale
+					},
+				},
+			];
+		}
 
-    let hasMore = true;
-    let lastId = 0;
+		const locales: ("en" | "id")[] = ["en", "id"];
+		let allCafes: {
+			id: number | null;
+			name: string | null;
+			place_id: string | null;
+			all_image_urls: { url: string; label: string | null }[] | null;
+			gmaps_featured_image: string | null;
+			website: string | null;
+			phone: string | null;
+		}[] = [];
 
-    while (hasMore) {
-      const { data: cafes, error } = await supabase
-        .from("cafe_location_view")
-        .select(
-          "id, name, place_id, all_image_urls, gmaps_featured_image, website, phone",
-        )
-        .order("id", { ascending: true })
-        .gt("id", lastId)
-        .limit(BATCH_SIZE);
+		let hasMore = true;
+		let lastId = 0;
 
-      if (error) {
-        console.error("Error fetching cafes:", error);
-        return [];
-      }
+		while (hasMore) {
+			const { data: cafes, error } = await supabase
+				.from("cafe_location_view")
+				.select(
+					"id, name, place_id, all_image_urls, gmaps_featured_image, website, phone",
+				)
+				.order("id", { ascending: true })
+				.gt("id", lastId)
+				.limit(BATCH_SIZE);
 
-      if (cafes.length > 0) {
-        allCafes = [...allCafes, ...cafes];
-        lastId = cafes[cafes.length - 1].id!;
-      }
+			if (error) {
+				console.error("Error fetching cafes:", error);
+				return [];
+			}
 
-      hasMore = cafes.length === BATCH_SIZE;
-      break;
-    }
+			if (cafes.length > 0) {
+				allCafes = [...allCafes, ...cafes];
+				lastId = cafes[cafes.length - 1].id!;
+			}
 
-    const urls: { url: string; pageContext: any }[] = [];
+			hasMore = cafes.length === BATCH_SIZE;
+			break;
+		}
 
-    for (const locale of locales) {
-      // Add root URL for each locale
-      urls.push({
-        url: `/${locale}`,
-        pageContext: {
-          locale,
-        },
-      });
+		const urls: { url: string; pageContext: any }[] = [];
 
-      // Add cafe-specific URLs
-      for (const cafe of allCafes) {
-        const cafeSlug = createSlug(cafe.name!);
+		for (const locale of locales) {
+			// Add root URL for each locale
+			urls.push({
+				url: `/${locale}`,
+				pageContext: {
+					locale,
+				},
+			});
 
-        urls.push({
-          url: `/${locale}/?cafe=${cafeSlug}&place_id=${
-            encodeURIComponent(cafe.place_id!)
-          }`,
-          pageContext: {
-            locale,
-            data: {
-              name: cafe.name,
-              image: cafe.all_image_urls && cafe.all_image_urls.length > 0
-                ? cafe.all_image_urls[0]
-                : cafe.gmaps_featured_image || null,
-              website: cafe.website,
-              phone: cafe.phone,
-            },
-          },
-        });
-      }
-    }
+			// Add cafe-specific URLs
+			for (const cafe of allCafes) {
+				const cafeSlug = createSlug(cafe.name!);
 
-    return urls;
-  };
+				urls.push({
+					url: `/${locale}/?cafe=${cafeSlug}&place_id=${encodeURIComponent(
+						cafe.place_id!,
+					)}`,
+					pageContext: {
+						locale,
+						data: {
+							name: cafe.name,
+							image:
+								cafe.all_image_urls && cafe.all_image_urls.length > 0
+									? cafe.all_image_urls[0]
+									: cafe.gmaps_featured_image || null,
+							website: cafe.website,
+							phone: cafe.phone,
+						},
+					},
+				});
+			}
+		}
+
+		return urls;
+	};

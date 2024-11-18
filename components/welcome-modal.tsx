@@ -24,7 +24,11 @@ export const WelcomeModal: React.FC = () => {
   const handleClose = () => setIsOpen(false);
 
   return (
-      <Dialog open={isOpen} onClose={setIsOpen} className='md:pb-10'>
+    <Dialog
+      open={isOpen}
+      onClose={setIsOpen}
+      className="md:pb-10 z-[100000000]"
+    >
       <DialogTitle className="text-2xl font-bold text-center">
         Selamat Datang di Kopimap! ☕️🗺️
       </DialogTitle>
