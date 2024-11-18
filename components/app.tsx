@@ -1,5 +1,3 @@
-import { Capacitor } from "@capacitor/core";
-import { StatusBar, Style } from "@capacitor/status-bar";
 import { addProtocol, removeProtocol } from "maplibre-gl";
 import * as pmtiles from "pmtiles";
 import { Suspense, lazy, useEffect, useState } from "react";
@@ -12,21 +10,25 @@ import "@smastrom/react-rating/style.css";
 import type { MeiliSearchCafe } from "@/types";
 import { useStore } from "../store";
 import MobileView from "./mobile/mobile-view";
+import { isPlatform, capacitorServices } from "@/components/lib/platform";
+import { Style } from "@capacitor/status-bar";
 
 // Lazy load components
 const DesktopView = lazy(() => import("./desktop-view"));
 
 export const App = () => {
-  const { openFilters, selectCafe, selectedCafe, setOpenFilters } = useStore();
+  const { openFilters, selectCafe, selectedCafe } = useStore();
   const [pmTilesReady, setPmTilesReady] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
   const isWide = useMedia("(min-width: 640px)", false);
   const data = useData<undefined | { cafeToSelect?: MeiliSearchCafe }>();
 
+  // Handle mounting
   useIsomorphicLayoutEffect(() => {
     setHasMounted(true);
   }, []);
 
+  // Handle cafe selection from URL
   useEffect(() => {
     if (data?.cafeToSelect) {
       selectCafe({
@@ -39,12 +41,14 @@ export const App = () => {
     }
   }, [data, selectCafe]);
 
+  // Handle document title
   useEffect(() => {
     document.title = selectedCafe
       ? `Kopimap | ${selectedCafe.name}`
       : `Kopimap - Discover Jakarta's Best Cafes 🗺️☕️`;
-  }, [selectedCafe, setOpenFilters]);
+  }, [selectedCafe]);
 
+  // Initialize PMTiles
   useEffect(() => {
     const protocol = new pmtiles.Protocol();
     addProtocol("pmtiles", protocol.tile);
@@ -54,15 +58,24 @@ export const App = () => {
     };
   }, []);
 
+  // Handle native platform setup
   useEffect(() => {
-    if (Capacitor.isNativePlatform()) {
-      StatusBar.setStyle({ style: Style.Dark });
-      StatusBar.setOverlaysWebView({ overlay: false });
-    }
+    const setupNativePlatform = async () => {
+      const isNative = await isPlatform.capacitor();
+      if (!isNative) return;
+
+      const statusBar = await capacitorServices.statusBar();
+      if (!statusBar) return;
+
+      await statusBar.setStyle({ style: Style.Dark });
+      await statusBar.setOverlaysWebView({ overlay: false });
+    };
+
+    setupNativePlatform();
   }, []);
 
   if (!hasMounted) {
-    return null; // or a loading spinner
+    return null;
   }
 
   return (

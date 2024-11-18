@@ -3,8 +3,6 @@ import React, { useEffect } from "react";
 import "./style.css";
 import "./tailwind.css";
 import { useWindowSize } from "react-use";
-import { SafeArea } from "capacitor-plugin-safe-area";
-import { App } from "@capacitor/app";
 
 import { MobileToolbar } from "@/components/mobile/mobile-toolbar";
 import { LocaleContext } from "@/components/locale-context";
@@ -12,6 +10,7 @@ import { UsernamePrompt } from "@/components/username-prompt";
 import { WelcomeModal } from "@/components/welcome-modal";
 import { NavbarContainer } from "@/components/navbar-container";
 import { ThemeProvider } from "@/components/theme-provider";
+import { isPlatform, setPlatformSafeArea } from "@/components/lib/platform";
 
 const queryClient = new QueryClient();
 
@@ -24,32 +23,12 @@ export default function LayoutDefault({
   const isMobile = width < 768;
 
   useEffect(() => {
-    const initSafeArea = async () => {
-      try {
-        const safeArea = await SafeArea.getSafeAreaInsets();
-        console.log("safeArea", safeArea);
-        document.documentElement.style.setProperty(
-          "--safe-area-top",
-          `${safeArea.insets.top}px`
-        );
-        document.documentElement.style.setProperty(
-          "--safe-area-bottom",
-          `${safeArea.insets.bottom}px`
-        );
-        document.documentElement.style.setProperty(
-          "--safe-area-left",
-          `${safeArea.insets.left}px`
-        );
-        document.documentElement.style.setProperty(
-          "--safe-area-right",
-          `${safeArea.insets.right}px`
-        );
-      } catch (error) {
-        console.error("Error setting safe area:", error);
-      }
+    const initPlatform = async () => {
+      const isNative = await isPlatform.capacitor();
+      await setPlatformSafeArea(isNative);
     };
 
-    initSafeArea();
+    initPlatform();
   }, []);
 
   return (

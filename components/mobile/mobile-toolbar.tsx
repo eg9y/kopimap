@@ -13,14 +13,12 @@ import { MapIcon, NewspaperIcon, TrophyIcon, UserIcon } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { usePageContext } from "vike-react/usePageContext";
 import { navigate } from "vike/client/router";
-import { Browser } from "@capacitor/browser";
-import { App as CapacitorApp } from "@capacitor/app";
-import { Capacitor } from "@capacitor/core";
 import { useUser } from "../../hooks/use-user";
 import { useStore } from "../../store";
 import { Avatar } from "../catalyst/avatar";
 import { LanguageSwitcher } from "../language-switcher";
 import { ThemeToggle } from "../theme-toggle";
+import { capacitorServices, isPlatform } from "../lib/platform";
 
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
@@ -28,11 +26,6 @@ const supabase = createClient(
 );
 
 const handleNavigation = async (path: string) => {
-  // if (Capacitor.getPlatform() === "android") {
-  //   window.location.href = path;
-  // } else {
-  //   // For web
-  // }
   await navigate(path);
 };
 
@@ -45,53 +38,51 @@ export const MobileToolbar: React.FC = () => {
   const pageContext = usePageContext();
 
   useEffect(() => {
-    const listener = CapacitorApp.addListener("appUrlOpen", async ({ url }) => {
-      console.log("App URL Opened:", url);
+    const setupAppUrlListener = async () => {
+      if (!isPlatform.mobile()) return;
 
-      if (url.startsWith("kopimap://login-callback")) {
-        // Close the in-app browser
-        await Browser.close();
+      const app = await capacitorServices.app();
+      if (!app) return;
 
-        // Extract the fragment part of the URL (after the #)
-        const urlObj = new URL(url);
-        const fragment = urlObj.hash.substring(1); // Remove the '#' at the beginning
-        const params = new URLSearchParams(fragment);
+      const listener = app.addListener("appUrlOpen", async ({ url }) => {
+        console.log("App URL Opened:", url);
 
-        // Extract tokens
-        const access_token = params.get("access_token");
-        const refresh_token = params.get("refresh_token");
-        const expires_in = params.get("expires_in");
-        const token_type = params.get("token_type");
-
-        console.log("Extracted access_token:", access_token);
-        console.log("Extracted refresh_token:", refresh_token);
-
-        if (access_token && refresh_token) {
-          // Set the session
-          const { data, error } = await supabase.auth.setSession({
-            access_token,
-            refresh_token,
-          });
-
-          console.log("Session data:", data);
-
-          if (error) {
-            console.error("Error setting session:", error);
-            return;
+        if (url.startsWith("kopimap://login-callback")) {
+          const browser = await capacitorServices.browser();
+          if (browser) {
+            await browser.close();
           }
 
-          // Session is now updated
-          setIsUserSheetOpen(false);
-          // Optionally, update user state here
-        } else {
-          console.error("Access token or refresh token not found in URL");
-        }
-      }
-    });
+          // Extract the fragment part of the URL (after the #)
+          const urlObj = new URL(url);
+          const fragment = urlObj.hash.substring(1);
+          const params = new URLSearchParams(fragment);
 
-    return () => {
-      listener.then((handle) => handle.remove());
+          const access_token = params.get("access_token");
+          const refresh_token = params.get("refresh_token");
+
+          if (access_token && refresh_token) {
+            const { data, error } = await supabase.auth.setSession({
+              access_token,
+              refresh_token,
+            });
+
+            if (error) {
+              console.error("Error setting session:", error);
+              return;
+            }
+
+            setIsUserSheetOpen(false);
+          }
+        }
+      });
+
+      return () => {
+        listener.then((handle) => handle.remove());
+      };
     };
+
+    setupAppUrlListener();
   }, []);
 
   const handleSignIn = async () => {
@@ -109,8 +100,13 @@ export const MobileToolbar: React.FC = () => {
       return;
     }
 
-    // Open the OAuth sign-in page in the in-app browser
-    await Browser.open({ url: data.url, windowName: "_self" });
+    const browser = await capacitorServices.browser();
+    if (browser) {
+      await browser.open({ url: data.url, windowName: "_self" });
+    } else {
+      // Fallback for web - redirect directly
+      window.location.href = data.url;
+    }
   };
 
   const handleSignOut = async () => {

@@ -1,5 +1,3 @@
-// vite.config.ts
-
 import path from "path";
 import react from "@vitejs/plugin-react";
 import { pages } from "vike-cloudflare";
@@ -13,8 +11,17 @@ export default defineConfig({
 			"@": path.resolve(__dirname, "./"),
 		},
 	},
-	server: {
-		host: true, // Add this to allow external connections
-		port: 5173, // Optional: specify port
+	build: {
+		rollupOptions: {
+			external: [
+				"@capacitor/core",
+				"@capacitor/app",
+				"@capacitor/browser",
+				"@capacitor/filesystem",
+				"@capacitor/status-bar",
+				"@capacitor/live-updates",
+				"capacitor-plugin-safe-area",
+			],
+		},
 	},
 });
