@@ -10,8 +10,11 @@ import "@smastrom/react-rating/style.css";
 import type { MeiliSearchCafe } from "@/types";
 import { useStore } from "../store";
 import MobileView from "./mobile/mobile-view";
-import { isPlatform, capacitorServices } from "@/components/lib/platform";
-import { Style } from "@capacitor/status-bar";
+import {
+  isPlatform,
+  capacitorServices,
+  Style,
+} from "@/components/lib/platform";
 
 // Lazy load components
 const DesktopView = lazy(() => import("./desktop-view"));

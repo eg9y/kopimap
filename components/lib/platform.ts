@@ -1,4 +1,8 @@
-import type { Style as StatusBarStyle } from "@capacitor/status-bar";
+export enum Style {
+	Dark = "DARK",
+	Light = "LIGHT",
+	Default = "DEFAULT",
+}
 
 export const isPlatform = {
 	mobile: () => import.meta.env.BUILD_FOR_MOBILE === "test",
@@ -23,11 +27,7 @@ export const capacitorServices = {
 	statusBar: async () => {
 		if (!isPlatform.mobile()) return null;
 		const { StatusBar } = await import("@capacitor/status-bar");
-		return {
-			...StatusBar,
-			setStyle: async (options: { style: StatusBarStyle }) =>
-				await StatusBar.setStyle(options),
-		};
+		return StatusBar;
 	},
 };
 
