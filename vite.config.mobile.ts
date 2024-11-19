@@ -23,4 +23,7 @@ export default defineConfig({
 			"@": path.resolve(__dirname, "./"),
 		},
 	},
+	define: {
+		"import.meta.env.BUILD_FOR_MOBILE": JSON.stringify("test"),
+	},
 });

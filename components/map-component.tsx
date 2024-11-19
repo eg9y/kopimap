@@ -12,6 +12,7 @@ import Clusters, { ClustersRef } from "./clusters";
 import { useTheme } from "./theme-provider";
 import "maplibre-gl/dist/maplibre-gl.css";
 import type { LngLatBoundsLike } from "react-map-gl";
+import { capacitorServices } from "./lib/platform";
 import { GeolocateResultEvent } from "react-map-gl/dist/esm/types";
 
 interface MapComponentProps {}
@@ -54,8 +55,8 @@ export default function MapComponent({}: MapComponentProps) {
   }, [mapCenter, refetchMapCafes]);
 
   const handleGeolocate = useCallback(
-    (e: GeolocateResultEvent<maplibregl.GeolocateControl>) => {
-      if (mapRef && mapRef.current) {
+    async (e: GeolocateResultEvent<maplibregl.GeolocateControl>) => {
+      if (e.coords && mapRef && mapRef.current) {
         if (e.coords.latitude < -90 || e.coords.latitude > 90) {
           return;
         }
@@ -67,6 +68,44 @@ export default function MapComponent({}: MapComponentProps) {
           zoom: 14,
           essential: true,
         });
+      } else {
+        try {
+          const geolocation = await capacitorServices.geolocation();
+
+          // Check permissions first
+          const permissionStatus = await geolocation.checkPermissions();
+
+          if (permissionStatus.location !== "granted") {
+            const newStatus = await geolocation.requestPermissions();
+            if (newStatus.location !== "granted") {
+              console.error("Location permission denied");
+              return;
+            }
+          }
+
+          const position = await geolocation.getCurrentPosition({
+            enableHighAccuracy: true,
+            timeout: 10000,
+          });
+
+          if (mapRef && mapRef.current) {
+            const { latitude, longitude } = position.coords;
+            if (latitude < -90 || latitude > 90) {
+              return;
+            }
+
+            mapRef.current.flyTo({
+              center: {
+                lat: latitude,
+                lng: longitude,
+              },
+              zoom: 14,
+              essential: true,
+            });
+          }
+        } catch (error) {
+          console.error("Error getting location:", error);
+        }
       }
     },
     [mapRef]

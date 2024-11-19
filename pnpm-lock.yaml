@@ -23,6 +23,9 @@ dependencies:
   '@capacitor/filesystem':
     specifier: ^6.0.1
     version: 6.0.1(@capacitor/core@6.1.1)
+  '@capacitor/geolocation':
+    specifier: ^6.0.1
+    version: 6.0.1(@capacitor/core@6.1.1)
   '@capacitor/ios':
     specifier: ^6.1.1
     version: 6.1.1(@capacitor/core@6.1.1)
@@ -723,6 +726,14 @@ packages:
 
   /@capacitor/filesystem@6.0.1(@capacitor/core@6.1.1):
     resolution: {integrity: sha512-eHhXm6tzBIQhErzFnfOE6eA1U+15DHc2212/COfzzGGRk/dyGympoVV3ct2YPVzvpTSxMEW3xFocORv/xD9gFg==}
+    peerDependencies:
+      '@capacitor/core': ^6.0.0
+    dependencies:
+      '@capacitor/core': 6.1.1
+    dev: false
+
+  /@capacitor/geolocation@6.0.1(@capacitor/core@6.1.1):
+    resolution: {integrity: sha512-QOkIrSzG6E0vD2MF3gZmtuILQiuVro4LGPjqrUjCzhX10zl/4lx6bq4T+hj2YLUmMUnCiV1hWTOJHcpdVRMz7w==}
     peerDependencies:
       '@capacitor/core': ^6.0.0
     dependencies:

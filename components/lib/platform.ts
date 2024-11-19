@@ -4,6 +4,38 @@ export enum Style {
 	Default = "DEFAULT",
 }
 
+// Define types for Geolocation
+interface GeolocationPosition {
+	coords: {
+		latitude: number;
+		longitude: number;
+		accuracy: number;
+		altitudeAccuracy: number | null;
+		altitude: number | null;
+		speed: number | null;
+		heading: number | null;
+	};
+	timestamp: number;
+}
+
+interface GeolocationOptions {
+	enableHighAccuracy?: boolean;
+	timeout?: number;
+	maximumAge?: number;
+}
+
+// Add these type definitions
+type PermissionState =
+	| "prompt"
+	| "prompt-with-rationale"
+	| "granted"
+	| "denied";
+
+interface PermissionStatus {
+	location: PermissionState;
+	coarseLocation?: PermissionState;
+}
+
 export const isPlatform = {
 	mobile: () => import.meta.env.BUILD_FOR_MOBILE === "test",
 	capacitor: async () => {
@@ -29,6 +61,55 @@ export const capacitorServices = {
 		const { StatusBar } = await import("@capacitor/status-bar");
 		return StatusBar;
 	},
+	geolocation: async () => {
+		if (!isPlatform.mobile()) {
+			// Fallback to browser geolocation
+			return {
+				getCurrentPosition: async (options?: GeolocationOptions) => {
+					return new Promise<GeolocationPosition>((resolve, reject) => {
+						navigator.geolocation.getCurrentPosition(
+							(position) =>
+								resolve({
+									coords: {
+										latitude: position.coords.latitude,
+										longitude: position.coords.longitude,
+										accuracy: position.coords.accuracy,
+										altitudeAccuracy: position.coords.altitudeAccuracy,
+										altitude: position.coords.altitude,
+										speed: position.coords.speed,
+										heading: position.coords.heading,
+									},
+									timestamp: position.timestamp,
+								}),
+							reject,
+							{
+								enableHighAccuracy: options?.enableHighAccuracy ?? false,
+								timeout: options?.timeout ?? 10000,
+								maximumAge: options?.maximumAge ?? 0,
+							},
+						);
+					});
+				},
+				checkPermissions: async (): Promise<PermissionStatus> => {
+					if (!navigator.geolocation) {
+						return { location: "denied" };
+					}
+					return { location: "granted" };
+				},
+				requestPermissions: async (): Promise<PermissionStatus> => {
+					return new Promise((resolve) => {
+						navigator.geolocation.getCurrentPosition(
+							() => resolve({ location: "granted" }),
+							() => resolve({ location: "denied" }),
+						);
+					});
+				},
+			};
+		}
+
+		const { Geolocation } = await import("@capacitor/geolocation");
+		return Geolocation;
+	},
 };
 
 export const SafeArea = {
@@ -50,6 +131,7 @@ export const SafeArea = {
 };
 
 export const setPlatformSafeArea = async (isNative: boolean) => {
+	console.log("Setting platform safe area. isNative:", isNative);
 	try {
 		if (isNative) {
 			const safeArea = await SafeArea.getSafeAreaInsets();

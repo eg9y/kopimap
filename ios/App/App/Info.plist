@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-        <string>kopimap</string>
+	<string>kopimap</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -46,16 +46,16 @@
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
 	<key>CFBundleURLTypes</key>
-<array>
-  <dict>
-    <key>CFBundleURLName</key>
-    <string>com.kopimap.app</string>
-    <key>CFBundleURLSchemes</key>
-    <array>
-      <string>kopimap</string>
-    </array>
-  </dict>
-</array>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.kopimap.app</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>kopimap</string>
+			</array>
+		</dict>
+	</array>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
@@ -63,5 +63,7 @@
 		<key>NSAllowsArbitraryLoadsInWebContent</key>
 		<true/>
 	</dict>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Find nearby cafes</string>
 </dict>
 </plist>
