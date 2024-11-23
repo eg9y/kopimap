@@ -14,8 +14,8 @@ import {
 import React, { useState } from "react";
 import convert from "url-slug";
 import { Badge } from "./catalyst/badge";
-import { Link } from "./catalyst/link";
 import { cn } from "./lib/utils";
+import { navigate } from "vike/client/router";
 
 type ReviewMetadata = {
   coffee_quality: Database["public"]["Enums"]["quality_rating"] | null;
@@ -128,6 +128,14 @@ export const UserReview: React.FC<UserReviewProps> = ({
     return `${image.url}?width=200&sharpen=true`;
   };
 
+  const handleCafeClick = async (e: React.MouseEvent, url: string) => {
+    e.preventDefault();
+
+    const cafeQueryParams = `/?cafe=${convert(cafeName || "")}&place_id=${placeId}`;
+    
+    await navigate(cafeQueryParams);
+  };
+
   return (
     <div className="p-4 flex flex-col border rounded-md shadow-md border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200">
       <div className="flex justify-between items-baseline mb-2">
@@ -148,7 +156,17 @@ export const UserReview: React.FC<UserReviewProps> = ({
         </p>
       </div>
       {showCafeInfo && cafeName && (
-        <Link href={`/?cafe=${convert(cafeName)}&place_id=${placeId}`}>
+        <a
+          onClick={(e) =>
+            handleCafeClick(
+              e,
+              `${window.location.origin}/?cafe=${convert(
+                cafeName
+              )}&place_id=${placeId}`
+            )
+          }
+          className="cursor-pointer"
+        >
           <div className="text-sm text-blue-600 dark:text-blue-400 mb-2">
             <p className="flex items-center">
               <MapPin size={12} className="mr-1" />
@@ -156,7 +174,7 @@ export const UserReview: React.FC<UserReviewProps> = ({
               <ExternalLinkIcon size={12} className="ml-1" />
             </p>
           </div>
-        </Link>
+        </a>
       )}
       <div
         className={cn(

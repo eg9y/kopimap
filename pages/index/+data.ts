@@ -4,23 +4,25 @@ import ky from "ky";
 export { data };
 
 async function data(pageContext: PageContext) {
-  const { place_id } = pageContext.urlParsed.search;
+	const { place_id } = pageContext.urlParsed.search;
 
-  if (!place_id) {
-    return;
-  }
+	console.log("place_id", place_id);
 
-  const response = await ky.get(
-    `${import.meta.env.VITE_MEILISEARCH_URL!}/api/cafe/${place_id}`,
-  );
+	if (!place_id) {
+		return;
+	}
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch cafe");
-  }
+	const response = await ky.get(
+		`${import.meta.env.VITE_MEILISEARCH_URL!}/api/cafe/${place_id}`,
+	);
 
-  let cafeToSelect = await response.json();
+	if (!response.ok) {
+		throw new Error("Failed to fetch cafe");
+	}
 
-  return {
-    cafeToSelect,
-  };
+	let cafeToSelect = await response.json();
+
+	return {
+		cafeToSelect,
+	};
 }

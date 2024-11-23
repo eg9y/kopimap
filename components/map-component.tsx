@@ -12,10 +12,24 @@ import Clusters, { ClustersRef } from "./clusters";
 import { useTheme } from "./theme-provider";
 import "maplibre-gl/dist/maplibre-gl.css";
 import type { LngLatBoundsLike } from "react-map-gl";
-import { capacitorServices } from "./lib/platform";
 import { GeolocateResultEvent } from "react-map-gl/dist/esm/types";
+import { Geolocation, Position } from '@capacitor/geolocation';
 
 interface MapComponentProps {}
+
+// Define web geolocation position type
+interface WebGeolocationPosition {
+  coords: {
+    latitude: number;
+    longitude: number;
+    accuracy: number;
+    altitudeAccuracy: number | null;
+    altitude: number | null;
+    speed: number | null;
+    heading: number | null;
+  };
+  timestamp: number;
+}
 
 export default function MapComponent({}: MapComponentProps) {
   const { setMapRef, mapRef, mapCenter, setMapCenter } = useStore();
@@ -70,23 +84,49 @@ export default function MapComponent({}: MapComponentProps) {
         });
       } else {
         try {
-          const geolocation = await capacitorServices.geolocation();
+          const isCapacitor = 'Capacitor' in window;
+          
+          let position: Position | WebGeolocationPosition;
+          if (isCapacitor) {
+            // Check permissions first
+            const permissionStatus = await Geolocation.checkPermissions();
 
-          // Check permissions first
-          const permissionStatus = await geolocation.checkPermissions();
-
-          if (permissionStatus.location !== "granted") {
-            const newStatus = await geolocation.requestPermissions();
-            if (newStatus.location !== "granted") {
-              console.error("Location permission denied");
-              return;
+            if (permissionStatus.location !== "granted") {
+              const newStatus = await Geolocation.requestPermissions();
+              if (newStatus.location !== "granted") {
+                console.error("Location permission denied");
+                return;
+              }
             }
-          }
 
-          const position = await geolocation.getCurrentPosition({
-            enableHighAccuracy: true,
-            timeout: 10000,
-          });
+            position = await Geolocation.getCurrentPosition({
+              enableHighAccuracy: true,
+              timeout: 10000,
+            });
+          } else {
+            // Web fallback
+            position = await new Promise<WebGeolocationPosition>((resolve, reject) => {
+              navigator.geolocation.getCurrentPosition(
+                (pos) => resolve({
+                  coords: {
+                    latitude: pos.coords.latitude,
+                    longitude: pos.coords.longitude,
+                    accuracy: pos.coords.accuracy,
+                    altitudeAccuracy: pos.coords.altitudeAccuracy,
+                    altitude: pos.coords.altitude,
+                    speed: pos.coords.speed,
+                    heading: pos.coords.heading,
+                  },
+                  timestamp: pos.timestamp,
+                }),
+                reject,
+                {
+                  enableHighAccuracy: true,
+                  timeout: 10000,
+                }
+              );
+            });
+          }
 
           if (mapRef && mapRef.current) {
             const { latitude, longitude } = position.coords;

@@ -4,17 +4,15 @@ import { Suspense, lazy, useEffect, useState } from "react";
 import { useMedia, useIsomorphicLayoutEffect } from "react-use";
 import { Toaster } from "sonner";
 import { useData } from "vike-react/useData";
+import { StatusBar, Style } from "@capacitor/status-bar";
+import { Capacitor } from "@capacitor/core";
+import ky from "ky";
 
 import "@smastrom/react-rating/style.css";
 
 import type { MeiliSearchCafe } from "@/types";
 import { useStore } from "../store";
 import MobileView from "./mobile/mobile-view";
-import {
-  isPlatform,
-  capacitorServices,
-  Style,
-} from "@/components/lib/platform";
 
 // Lazy load components
 const DesktopView = lazy(() => import("./desktop-view"));
@@ -64,18 +62,71 @@ export const App = () => {
   // Handle native platform setup
   useEffect(() => {
     const setupNativePlatform = async () => {
-      const isNative = await isPlatform.capacitor();
-      if (!isNative) return;
+      // Check if we're in a Capacitor environment
+      const isCapacitor = "Capacitor" in window;
+      if (!isCapacitor) return;
 
-      const statusBar = await capacitorServices.statusBar();
-      if (!statusBar) return;
+      const isAndroid = Capacitor.getPlatform() === "android";
+      const isNative = Capacitor.isNativePlatform();
 
-      await statusBar.setStyle({ style: Style.Dark });
-      await statusBar.setOverlaysWebView({ overlay: false });
+      if (isAndroid || !isNative) return;
+
+      try {
+        await StatusBar.setStyle({ style: Style.Dark });
+        await StatusBar.setOverlaysWebView({ overlay: false });
+      } catch (error) {
+        console.error("Error setting up StatusBar:", error);
+      }
     };
 
     setupNativePlatform();
   }, []);
+
+  // Handle cafe loading from URL params
+  useEffect(() => {
+
+    const loadCafeFromParams = async () => {
+      try {
+        // Extract `place_id` directly from the URL query params
+        const urlParams = new URLSearchParams(window.location.search);
+        const placeId = urlParams.get("place_id");
+
+        console.error("placeId", placeId);
+
+        // Only fetch if we have a place_id
+        if (placeId) {
+          const response = await ky.get(
+            `${import.meta.env.VITE_MEILISEARCH_URL!}/api/cafe/${placeId}`
+          );
+
+          if (!response.ok) {
+            throw new Error("Failed to fetch cafe");
+          }
+
+          const cafeData = await response.json<MeiliSearchCafe>();
+
+          // Use the same transformation as in the data effect
+          selectCafe({
+            gmaps_ratings: cafeData.gmaps_rating.toString(),
+            latitude: cafeData._geo.lat,
+            longitude: cafeData._geo.lng,
+            distance: cafeData._geoDistance,
+            ...cafeData,
+          });
+        }
+      } catch (error) {
+        console.error("Error loading cafe:", error);
+      }
+    };
+
+    if (data?.cafeToSelect) {
+      return;
+    }
+
+
+    loadCafeFromParams();
+    // Empty dependency array ensures this effect runs only once
+  }, [data?.cafeToSelect]);
 
   if (!hasMounted) {
     return null;

@@ -18,7 +18,9 @@ import { useStore } from "../../store";
 import { Avatar } from "../catalyst/avatar";
 import { LanguageSwitcher } from "../language-switcher";
 import { ThemeToggle } from "../theme-toggle";
-import { capacitorServices, isPlatform } from "../lib/platform";
+import { App as CapacitorApp } from '@capacitor/app';
+import { Browser as CapacitorBrowser } from '@capacitor/browser';
+
 
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
@@ -39,54 +41,74 @@ export const MobileToolbar: React.FC = () => {
 
   useEffect(() => {
     const setupAppUrlListener = async () => {
-      if (!isPlatform.mobile()) return;
+      // Check if we're in a Capacitor environment
+      const isCapacitor = 'Capacitor' in window;
+      
+      if (!isCapacitor || !CapacitorApp) {
+        console.log("Not in Capacitor environment or App not available");
+        return;
+      }
 
-      const app = await capacitorServices.app();
-      if (!app) return;
+      try {
+        console.log("Setting up App URL listener");
+        const listener = await CapacitorApp.addListener(
+          "appUrlOpen",
+          async ({ url }) => {
+            console.log("App URL Opened:", url);
 
-      const listener = app.addListener("appUrlOpen", async ({ url }) => {
-        console.log("App URL Opened:", url);
+            if (url.startsWith("kopimap://login-callback")) {
+              // Check if Browser is available
+              if (isCapacitor && CapacitorBrowser) {
+                await CapacitorBrowser.close();
+              }
 
-        if (url.startsWith("kopimap://login-callback")) {
-          const browser = await capacitorServices.browser();
-          if (browser) {
-            await browser.close();
-          }
+              // Extract the fragment part of the URL (after the #)
+              const urlObj = new URL(url);
+              const fragment = urlObj.hash.substring(1);
+              const params = new URLSearchParams(fragment);
 
-          // Extract the fragment part of the URL (after the #)
-          const urlObj = new URL(url);
-          const fragment = urlObj.hash.substring(1);
-          const params = new URLSearchParams(fragment);
+              const access_token = params.get("access_token");
+              const refresh_token = params.get("refresh_token");
 
-          const access_token = params.get("access_token");
-          const refresh_token = params.get("refresh_token");
+              console.error("access_token", access_token);
+              console.error("refresh_token", refresh_token);
 
-          if (access_token && refresh_token) {
-            const { data, error } = await supabase.auth.setSession({
-              access_token,
-              refresh_token,
-            });
+              if (access_token && refresh_token) {
+                const { data, error } = await supabase.auth.setSession({
+                  access_token,
+                  refresh_token,
+                });
 
-            if (error) {
-              console.error("Error setting session:", error);
-              return;
+                if (error) {
+                  console.error("Error setting session:", error);
+                  return;
+                }
+
+                setIsUserSheetOpen(false);
+              }
             }
-
-            setIsUserSheetOpen(false);
           }
-        }
-      });
+        );
 
-      return () => {
-        listener.then((handle) => handle.remove());
-      };
+        return () => {
+          console.log("Removing App URL listener");
+          if (listener) listener.remove();
+        };
+      } catch (error) {
+        console.error("Error setting up app URL listener:", error);
+      }
     };
 
     setupAppUrlListener();
   }, []);
 
   const handleSignIn = async () => {
-    const redirectTo = "kopimap://login-callback";
+    const isCapacitor = 'Capacitor' in window;
+    const redirectTo = isCapacitor
+      ? "kopimap://login-callback"
+      : import.meta.env.VITE_URL;
+
+    console.log("redirectTo", redirectTo);
 
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
@@ -100,11 +122,20 @@ export const MobileToolbar: React.FC = () => {
       return;
     }
 
-    const browser = await capacitorServices.browser();
-    if (browser) {
-      await browser.open({ url: data.url, windowName: "_self" });
-    } else {
-      // Fallback for web - redirect directly
+    // Handle browser opening
+    if (isCapacitor && CapacitorBrowser && data.url) {
+      try {
+        await CapacitorBrowser.open({
+          url: data.url,
+          presentationStyle: "popover",
+        });
+      } catch (error) {
+        console.error("Error opening browser:", error);
+        // Fallback to direct navigation
+        window.location.href = data.url;
+      }
+    } else if (data.url) {
+      // Web fallback
       window.location.href = data.url;
     }
   };

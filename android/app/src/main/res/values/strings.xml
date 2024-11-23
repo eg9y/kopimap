@@ -3,5 +3,5 @@
     <string name="app_name">kopimap</string>
     <string name="title_activity_main">kopimap</string>
     <string name="package_name">com.kopimap.app</string>
-    <string name="custom_url_scheme">com.kopimap.app</string>
+    <string name="custom_url_scheme">kopimap</string>
 </resources>
