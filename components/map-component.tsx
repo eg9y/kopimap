@@ -13,6 +13,7 @@ import { useTheme } from "./theme-provider";
 import "maplibre-gl/dist/maplibre-gl.css";
 import type { LngLatBoundsLike } from "react-map-gl";
 import { GeolocateResultEvent } from "react-map-gl/dist/esm/types";
+import { Navigation } from "lucide-react";
 
 interface MapComponentProps {}
 
@@ -31,7 +32,8 @@ interface WebGeolocationPosition {
 }
 
 export default function MapComponent({}: MapComponentProps) {
-  const { setMapRef, mapRef, mapCenter, setMapCenter } = useStore();
+  const { setMapRef, mapRef, mapCenter, setMapCenter, selectedCafe } =
+    useStore();
   const geoControlRef = useRef<GeolocateControlType>();
   const clustersRef = useRef<ClustersRef>(null);
   const isWide = useMedia("(min-width: 640px)");
@@ -67,9 +69,51 @@ export default function MapComponent({}: MapComponentProps) {
     return () => clearTimeout(debounceTimer);
   }, [mapCenter, refetchMapCafes]);
 
+  const handleCapacitorLocation = useCallback(async () => {
+    try {
+      const { Geolocation } = await import("@capacitor/geolocation");
+  
+      const permissionStatus = await Geolocation.checkPermissions();
+  
+      if (permissionStatus.location !== "granted") {
+        const newStatus = await Geolocation.requestPermissions();
+  
+        if (newStatus.location !== "granted") {
+          throw new Error("Location permission denied");
+        }
+      }
+  
+      // Set enableHighAccuracy to false or omit it
+      const position = await Geolocation.getCurrentPosition({
+        timeout: 10000, // Optional: Reduce timeout
+      });
+  
+      if (mapRef && mapRef.current) {
+        const { latitude, longitude } = position.coords;
+        if (latitude < -90 || latitude > 90) {
+          throw new Error("Invalid coordinates received");
+        }
+  
+        mapRef.current.flyTo({
+          center: {
+            lat: latitude,
+            lng: longitude,
+          },
+          zoom: 14,
+          essential: true,
+        });
+      }
+    } catch (error) {
+      console.error("Geolocation error:", error);
+      throw error;
+    }
+  }, [mapRef]);
+  
+
   const handleGeolocate = useCallback(
-    async (e: GeolocateResultEvent<maplibregl.GeolocateControl>) => {
+    (e: GeolocateResultEvent<maplibregl.GeolocateControl>) => {
       if (e.coords && mapRef && mapRef.current) {
+        console.log("Web Geolocation coords:", e.coords);
         if (e.coords.latitude < -90 || e.coords.latitude > 90) {
           return;
         }
@@ -81,78 +125,6 @@ export default function MapComponent({}: MapComponentProps) {
           zoom: 14,
           essential: true,
         });
-      } else {
-        try {
-          const isCapacitor = "Capacitor" in window;
-
-          const { Geolocation } = await import(
-            "@capacitor/geolocation"
-          );
-          let position: any | WebGeolocationPosition;
-          if (isCapacitor) {
-            // Dynamically import Geolocation
-
-            // Check permissions first
-            const permissionStatus = await Geolocation.checkPermissions();
-
-            if (permissionStatus.location !== "granted") {
-              const newStatus = await Geolocation.requestPermissions();
-              if (newStatus.location !== "granted") {
-                console.error("Location permission denied");
-                return;
-              }
-            }
-
-            position = await Geolocation.getCurrentPosition({
-              enableHighAccuracy: true,
-              timeout: 10000,
-            });
-          } else {
-            // Web fallback
-            position = await new Promise<WebGeolocationPosition>(
-              (resolve, reject) => {
-                navigator.geolocation.getCurrentPosition(
-                  (pos) =>
-                    resolve({
-                      coords: {
-                        latitude: pos.coords.latitude,
-                        longitude: pos.coords.longitude,
-                        accuracy: pos.coords.accuracy,
-                        altitudeAccuracy: pos.coords.altitudeAccuracy,
-                        altitude: pos.coords.altitude,
-                        speed: pos.coords.speed,
-                        heading: pos.coords.heading,
-                      },
-                      timestamp: pos.timestamp,
-                    }),
-                  reject,
-                  {
-                    enableHighAccuracy: true,
-                    timeout: 10000,
-                  }
-                );
-              }
-            );
-          }
-
-          if (mapRef && mapRef.current) {
-            const { latitude, longitude } = position.coords;
-            if (latitude < -90 || latitude > 90) {
-              return;
-            }
-
-            mapRef.current.flyTo({
-              center: {
-                lat: latitude,
-                lng: longitude,
-              },
-              zoom: 14,
-              essential: true,
-            });
-          }
-        } catch (error) {
-          console.error("Error getting location:", error);
-        }
       }
     },
     [mapRef]
@@ -210,6 +182,20 @@ export default function MapComponent({}: MapComponentProps) {
     }
   }, [mapRef, maxBounds]);
 
+  // Add a new effect to handle flying to selected cafe
+  useEffect(() => {
+    if (selectedCafe && mapRef?.current) {
+      mapRef.current.flyTo({
+        center: {
+          lat: selectedCafe.latitude,
+          lng: selectedCafe.longitude,
+        },
+        zoom: 15,
+        essential: true,
+      });
+    }
+  }, [selectedCafe, mapRef]);
+
   return (
     <Mapgl
       id="test"
@@ -227,7 +213,6 @@ export default function MapComponent({}: MapComponentProps) {
           lat: center.lat,
           long: center.lng,
         });
-        geoControlRef.current?.trigger();
       }}
       onMoveEnd={handleMapMove}
       maxBounds={maxBounds}
@@ -255,14 +240,24 @@ export default function MapComponent({}: MapComponentProps) {
         cafes={mapCafesData?.visibleCafes || []}
       />
 
-      <GeolocateControl
-        ref={geoControlRef as any}
-        positionOptions={{
-          enableHighAccuracy: true,
-        }}
-        onGeolocate={handleGeolocate}
-        onOutOfMaxBounds={handleOutOfMaxBounds}
-      />
+      {"Capacitor" in window ? (
+        <button
+          className="absolute bottom-12 right-4 z-[1000] bg-white dark:bg-slate-500 p-3.5 rounded-full shadow-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          onClick={handleCapacitorLocation}
+          aria-label="Get Location"
+        >
+          <Navigation className="w-7 h-7" />
+        </button>
+      ) : (
+        <GeolocateControl
+          ref={geoControlRef as any}
+          positionOptions={{
+            enableHighAccuracy: true,
+          }}
+          onGeolocate={handleGeolocate}
+          onOutOfMaxBounds={handleOutOfMaxBounds}
+        />
+      )}
     </Mapgl>
   );
 }

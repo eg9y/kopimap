@@ -29,6 +29,9 @@ dependencies:
   '@capacitor/ios':
     specifier: ^6.1.1
     version: 6.1.1(@capacitor/core@6.1.1)
+  '@capacitor/keyboard':
+    specifier: ^6.0.3
+    version: 6.0.3(@capacitor/core@6.1.1)
   '@capacitor/live-updates':
     specifier: ^0.3.1
     version: 0.3.1(@capacitor/core@6.1.1)
@@ -744,6 +747,14 @@ packages:
     resolution: {integrity: sha512-he6+Fhj6x1dSnOzM98xaPvioOU8MNO+qpodCJwnHE3mIRonTpFutXJK8DP8fnNhjDPk2km9VafLSfOeiZXNv3Q==}
     peerDependencies:
       '@capacitor/core': ^6.1.0
+    dependencies:
+      '@capacitor/core': 6.1.1
+    dev: false
+
+  /@capacitor/keyboard@6.0.3(@capacitor/core@6.1.1):
+    resolution: {integrity: sha512-V/mURxBI68HvClYjrGBlOriWkwYN7r+cWid/igJz/3scNc/V81DgQ9fpoLr4W0I5NY7YxOesjIJLuLO+LT18mQ==}
+    peerDependencies:
+      '@capacitor/core': ^6.0.0
     dependencies:
       '@capacitor/core': 6.1.1
     dev: false

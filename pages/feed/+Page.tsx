@@ -71,7 +71,7 @@ export default function Feed() {
   if (error) return <div>Error: {error.message}</div>;
 
   return (
-    <div className="flex flex-col h-full overflow-hidden pt-[var(--safe-area-top)]">
+    <div className="flex flex-col h-full overflow-hidden">
       <div className="px-6 py-4 gap-4 flex-shrink-0">
         <div className="flex items-center gap-1">
           <img

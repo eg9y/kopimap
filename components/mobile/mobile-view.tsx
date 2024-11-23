@@ -166,12 +166,12 @@ export default function MobileView({
   return (
     <>
       {/* Map container that covers full screen including safe areas */}
-      <div className="absolute inset-0 bottom-[calc(56px+var(--safe-area-bottom))] z-[1000]">
+      <div className="absolute inset-0 bottom-[56px] z-[1000]">
         {!pmTilesReady && <MapLoader />}
         {pmTilesReady && <MapComponent />}
       </div>
       {/* UI Layer that respects safe areas */}
-      <div className="absolute inset-0 pt-[var(--safe-area-top)] pb-[calc(56px+var(--safe-area-bottom))] flex flex-col pointer-events-none">
+      <div className="absolute inset-0 pt-[var(--safe-area-top)] pb-[56px] flex flex-col pointer-events-none">
         {/* Search and filters container */}
         <div className="px-4 z-[1000]">
           <div
@@ -241,7 +241,7 @@ export default function MobileView({
                 snapPoints={[height - 80 - 130, 200]}
                 initialSnap={0}
                 onSnap={handleSnap}
-                className="!bottom-[calc(56px+var(--safe-area-bottom))] pointer-events-auto"
+                className="!bottom-[56px] pointer-events-auto"
               >
                 <Sheet.Container className="!bg-white dark:!bg-gray-800">
                   <Sheet.Content
@@ -274,7 +274,7 @@ export default function MobileView({
                 </Sheet.Container>
                 <Sheet.Backdrop />
               </Sheet>
-              <div className="fixed left-0 right-0 bottom-[calc(76px+var(--safe-area-bottom))] z-[10000000] flex justify-center pointer-events-auto">
+              <div className="fixed left-0 right-0 bottom-[76px] z-[10000000] flex justify-center pointer-events-auto">
                 <button
                   onClick={handleBackToList}
                   className="px-4 py-2 border drop-shadow-lg border-yellow-500 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-slate-300 rounded-full shadow-md transition-all duration-200 ease-in-out flex items-center justify-center space-x-2 font-bold"
@@ -331,7 +331,7 @@ export default function MobileView({
           )}
         </div>
         {/* Floating buttons container - update z-index */}
-        <div className="absolute bottom-[calc(76px+var(--safe-area-bottom))] left-0 right-0 flex justify-center pointer-events-auto">
+        <div className="absolute bottom-[76px] left-0 right-0 flex justify-center pointer-events-auto">
           <button
             onClick={() => setIsListDialogOpen(!isListDialogOpen)}
             className="px-4 py-2 drop-shadow-lg border border-yellow-500 z-[1000] bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-slate-300 font-bold rounded-full shadow-md transition-all duration-200 ease-in-out flex items-center justify-center space-x-2"

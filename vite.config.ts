@@ -21,6 +21,7 @@ export default defineConfig({
 				"@capacitor/status-bar",
 				"@capacitor/live-updates",
 				"capacitor-plugin-safe-area",
+				"@capacitor/keyboard",
 			],
 		},
 	},

@@ -29,9 +29,14 @@ export default function LayoutDefault({
         if (isCapacitor) {
           const { Capacitor } = await import("@capacitor/core");
           const isNative = Capacitor.isNativePlatform();
-
+          
           if (isNative) {
             const { SafeArea } = await import("capacitor-plugin-safe-area");
+            const { Keyboard, KeyboardResize } = await import("@capacitor/keyboard");
+
+            // Set the keyboard resize mode to 'none' to prevent WebView resizing
+            await Keyboard.setResizeMode({ mode: KeyboardResize.None });
+
             const safeArea = await SafeArea.getSafeAreaInsets();
             
             document.documentElement.style.setProperty(
@@ -79,7 +84,7 @@ export default function LayoutDefault({
           <div
             className={`flex flex-col h-[100dvh] relative ${
               !isMobile
-                ? "pt-[var(--safe-area-top)] pb-[var(--safe-area-bottom)] pl-[var(--safe-area-left)] pr-[var(--safe-area-right)]"
+                ? "pt-[var(--safe-area-top)] pl-[var(--safe-area-left)] pr-[var(--safe-area-right)]"
                 : ""
             }`}
           >

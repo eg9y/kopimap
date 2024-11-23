@@ -19,7 +19,6 @@ import { Avatar } from "../catalyst/avatar";
 import { LanguageSwitcher } from "../language-switcher";
 import { ThemeToggle } from "../theme-toggle";
 
-
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
   import.meta.env.VITE_SUPABASE_ANON_KEY
@@ -40,8 +39,8 @@ export const MobileToolbar: React.FC = () => {
   useEffect(() => {
     const setupAppUrlListener = async () => {
       // Check if we're in a Capacitor environment
-      const isCapacitor = 'Capacitor' in window;
-      
+      const isCapacitor = "Capacitor" in window;
+
       if (!isCapacitor) {
         console.log("Not in Capacitor environment");
         return;
@@ -49,8 +48,8 @@ export const MobileToolbar: React.FC = () => {
 
       try {
         console.log("Setting up App URL listener");
-        const { App } = await import('@capacitor/app');
-        
+        const { App } = await import("@capacitor/app");
+
         const listener = await App.addListener(
           "appUrlOpen",
           async ({ url }) => {
@@ -58,7 +57,7 @@ export const MobileToolbar: React.FC = () => {
 
             if (url.startsWith("kopimap://login-callback")) {
               // Dynamically import Browser when needed
-              const { Browser } = await import('@capacitor/browser');
+              const { Browser } = await import("@capacitor/browser");
               if (Browser) {
                 await Browser.close();
               }
@@ -104,7 +103,7 @@ export const MobileToolbar: React.FC = () => {
   }, []);
 
   const handleSignIn = async () => {
-    const isCapacitor = 'Capacitor' in window;
+    const isCapacitor = "Capacitor" in window;
     const redirectTo = isCapacitor
       ? "kopimap://login-callback"
       : import.meta.env.VITE_URL;
@@ -126,7 +125,7 @@ export const MobileToolbar: React.FC = () => {
     // Handle browser opening
     if (isCapacitor && data.url) {
       try {
-        const { Browser } = await import('@capacitor/browser');
+        const { Browser } = await import("@capacitor/browser");
         await Browser.open({
           url: data.url,
           presentationStyle: "popover",
@@ -162,7 +161,7 @@ export const MobileToolbar: React.FC = () => {
   return (
     <>
       <Sheet
-        className="w-full z-[1000]"
+        className="w-full z-[1000] pb-[56px]"
         opened={isUserSheetOpen}
         onBackdropClick={() => setIsUserSheetOpen(false)}
       >
@@ -204,7 +203,7 @@ export const MobileToolbar: React.FC = () => {
         </Block>
       </Sheet>
       {!openSubmitReviewDialog && (
-        <Tabbar className="fixed bottom-[var(--safe-area-bottom)] left-0 right-0 !z-[1000] bg-white dark:bg-black">
+        <Tabbar className="fixed bottom-0 left-0 right-0 !z-[1000] bg-white dark:bg-black">
           <TabbarLink
             active={isActive("/feed")}
             onClick={async () => {
