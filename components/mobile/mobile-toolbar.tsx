@@ -18,8 +18,6 @@ import { useStore } from "../../store";
 import { Avatar } from "../catalyst/avatar";
 import { LanguageSwitcher } from "../language-switcher";
 import { ThemeToggle } from "../theme-toggle";
-import { App as CapacitorApp } from '@capacitor/app';
-import { Browser as CapacitorBrowser } from '@capacitor/browser';
 
 
 const supabase = createClient(
@@ -44,22 +42,25 @@ export const MobileToolbar: React.FC = () => {
       // Check if we're in a Capacitor environment
       const isCapacitor = 'Capacitor' in window;
       
-      if (!isCapacitor || !CapacitorApp) {
-        console.log("Not in Capacitor environment or App not available");
+      if (!isCapacitor) {
+        console.log("Not in Capacitor environment");
         return;
       }
 
       try {
         console.log("Setting up App URL listener");
-        const listener = await CapacitorApp.addListener(
+        const { App } = await import('@capacitor/app');
+        
+        const listener = await App.addListener(
           "appUrlOpen",
           async ({ url }) => {
             console.log("App URL Opened:", url);
 
             if (url.startsWith("kopimap://login-callback")) {
-              // Check if Browser is available
-              if (isCapacitor && CapacitorBrowser) {
-                await CapacitorBrowser.close();
+              // Dynamically import Browser when needed
+              const { Browser } = await import('@capacitor/browser');
+              if (Browser) {
+                await Browser.close();
               }
 
               // Extract the fragment part of the URL (after the #)
@@ -123,9 +124,10 @@ export const MobileToolbar: React.FC = () => {
     }
 
     // Handle browser opening
-    if (isCapacitor && CapacitorBrowser && data.url) {
+    if (isCapacitor && data.url) {
       try {
-        await CapacitorBrowser.open({
+        const { Browser } = await import('@capacitor/browser');
+        await Browser.open({
           url: data.url,
           presentationStyle: "popover",
         });

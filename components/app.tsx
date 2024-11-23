@@ -4,8 +4,6 @@ import { Suspense, lazy, useEffect, useState } from "react";
 import { useMedia, useIsomorphicLayoutEffect } from "react-use";
 import { Toaster } from "sonner";
 import { useData } from "vike-react/useData";
-import { StatusBar, Style } from "@capacitor/status-bar";
-import { Capacitor } from "@capacitor/core";
 import ky from "ky";
 
 import "@smastrom/react-rating/style.css";
@@ -66,12 +64,14 @@ export const App = () => {
       const isCapacitor = "Capacitor" in window;
       if (!isCapacitor) return;
 
-      const isAndroid = Capacitor.getPlatform() === "android";
-      const isNative = Capacitor.isNativePlatform();
-
-      if (isAndroid || !isNative) return;
-
       try {
+        const { Capacitor } = await import("@capacitor/core");
+        const { StatusBar, Style } = await import("@capacitor/status-bar");
+
+        const isNative = Capacitor.isNativePlatform();
+
+        if (!isNative) return;
+
         await StatusBar.setStyle({ style: Style.Dark });
         await StatusBar.setOverlaysWebView({ overlay: false });
       } catch (error) {

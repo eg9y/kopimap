@@ -13,7 +13,6 @@ import { useTheme } from "./theme-provider";
 import "maplibre-gl/dist/maplibre-gl.css";
 import type { LngLatBoundsLike } from "react-map-gl";
 import { GeolocateResultEvent } from "react-map-gl/dist/esm/types";
-import { Geolocation, Position } from '@capacitor/geolocation';
 
 interface MapComponentProps {}
 
@@ -84,10 +83,15 @@ export default function MapComponent({}: MapComponentProps) {
         });
       } else {
         try {
-          const isCapacitor = 'Capacitor' in window;
-          
-          let position: Position | WebGeolocationPosition;
+          const isCapacitor = "Capacitor" in window;
+
+          const { Geolocation } = await import(
+            "@capacitor/geolocation"
+          );
+          let position: any | WebGeolocationPosition;
           if (isCapacitor) {
+            // Dynamically import Geolocation
+
             // Check permissions first
             const permissionStatus = await Geolocation.checkPermissions();
 
@@ -105,27 +109,30 @@ export default function MapComponent({}: MapComponentProps) {
             });
           } else {
             // Web fallback
-            position = await new Promise<WebGeolocationPosition>((resolve, reject) => {
-              navigator.geolocation.getCurrentPosition(
-                (pos) => resolve({
-                  coords: {
-                    latitude: pos.coords.latitude,
-                    longitude: pos.coords.longitude,
-                    accuracy: pos.coords.accuracy,
-                    altitudeAccuracy: pos.coords.altitudeAccuracy,
-                    altitude: pos.coords.altitude,
-                    speed: pos.coords.speed,
-                    heading: pos.coords.heading,
-                  },
-                  timestamp: pos.timestamp,
-                }),
-                reject,
-                {
-                  enableHighAccuracy: true,
-                  timeout: 10000,
-                }
-              );
-            });
+            position = await new Promise<WebGeolocationPosition>(
+              (resolve, reject) => {
+                navigator.geolocation.getCurrentPosition(
+                  (pos) =>
+                    resolve({
+                      coords: {
+                        latitude: pos.coords.latitude,
+                        longitude: pos.coords.longitude,
+                        accuracy: pos.coords.accuracy,
+                        altitudeAccuracy: pos.coords.altitudeAccuracy,
+                        altitude: pos.coords.altitude,
+                        speed: pos.coords.speed,
+                        heading: pos.coords.heading,
+                      },
+                      timestamp: pos.timestamp,
+                    }),
+                  reject,
+                  {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                  }
+                );
+              }
+            );
           }
 
           if (mapRef && mapRef.current) {

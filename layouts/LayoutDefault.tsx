@@ -3,8 +3,6 @@ import React, { useEffect } from "react";
 import "./style.css";
 import "./tailwind.css";
 import { useWindowSize } from "react-use";
-import { Capacitor } from "@capacitor/core";
-import { SafeArea as NativeSafeArea } from "capacitor-plugin-safe-area";
 
 import { MobileToolbar } from "@/components/mobile/mobile-toolbar";
 import { LocaleContext } from "@/components/locale-context";
@@ -26,48 +24,49 @@ export default function LayoutDefault({
   useEffect(() => {
     const initSafeArea = async () => {
       const isCapacitor = "Capacitor" in window;
-      const isNative = isCapacitor && Capacitor.isNativePlatform();
-
+      
       try {
-        if (isNative) {
-          const safeArea = await NativeSafeArea.getSafeAreaInsets();
-          document.documentElement.style.setProperty(
-            "--safe-area-top",
-            `${safeArea.insets.top}px`
-          );
-          document.documentElement.style.setProperty(
-            "--safe-area-bottom",
-            `${safeArea.insets.bottom}px`
-          );
-          document.documentElement.style.setProperty(
-            "--safe-area-left",
-            `${safeArea.insets.left}px`
-          );
-          document.documentElement.style.setProperty(
-            "--safe-area-right",
-            `${safeArea.insets.right}px`
-          );
+        if (isCapacitor) {
+          const { Capacitor } = await import("@capacitor/core");
+          const isNative = Capacitor.isNativePlatform();
+
+          if (isNative) {
+            const { SafeArea } = await import("capacitor-plugin-safe-area");
+            const safeArea = await SafeArea.getSafeAreaInsets();
+            
+            document.documentElement.style.setProperty(
+              "--safe-area-top",
+              `${safeArea.insets.top}px`
+            );
+            document.documentElement.style.setProperty(
+              "--safe-area-bottom",
+              `${safeArea.insets.bottom}px`
+            );
+            document.documentElement.style.setProperty(
+              "--safe-area-left",
+              `${safeArea.insets.left}px`
+            );
+            document.documentElement.style.setProperty(
+              "--safe-area-right",
+              `${safeArea.insets.right}px`
+            );
+          } else {
+            setWebDefaults();
+          }
         } else {
-          // Web defaults
-          document.documentElement.style.setProperty("--safe-area-top", "1rem");
-          document.documentElement.style.setProperty(
-            "--safe-area-bottom",
-            "0px"
-          );
-          document.documentElement.style.setProperty("--safe-area-left", "0px");
-          document.documentElement.style.setProperty(
-            "--safe-area-right",
-            "0px"
-          );
+          setWebDefaults();
         }
       } catch (error) {
         console.error("Error setting safe area:", error);
-        // Set fallback values
-        document.documentElement.style.setProperty("--safe-area-top", "1rem");
-        document.documentElement.style.setProperty("--safe-area-bottom", "0px");
-        document.documentElement.style.setProperty("--safe-area-left", "0px");
-        document.documentElement.style.setProperty("--safe-area-right", "0px");
+        setWebDefaults();
       }
+    };
+
+    const setWebDefaults = () => {
+      document.documentElement.style.setProperty("--safe-area-top", "1rem");
+      document.documentElement.style.setProperty("--safe-area-bottom", "0px");
+      document.documentElement.style.setProperty("--safe-area-left", "0px");
+      document.documentElement.style.setProperty("--safe-area-right", "0px");
     };
 
     initSafeArea();
