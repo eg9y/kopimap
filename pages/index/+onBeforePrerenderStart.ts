@@ -50,7 +50,7 @@ export const onBeforePrerenderStart: OnBeforePrerenderStartAsync =
 		while (hasMore) {
 			try {
 				const response = await fetch(
-					`${import.meta.env.VITE_BACKEND_URL}/api/cafe-list?lastId=${lastId}&limit=${BATCH_SIZE}`,
+					`${process.env.VITE_BACKEND_URL}/api/cafe-list?lastId=${lastId}&limit=${BATCH_SIZE}`,
 				);
 
 				if (!response.ok) {
