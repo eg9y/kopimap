@@ -48,27 +48,27 @@ export const onBeforePrerenderStart: OnBeforePrerenderStartAsync =
 		let lastId = 0;
 
 		while (hasMore) {
-			const { data: cafes, error } = await supabase
-				.from("cafe_location_view")
-				.select(
-					"id, name, place_id, all_image_urls, gmaps_featured_image, website, phone",
-				)
-				.order("id", { ascending: true })
-				.gt("id", lastId)
-				.limit(BATCH_SIZE);
+			try {
+				const response = await fetch(
+					`${import.meta.env.VITE_BACKEND_URL}/api/cafe-list?lastId=${lastId}&limit=${BATCH_SIZE}`,
+				);
 
-			if (error) {
+				if (!response.ok) {
+					throw new Error("Failed to fetch cafe list");
+				}
+
+				const cafes = await response.json();
+
+				if (cafes.length > 0) {
+					allCafes = [...allCafes, ...cafes];
+					lastId = cafes[cafes.length - 1].id!;
+				}
+
+				hasMore = cafes.length === BATCH_SIZE;
+			} catch (error) {
 				console.error("Error fetching cafes:", error);
 				return [];
 			}
-
-			if (cafes.length > 0) {
-				allCafes = [...allCafes, ...cafes];
-				lastId = cafes[cafes.length - 1].id!;
-			}
-
-			hasMore = cafes.length === BATCH_SIZE;
-			break;
 		}
 
 		const urls: { url: string; pageContext: any }[] = [];
