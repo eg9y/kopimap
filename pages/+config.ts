@@ -5,8 +5,8 @@ import Layout from "../layouts/LayoutDefault.js";
 
 // Default config (can be overridden by pages)
 export default {
-  Layout,
-  Head,
-  extends: vikeReact,
-  ssr: false,
+	Layout,
+	Head,
+	extends: vikeReact,
+	ssr: true,
 } satisfies Config;

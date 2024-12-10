@@ -1,15 +1,15 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import React, { useEffect } from "react";
+import { useWindowSize } from "react-use";
+import { clientOnly } from "vike-react/clientOnly";
+
 import "./style.css";
 import "./tailwind.css";
-import { useWindowSize } from "react-use";
 
 import { MobileToolbar } from "@/components/mobile/mobile-toolbar";
 import { LocaleContext } from "@/components/locale-context";
 import { UsernamePrompt } from "@/components/username-prompt";
-import { WelcomeModal } from "@/components/welcome-modal";
 import { NavbarContainer } from "@/components/navbar-container";
-import { ThemeProvider } from "@/components/theme-provider";
 
 const queryClient = new QueryClient();
 
@@ -21,24 +21,33 @@ export default function LayoutDefault({
   const { width } = useWindowSize();
   const isMobile = width < 768;
 
+  const WelcomeModal = clientOnly(() =>
+    import("@/components/welcome-modal").then((m) => m.WelcomeModal)
+  );
+  const ThemeProvider = clientOnly(() =>
+    import("@/components/theme-provider").then((m) => m.ThemeProvider)
+  );
+
   useEffect(() => {
     const initSafeArea = async () => {
       const isCapacitor = "Capacitor" in window;
-      
+
       try {
         if (isCapacitor) {
           const { Capacitor } = await import("@capacitor/core");
           const isNative = Capacitor.isNativePlatform();
-          
+
           if (isNative) {
             const { SafeArea } = await import("capacitor-plugin-safe-area");
-            const { Keyboard, KeyboardResize } = await import("@capacitor/keyboard");
+            const { Keyboard, KeyboardResize } = await import(
+              "@capacitor/keyboard"
+            );
 
             // Set the keyboard resize mode to 'none' to prevent WebView resizing
             await Keyboard.setResizeMode({ mode: KeyboardResize.None });
 
             const safeArea = await SafeArea.getSafeAreaInsets();
-            
+
             document.documentElement.style.setProperty(
               "--safe-area-top",
               `${safeArea.insets.top}px`

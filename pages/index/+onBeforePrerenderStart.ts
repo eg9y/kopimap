@@ -10,7 +10,7 @@ const supabase = createClient<Database>(
 	import.meta.env.VITE_SUPABASE_ANON_KEY,
 );
 
-const BATCH_SIZE = 1000;
+const BATCH_SIZE = 10000;
 
 // Replace the createSlug function with this:
 function createSlug(name: string): string {
@@ -46,9 +46,11 @@ export const onBeforePrerenderStart: OnBeforePrerenderStartAsync =
 
 		let hasMore = true;
 		let lastId = 0;
+		let totalCafes = 0;
 
 		while (hasMore) {
 			try {
+				console.log(`Fetching cafes after ID ${lastId}...`);
 				const response = await fetch(
 					`https://kopimapsearch.blogstreak.com/api/cafe-list?lastId=${lastId}&limit=${BATCH_SIZE}`,
 				);
@@ -58,18 +60,31 @@ export const onBeforePrerenderStart: OnBeforePrerenderStartAsync =
 				}
 
 				const cafes = await response.json();
+				console.log(`Received ${cafes.length} cafes`);
 
 				if (cafes.length > 0) {
 					allCafes = [...allCafes, ...cafes];
 					lastId = cafes[cafes.length - 1].id!;
+					totalCafes += cafes.length;
 				}
 
 				hasMore = cafes.length === BATCH_SIZE;
+				console.log(
+					`Total cafes processed: ${totalCafes}. Continue? ${hasMore}`,
+				);
+
+				if (!hasMore) {
+					console.log("Finished fetching all cafes");
+				}
 			} catch (error) {
 				console.error("Error fetching cafes:", error);
 				return [];
 			}
+
+			break;
 		}
+
+		console.log(`Processing ${allCafes.length} cafes for URL generation...`);
 
 		const urls: { url: string; pageContext: any }[] = [];
 
@@ -105,6 +120,8 @@ export const onBeforePrerenderStart: OnBeforePrerenderStartAsync =
 				});
 			}
 		}
+
+		console.log("done");
 
 		return urls;
 	};

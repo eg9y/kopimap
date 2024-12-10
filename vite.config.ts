@@ -5,7 +5,7 @@ import vike from "vike/plugin";
 import { defineConfig } from "vite";
 
 export default defineConfig({
-	plugins: [vike({ prerender: true }), react(), pages()],
+	plugins: [vike(), react(), pages()],
 	resolve: {
 		alias: {
 			"@": path.resolve(__dirname, "./"),
