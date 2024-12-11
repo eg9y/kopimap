@@ -1,120 +1,12 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import React, { useEffect } from "react";
-import { useWindowSize } from "react-use";
 import { clientOnly } from "vike-react/clientOnly";
-
-import "./style.css";
-import "./tailwind.css";
-
-import { MobileToolbar } from "@/components/mobile/mobile-toolbar";
-import { LocaleContext } from "@/components/locale-context";
-import { UsernamePrompt } from "@/components/username-prompt";
-import { NavbarContainer } from "@/components/navbar-container";
-
-const queryClient = new QueryClient();
 
 export default function LayoutDefault({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { width } = useWindowSize();
-  const isMobile = width < 768;
-
-  const WelcomeModal = clientOnly(() =>
-    import("@/components/welcome-modal").then((m) => m.WelcomeModal)
+  const Layout = clientOnly(() =>
+    import("@/components/layout").then((m) => m.Layout)
   );
-  const ThemeProvider = clientOnly(() =>
-    import("@/components/theme-provider").then((m) => m.ThemeProvider)
-  );
-
-  useEffect(() => {
-    const initSafeArea = async () => {
-      const isCapacitor = "Capacitor" in window;
-
-      try {
-        if (isCapacitor) {
-          const { Capacitor } = await import("@capacitor/core");
-          const isNative = Capacitor.isNativePlatform();
-
-          if (isNative) {
-            const { SafeArea } = await import("capacitor-plugin-safe-area");
-            const { Keyboard, KeyboardResize } = await import(
-              "@capacitor/keyboard"
-            );
-
-            // Set the keyboard resize mode to 'none' to prevent WebView resizing
-            await Keyboard.setResizeMode({ mode: KeyboardResize.None });
-
-            const safeArea = await SafeArea.getSafeAreaInsets();
-
-            document.documentElement.style.setProperty(
-              "--safe-area-top",
-              `${safeArea.insets.top}px`
-            );
-            document.documentElement.style.setProperty(
-              "--safe-area-bottom",
-              `${safeArea.insets.bottom}px`
-            );
-            document.documentElement.style.setProperty(
-              "--safe-area-left",
-              `${safeArea.insets.left}px`
-            );
-            document.documentElement.style.setProperty(
-              "--safe-area-right",
-              `${safeArea.insets.right}px`
-            );
-          } else {
-            setWebDefaults();
-          }
-        } else {
-          setWebDefaults();
-        }
-      } catch (error) {
-        console.error("Error setting safe area:", error);
-        setWebDefaults();
-      }
-    };
-
-    const setWebDefaults = () => {
-      document.documentElement.style.setProperty("--safe-area-top", "1rem");
-      document.documentElement.style.setProperty("--safe-area-bottom", "0px");
-      document.documentElement.style.setProperty("--safe-area-left", "0px");
-      document.documentElement.style.setProperty("--safe-area-right", "0px");
-    };
-
-    initSafeArea();
-  }, []);
-
-  return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <LocaleContext>
-          <div
-            className={`flex flex-col h-[100dvh] relative ${
-              !isMobile
-                ? "pt-[var(--safe-area-top)] pl-[var(--safe-area-left)] pr-[var(--safe-area-right)]"
-                : ""
-            }`}
-          >
-            {isMobile && (
-              <div className="fixed bottom-0 left-0 right-0 h-[var(--safe-area-bottom)] bg-black dark:bg-black z-[999]" />
-            )}
-
-            {isMobile && (
-              <main className="grow overflow-y-auto">{children}</main>
-            )}
-            {!isMobile && (
-              <NavbarContainer>
-                <main className="grow overflow-y-auto">{children}</main>
-              </NavbarContainer>
-            )}
-            {isMobile && <MobileToolbar />}
-            <UsernamePrompt />
-            <WelcomeModal />
-          </div>
-        </LocaleContext>
-      </ThemeProvider>
-    </QueryClientProvider>
-  );
+  return <Layout>{children}</Layout>;
 }
